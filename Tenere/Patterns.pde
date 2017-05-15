@@ -110,11 +110,11 @@ public static class Swirl extends LXPattern {
 public static class Rotors extends LXPattern {
   // by Mark C. Slee
   
-  private final SawLFO phi = new SawLFO(0, PI, startModulator(
+  private final SawLFO aziumuth = new SawLFO(0, PI, startModulator(
     new SinLFO(11000, 29000, 33000)
   ));
   
-  private final SawLFO phi2 = new SawLFO(PI, 0, startModulator(
+  private final SawLFO aziumuth2 = new SawLFO(PI, 0, startModulator(
     new SinLFO(23000, 49000, 53000)
   ));
   
@@ -128,15 +128,15 @@ public static class Rotors extends LXPattern {
   
   public Rotors(LX lx) {
     super(lx);
-    startModulator(phi);
-    startModulator(phi2);
+    startModulator(aziumuth);
+    startModulator(aziumuth2);
     startModulator(falloff);
     startModulator(falloff2);
   }
   
   public void run(double deltaMs) {
-    float phi = this.phi.getValuef();
-    float phi2 = this.phi2.getValuef();
+    float aziumuth = this.aziumuth.getValuef();
+    float aziumuth2 = this.aziumuth2.getValuef();
     float falloff = this.falloff.getValuef();
     float falloff2 = this.falloff2.getValuef();
     for (LXPoint p : model.points) {
@@ -144,8 +144,8 @@ public static class Rotors extends LXPattern {
       float fv = falloff * yn;
       float fv2 = falloff2 * yn;
       float b = max(
-        100 - fv * LXUtils.wrapdistf(p.phi, phi, PI),
-        100 - fv2 * LXUtils.wrapdistf(p.phi, phi2, PI)
+        100 - fv * LXUtils.wrapdistf(p.aziumuth, aziumuth, PI),
+        100 - fv2 * LXUtils.wrapdistf(p.aziumuth, aziumuth2, PI)
       );
       if (b > 0) {
         colors[p.index] = palette.getColor(p, b);
@@ -177,8 +177,8 @@ public static class DiamondRain extends LXPattern {
     private final float MAX_LENGTH = 14*FEET;
     
     private final SawLFO yPos = new SawLFO(model.yMax + MAX_LENGTH, model.yMin - MAX_LENGTH, 4000 + Math.random() * 3000);
-    private float phi;
-    private float phiFalloff;
+    private float aziumuth;
+    private float aziumuthFalloff;
     private float yFalloff;
     
     Drop(LX lx) {
@@ -189,8 +189,8 @@ public static class DiamondRain extends LXPattern {
     
     private void init() {
       this.yPos.setPeriod(2500 + Math.random() * 11000);
-      phi = (float) Math.random() * TWO_PI;
-      phiFalloff = 140 + 340 * (float) Math.random();
+      aziumuth = (float) Math.random() * TWO_PI;
+      aziumuthFalloff = 140 + 340 * (float) Math.random();
       yFalloff = 100 / (2*FEET + 12*FEET * (float) Math.random());
     }
     
@@ -201,8 +201,8 @@ public static class DiamondRain extends LXPattern {
       }
       for (LXPoint p : model.points) {
         float yDist = abs(p.y - yPos);
-        float phiDist = abs(p.phi - phi); 
-        float b = 100 - yFalloff*yDist - phiFalloff*phiDist;
+        float aziumuthDist = abs(p.aziumuth - aziumuth); 
+        float b = 100 - yFalloff*yDist - aziumuthFalloff*aziumuthDist;
         if (b > 0) {
           addColor(p.index, palette.getColor(p, b));
         }
