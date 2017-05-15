@@ -15,9 +15,6 @@ LXModel tree;
 
 PApplet applet = Tenere.this;
 
-
-
-
 // Processing's main invocation, build our model and set up LX
 void setup() {
   size(1200, 960, P3D);
@@ -28,7 +25,6 @@ void setup() {
         lx.registerEffect(BlurEffect.class);
         lx.registerEffect(DesaturationEffect.class);
         // TODO: the UDP output instantiation will go in here!
-      //  lx.flags.showFramerate=true;
       }
       
       public void onUIReady(LXStudio lx, LXStudio.UI ui) {
