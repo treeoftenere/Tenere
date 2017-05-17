@@ -2,12 +2,14 @@ import heronarts.lx.model.*;
 import java.util.Collections;
 import java.util.List;
 
-LXModel buildTree() {
-  return new Hemisphere();
+Tree buildTree() {
+  return new Tree();
 }
 
-// Cheap mockup of the tree canopy until we get a better model
-// based upon actual mechanical drawings and fabricated dimensions
+// Cheap mockup of a tree canopy until we get a better model
+// based upon actual mechanical drawings and fabricated dimensions.
+// This one just estimates a cloud of points distributed across
+// a hemisphere.
 public static class Hemisphere extends LXModel {
   
   public static final float NUM_POINTS = 25000;
@@ -45,6 +47,8 @@ public static class Tree extends LXModel {
   public static final int NUM_LIMBS = 12;
   
   public final List<Limb> limbs;
+  public final List<Branch> branches;
+  public final List<Leaf> leaves;
   
   public Tree() {
     this(new LXTransform());
@@ -54,24 +58,62 @@ public static class Tree extends LXModel {
     super(new Fixture(t));
     Fixture f = (Fixture) this.fixtures.get(0);
     this.limbs = Collections.unmodifiableList(f.limbs);
+    this.branches = Collections.unmodifiableList(f.branches);
+    
+    // Collect up all the leaves for top-level reference
+    final List<Leaf> leaves = new ArrayList<Leaf>();
+    for (Branch branch : this.branches) {
+      for (LeafAssemblage assemblage : branch.assemblages) {
+        for (Leaf leaf : assemblage.leaves) {
+          leaves.add(leaf);
+        }
+      }
+    }
+    this.leaves = Collections.unmodifiableList(leaves);
+  }
+  
+  public static class BranchPosition {
+    
+    public final float azimuth;
+    public final float elevation;
+    public final float radius;
+    public final float tilt;
+    
+    public BranchPosition(float azimuth, float elevation, float radius) {
+      this.azimuth = azimuth;
+      this.elevation = elevation;
+      this.radius = radius;
+      this.tilt = TWO_PI * (float) Math.random();
+    }
   }
 
   private static class Fixture extends LXAbstractFixture {
     
     private final List<Limb> limbs = new ArrayList<Limb>();
+    private final List<Branch> branches = new ArrayList<Branch>();
     
     Fixture(LXTransform t) {
-      t.translate(0, LIMB_HEIGHT, 0);
-      for (int i = 0; i < NUM_LIMBS; ++i) {
-        t.push();
-        t.rotateX(HALF_PI * i / NUM_LIMBS);
-        Limb limb = new Limb(t);
-        this.limbs.add(limb);
-        addPoints(limb);
-        t.pop();
-        t.rotateY(TWO_PI / 5);
-        
+      // addBranch(t, new BranchPosition(QUARTER_PI, QUARTER_PI, 12*FEET));
+      for (int ai = 0; ai < 14; ++ai) {
+        for (int ei = 0; ei < 14; ++ ei) {
+          float azimuth = (ai + (ei % 2) * .5) * TWO_PI / 13;
+          float elevation = ei * HALF_PI / 13;
+          float radius = 12*FEET;
+          addBranch(t, new BranchPosition(azimuth, elevation, radius));
+        }
       }
+    }
+    
+    private void addBranch(LXTransform t, BranchPosition position) {
+      t.push();
+      t.rotateY(position.azimuth);
+      t.rotateZ(HALF_PI-position.elevation);
+      t.translate(0, position.radius, 0);
+      t.rotateY(position.tilt);
+      Branch branch = new Branch(t, position);
+      this.branches.add(branch);
+      addPoints(branch);
+      t.pop();
     }
   }
 }
@@ -127,32 +169,82 @@ public static class Limb extends LXModel {
  */
 public static class Branch extends LXModel {
   public static final int NUM_ASSEMBLAGES = 8;
-  public static final float ASSEMBLAGE_RADIUS = 1*FEET;
-  
   public static final float LENGTH = 6*FEET;
   public static final float WIDTH = 7*FEET;
-  public static final float DEPTH = 1*FEET;
   
+  public final List<LeafAssemblage> assemblages;
+  public final float x;
+  public final float y;
+  public final float z;
+  public final Tree.BranchPosition position;
+  
+  public static class AssemblagePosition {
+    public final float x;
+    public final float y;
+    public final float theta;
+    public final float tilt;
+    
+    AssemblagePosition(float x, float y, float theta) {
+      this.x = x;
+      this.y = y;
+      this.theta = theta;
+      this.tilt = -QUARTER_PI + HALF_PI * (float) Math.random();
+    }
+  }
+  
+  private static final float RIGHT_THETA = QUARTER_PI;
+  private static final float LEFT_THETA = -QUARTER_PI;
+  
+  private static final float RIGHT_OFFSET = 12*IN;
+  private static final float LEFT_OFFSET = -12*IN;
+  
+  // Assemblage positions are relative to an assemblage
+  // facing upwards. Each leaf assemblage 
+  public static final AssemblagePosition[] ASSEMBLAGE_POSITIONS = {
+    // Right side bottom to top
+    new AssemblagePosition(RIGHT_OFFSET, 2*IN, RIGHT_THETA),
+    new AssemblagePosition(RIGHT_OFFSET, 14*IN, RIGHT_THETA),
+    new AssemblagePosition(RIGHT_OFFSET, 26*IN, RIGHT_THETA),
+    new AssemblagePosition(RIGHT_OFFSET, 38*IN, RIGHT_THETA),
+    
+    // End node
+    new AssemblagePosition(0, 44*IN, 0),
+    
+    // Left side top to bottom
+    new AssemblagePosition(LEFT_OFFSET, 32*IN, LEFT_THETA),
+    new AssemblagePosition(LEFT_OFFSET, 20*IN, LEFT_THETA),
+    new AssemblagePosition(LEFT_OFFSET, 8*IN, LEFT_THETA)
+  };
+    
   public Branch(LXTransform t) {
+    this(t, new Tree.BranchPosition(0, 0, 0));
+  }
+    
+  public Branch(LXTransform t, Tree.BranchPosition position) {
     super(new Fixture(t));
+    this.x = t.x();
+    this.y = t.y();
+    this.z = t.z();
+    this.position = position;
+    Fixture f = (Fixture) this.fixtures.get(0);
+    this.assemblages = Collections.unmodifiableList(f.assemblages);
   }
   
   private static class Fixture extends LXAbstractFixture {
     
-    private final List<Assemblage> assemblages = new ArrayList<Assemblage>();
+    private final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     
     Fixture(LXTransform t) {
-      t.push();
-      t.rotateY(-HALF_PI);
-      for (int i = 0; i < NUM_ASSEMBLAGES; ++i) {
-        t.translate(0, 0, ASSEMBLAGE_RADIUS);
-        Assemblage assemblage = new Assemblage(t);
-        assemblages.add(assemblage);
-        addPoints(assemblage);
-        t.translate(0, 0, -ASSEMBLAGE_RADIUS); 
-        t.rotateY(PI / NUM_ASSEMBLAGES);
+      for (AssemblagePosition position : ASSEMBLAGE_POSITIONS) {
+        t.push();
+        t.translate(position.x, position.y, 0);
+        t.rotateZ(position.theta);
+        t.rotateY(position.tilt);
+        LeafAssemblage leafAssemblage = new LeafAssemblage(t, position);
+        this.assemblages.add(leafAssemblage);
+        addPoints(leafAssemblage);
+        t.pop();
       }
-      t.pop();
     }
   }
 }
@@ -160,46 +252,74 @@ public static class Branch extends LXModel {
 /**
  * An assemblage is a modular fixture with multiple leaves.
  */
-public static class Assemblage extends LXModel {
+public static class LeafAssemblage extends LXModel {
   
   public static final int NUM_LEAVES = 15;
 
-  // x, y, z offset of leaf relative to assemablage base,
-  // looking "down" the assemblage goes into the z-axis
-  // x axis is left-right offset and y-axis is vertical 
-  // TODO(add rotation for geometrically accurate leaves?)  
-  public static final PVector[] LEAF_POSITIONS = {    
-    new PVector(-4,  0,  0), // 1 - wide leaves at the base
-    new PVector( 4,  0,  1), // 2 - wide leaves at the base
-    new PVector(-3,  1,  3), // 3
-    new PVector( 3, -1,  4), // 4
-    new PVector(-3,  0,  6), // 5
-    new PVector( 3,  1,  7), // 6
-    new PVector(-2,  0,  9), // 7
-    new PVector( 2, -1, 10), // 8
-    new PVector(-2,  0, 12), // 9
-    new PVector( 2,  1, 13), // 10
-    new PVector(-1,  1, 15), // 11
-    new PVector( 1, -1, 16), // 12
-    new PVector(-1,  0, 18), // 13
-    new PVector( 1, -1, 19), // 14
-    new PVector( 0,  0, 23), // 15 - pointing leaf at the tip
-  };
+  public static class LeafPosition {
+    public final float x;
+    public final float y;
+    public final float theta;
+    public final float tilt;
+    
+    LeafPosition(float x, float y, float theta) {
+      this.x = x;
+      this.y = y;
+      this.theta = theta;
+      this.tilt = -QUARTER_PI + HALF_PI * (float) Math.random();
+    }
+  }
 
+  // These positions indicate how a leaf is positioned on an assemblage,
+  // assuming the assemblage is facing "up", the main stem is at (0, 0)
+  // Positive x-values move to the right, and positive y-values move
+  // up the branch, away from the base stem.
+  //
+  // Third argument is the rotation of the leaf on the x-y plane, 0
+  // is the leaf pointing "up", HALF_PI is pointing to the right,
+  // -HALF_PI is pointing to the left, etc.
+  public static final LeafPosition[] LEAF_POSITIONS = {    
+    new LeafPosition( 6.4*IN,  8.8*IN, HALF_PI + QUARTER_PI), // A
+    new LeafPosition( 6.9*IN, 10.0*IN, HALF_PI), // B
+    new LeafPosition(10.4*IN, 14.7*IN, HALF_PI + .318), // C
+    new LeafPosition(10.0*IN, 16.1*IN, .900), // D
+    new LeafPosition( 1.2*IN, 13.9*IN, 1.08), // E
+    new LeafPosition( 3.5*IN, 22.2*IN, HALF_PI + .2), // F
+    new LeafPosition( 2.9*IN, 23.3*IN, .828), // G
+    new LeafPosition( 0.0*IN, 23.9*IN, 0), // H
+    null, // I
+    null, // J
+    null, // K
+    null, // L
+    null, // M
+    null, // N
+    null, // O
+  };
+  
   static {
     // Make sure we didn't bork that array editing manually!
     assert(LEAF_POSITIONS.length == NUM_LEAVES);
+    
+    // The last seven leaves are just inverse of the first about
+    // the y-axis.
+    for (int i = 0; i < 7; ++i) {
+      LeafPosition thisLeaf = LEAF_POSITIONS[i];
+      LEAF_POSITIONS[LEAF_POSITIONS.length - 1 - i] =
+        new LeafPosition(-thisLeaf.x, thisLeaf.y, -thisLeaf.theta);
+    }
   }
   
-  public static final float LENGTH = 28*INCHES;
-  public static final float WIDTH = 28*INCHES;
+  public static final float LENGTH = 28*IN;
+  public static final float WIDTH = 28*IN;
   
+  public final Branch.AssemblagePosition position;
   public final List<Leaf> leaves;
   
-  public Assemblage(LXTransform t) {
+  public LeafAssemblage(LXTransform t, Branch.AssemblagePosition position) {
     super(new Fixture(t));
     Fixture f = (Fixture) this.fixtures.get(0);
     this.leaves = Collections.unmodifiableList(f.leaves);
+    this.position = position;
   }
   
   private static class Fixture extends LXAbstractFixture {
@@ -208,13 +328,16 @@ public static class Assemblage extends LXModel {
     
     Fixture(LXTransform t) {
       for (int i = 0; i < NUM_LEAVES; ++i) {
-        PVector leafPosition = LEAF_POSITIONS[i];
-        t.translate(leafPosition.x*INCHES, leafPosition.y*INCHES, leafPosition.z*INCHES);
-        Leaf leaf = new Leaf(t);
+        LeafPosition leafPosition = LEAF_POSITIONS[i];
+        t.push();
+        t.translate(leafPosition.x, leafPosition.y, 0);
+        t.rotateZ(leafPosition.theta);
+        Leaf leaf = new Leaf(t, leafPosition);
         this.leaves.add(leaf);
         addPoints(leaf);
-        t.translate(-leafPosition.x*INCHES, -leafPosition.y*INCHES, -leafPosition.z*INCHES);
-      }
+        t.pop();
+      } 
+
     }
   }
 }
@@ -225,11 +348,43 @@ public static class Assemblage extends LXModel {
  */
 public static class Leaf extends LXModel {
   public static final int NUM_LEDS = 7;
-  public static final float WIDTH = 5*INCHES; 
-  public static final float LENGTH = 6.5*INCHES;
+  public static final float WIDTH = 5*IN; 
+  public static final float LENGTH = 6.5*IN;
+  
+  public final float x;
+  public final float y;
+  public final float z;
+  
+  public final LXVector[] coords = new LXVector[4];
+  
+  public final LeafAssemblage.LeafPosition position;
+  
+  public Leaf() {
+    this(new LXTransform());
+  }
   
   public Leaf(LXTransform t) {
+    this(t, new LeafAssemblage.LeafPosition(0, 0, 0));
+  }
+  
+  public Leaf(LXTransform t, LeafAssemblage.LeafPosition position) {
     super(new Fixture(t));
+    this.position = position;
+    this.x = t.x();
+    this.y = t.y();
+    this.z = t.z();
+    
+    // Precompute boundary coordinates for faster rendering
+    t.push();
+    t.translate(-WIDTH/2, 0);
+    this.coords[0] = t.vector();
+    t.translate(0, LENGTH);
+    this.coords[1] = t.vector();
+    t.translate(WIDTH, 0);
+    this.coords[2] = t.vector();
+    t.translate(0, -LENGTH);
+    this.coords[3] = t.vector();
+    t.pop();
   }
   
   private static class Fixture extends LXAbstractFixture {
