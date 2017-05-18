@@ -37,7 +37,7 @@ void setup() {
       }
       
       public void onUIReady(LXStudio lx, LXStudio.UI ui) {
-        ui.preview.setRadius(50*FEET);
+        ui.preview.setRadius(50*FEET).setPhi(-PI/12);
         ui.preview.addComponent(new UILogo());
         ui.preview.addComponent(new UITrunk());
         ui.preview.addComponent(uiTreeStructure = new UITreeStructure(tree));

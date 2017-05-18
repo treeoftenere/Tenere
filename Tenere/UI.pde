@@ -221,14 +221,12 @@ public class UIShapeLeaves extends UILeaves {
   class LeafShape extends PShapeOpenGL {
     
     private final IntBuffer tintBuffer;
-    private final PGL pgl;
     private final boolean BIG_ENDIAN =
       ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
   
     LeafShape(PGraphics pg) {
       super((PGraphicsOpenGL) pg, PShape.GEOMETRY);
       set3D(true);
-      this.pgl = ((PGraphicsOpenGL) pg).pgl;
       
       setTexture(texImage);
       setTextureMode(NORMAL);
