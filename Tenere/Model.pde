@@ -43,7 +43,7 @@ public static class Hemisphere extends LXModel {
 public static class Tree extends LXModel {
   
   public static final float TRUNK_DIAMETER = 3*FEET;
-  public static final float LIMB_HEIGHT = 18*FEET;
+  public static final float LIMB_HEIGHT = 10*FEET;
   public static final int NUM_LIMBS = 12;
   
   public final List<Limb> limbs;

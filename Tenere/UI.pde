@@ -192,8 +192,7 @@ public class UILeaves extends UI3dComponent {
   
   @Override
   protected void onDraw(UI ui, PGraphics pg) {
-    int[] colors = lx.getColors();
-    
+    int[] colors = lx.getColors();    
     pg.noStroke();
     pg.noFill();
     pg.textureMode(NORMAL);
@@ -212,131 +211,82 @@ public class UILeaves extends UI3dComponent {
   }
 }
 
-public class UIGLLeaves extends UILeaves {
+// Faster version of UILeaves which uses PShape functionality to render
+// with a faster shader using VBOs. Only the color buffer is pushed to the
+// GPU on each frame.
+public class UIShapeLeaves extends UILeaves {
   
-  private PShader shader;
-  // private final Texture texture;
-  private final FloatBuffer vertexData;
-  private int vertexBufferObjectName;
-  private final int vertexBufferLengthBytes;
-  private final static int STRIDE = 9;
-  private final static int VERTICES_PER_LEAF = 6;
+  private LeafShape shape;
   
-  public UIGLLeaves(LXStudio lx) {
+  class LeafShape extends PShapeOpenGL {
     
-    PGraphics pg = lx.ui.preview.getGraphics();
-    pg.beginDraw();
-    pg.endDraw();
-    
-    //pg.beginDraw();    
-    //this.texImage.loadPixels();
-    //this.texture = new Texture((PGraphicsOpenGL) pg, this.texImage.width, this.texImage.height);
-    //this.texture.set(this.texImage.pixels, 0, 0, this.texImage.width, this.texImage.height, this.texImage.format);
-    //pg.endDraw();
-    
-    loadShader();
-    
-    this.vertexBufferLengthBytes = tree.leaves.size() * VERTICES_PER_LEAF * STRIDE * Float.SIZE/8;
-    
-    this.vertexData = ByteBuffer
-      .allocateDirect(vertexBufferLengthBytes)
-      .order(ByteOrder.nativeOrder())
-      .asFloatBuffer();
-    
-    this.vertexData.rewind();
-    for (Leaf leaf : tree.leaves) {
-      // Each leaf has two triangles
-      putCoord(leaf, 0, 0, 1); // bottom-left
-      putCoord(leaf, 1, 0, 0); // top-left
-      putCoord(leaf, 2, 1, 0); // top-right
-      putCoord(leaf, 0, 0, 1); // bottom-left
-      putCoord(leaf, 3, 1, 0); // bottom-right
-      putCoord(leaf, 2, 1, 0); // top-right
-    }
-    this.vertexData.position(0);
-    
-    // Generate a buffer binding
-    PGL pgl = pg.beginPGL();
-    IntBuffer resultBuffer = ByteBuffer
-      .allocateDirect(1 * Integer.SIZE/8)
+    private final IntBuffer tintBuffer;
+    private final PGL pgl;
+    private final boolean BIG_ENDIAN =
+      ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
+  
+    LeafShape(PGraphics pg) {
+      super((PGraphicsOpenGL) pg, PShape.GEOMETRY);
+      set3D(true);
+      this.pgl = ((PGraphicsOpenGL) pg).pgl;
+      
+      setTexture(texImage);
+      setTextureMode(NORMAL);
+      beginShape(QUADS);
+      for (Leaf leaf : tree.leaves) {
+        vertex(leaf.coords[0].x, leaf.coords[0].y, leaf.coords[0].z, 0, 1);
+        vertex(leaf.coords[1].x, leaf.coords[1].y, leaf.coords[1].z, 0, 0);
+        vertex(leaf.coords[2].x, leaf.coords[2].y, leaf.coords[2].z, 1, 0);
+        vertex(leaf.coords[3].x, leaf.coords[3].y, leaf.coords[3].z, 1, 1);
+      }
+      endShape(CLOSE);
+      markForTessellation();
+      updateTessellation();
+      initBuffers();
+      
+      this.tintBuffer = ByteBuffer
+      .allocateDirect(tree.leaves.size() * 4 * Integer.SIZE / 8)
       .order(ByteOrder.nativeOrder())
       .asIntBuffer();
-    pgl.genBuffers(1, resultBuffer); // Generates a buffer, places its id in resultBuffer[0]
-    this.vertexBufferObjectName = resultBuffer.get(0); // Grab our buffer name
-    pg.endPGL();
-  }
-  
-  void putCoord(Leaf leaf, int coord, float s, float t) {
-    // xyz coord
-    this.vertexData.put(leaf.coords[coord].x);
-    this.vertexData.put(leaf.coords[coord].y);
-    this.vertexData.put(leaf.coords[coord].z);
-    
-    // texture s,t
-    this.vertexData.put(s);
-    this.vertexData.put(t);
-
-    // color rgba
-    this.vertexData.put(0f);
-    this.vertexData.put(0f);
-    this.vertexData.put(0f);
-    this.vertexData.put(1f);
-  }
-  
-  @Override
-  protected void onUIResize(UI ui) {
-    loadShader();
-  }
-
-  public void loadShader() {
-    this.shader = applet.loadShader("LeafFragment.glsl", "LeafVertex.glsl");
-  }
-  
-  @Override
-  protected void onDraw(UI ui, PGraphics pg) {
-    int[] colors = lx.getColors();
-    // Put our new colors in the vertex data
-    int i = 0;
-    for (Leaf leaf : tree.leaves) {
-      int c = colors[leaf.points[0].index];
-      for (int j = 0; j < leaf.coords.length; ++j) {
-        this.vertexData.put(STRIDE*i + 5, (0xff & (c >> 16)) / 255f); // R
-        this.vertexData.put(STRIDE*i + 6, (0xff & (c >> 8)) / 255f); // G
-        this.vertexData.put(STRIDE*i + 7, (0xff & (c)) / 255f); // B
-        ++i;
-      }
     }
     
-    PGL pgl = pg.beginPGL();
+    void updateColors(PGraphics pg, int[] colors) {
+      // This is hacky as fuck! But couldn't find a better way to do this.
+      // This reaches inside the PShapeOpenGL guts and updates ONLY the
+      // vertex color buffer object with new data on each rendering pass.
+      this.tintBuffer.rewind();
+      if (BIG_ENDIAN) {
+        for (int i = 0; i < colors.length; ++i) {
+          int nativeARGB = (colors[i] >>> 24) | (colors[i] << 8);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+        }
+      } else {
+        for (int i = 0; i < colors.length; ++i) {
+          int rb = colors[i] & 0x00ff00ff;
+          int nativeARGB = (colors[i] & 0xff00ff00) | (rb << 16) | (rb >> 16);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+          this.tintBuffer.put(nativeARGB);
+        }
+      }
+      this.tintBuffer.position(0);
+      pgl.bindBuffer(PGL.ARRAY_BUFFER, bufPolyColor.glId);
+      pgl.bufferData(PGL.ARRAY_BUFFER, colors.length * 4 * Integer.SIZE/8, this.tintBuffer, PGL.STREAM_DRAW);
+      pgl.bindBuffer(PGL.ARRAY_BUFFER, 0);
+    }
+  }
     
-    // Bind to our vertex buffer object, place the new color data
-    pgl.bindBuffer(PGL.ARRAY_BUFFER, this.vertexBufferObjectName);
-    pgl.bufferData(PGL.ARRAY_BUFFER, this.vertexBufferLengthBytes, this.vertexData, PGL.DYNAMIC_DRAW);
-    
-    this.shader.set("texture", this.texImage);
-    this.shader.bind();
-    int vertexLocation = pgl.getAttribLocation(this.shader.glProgram, "vertex");
-    int texCoordLocation = pgl.getAttribLocation(this.shader.glProgram, "texCoord");
-    int colorLocation = pgl.getAttribLocation(this.shader.glProgram, "color");
-    pgl.enableVertexAttribArray(vertexLocation);
-    pgl.enableVertexAttribArray(colorLocation);
-    pgl.vertexAttribPointer(vertexLocation, 3, PGL.FLOAT, false, STRIDE * Float.SIZE/8, 0);
-    pgl.vertexAttribPointer(texCoordLocation, 2, PGL.FLOAT, false, STRIDE * Float.SIZE/8, 3 * Float.SIZE/8);
-    pgl.vertexAttribPointer(colorLocation, 4, PGL.FLOAT, false, STRIDE * Float.SIZE/8, 5 * Float.SIZE/8);
-        
-    // Draw the arrays
-    pgl.drawArrays(PGL.TRIANGLES, 0, tree.leaves.size() * VERTICES_PER_LEAF);
-    
-    // Unbind
-    pgl.disableVertexAttribArray(vertexLocation);
-    pgl.disableVertexAttribArray(texCoordLocation);
-    pgl.disableVertexAttribArray(colorLocation);
-    // this.texture.unbind();
-    this.shader.unbind();
-    pgl.bindBuffer(PGL.ARRAY_BUFFER, 0);
-    
-    // Done!
-    pg.endPGL();
+  @Override
+  protected void onDraw(UI ui, PGraphics pg) {
+    if (this.shape == null) {
+      this.shape = new LeafShape(pg);
+    }
+    this.shape.updateColors(pg, lx.getColors());
+    pg.shape(this.shape);
   }
 }
 

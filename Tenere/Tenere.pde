@@ -37,15 +37,14 @@ void setup() {
       }
       
       public void onUIReady(LXStudio lx, LXStudio.UI ui) {
-        ui.preview.setRadius(80*FEET).setPhi(-PI/6);
+        ui.preview.setRadius(50*FEET);
         ui.preview.addComponent(new UILogo());
         ui.preview.addComponent(new UITrunk());
         ui.preview.addComponent(uiTreeStructure = new UITreeStructure(tree));
-        // ui.preview.addComponent(uiLeaves = new UIGLLeaves(lx));
-        ui.preview.addComponent(uiLeaves = new UILeaves());
+        ui.preview.addComponent(uiLeaves = new UIShapeLeaves());
 
+        ui.preview.pointCloud.setVisible(false);
         uiTreeStructure.setVisible(false);
-        uiLeaves.setVisible(false);
         
         new UITreeControls(ui).addToContainer(ui.leftPane.global);
         t.log("Initialized LX UI");
