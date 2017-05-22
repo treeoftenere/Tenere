@@ -144,8 +144,8 @@ public static class Rotors extends LXPattern {
       float fv = falloff * yn;
       float fv2 = falloff2 * yn;
       float b = max(
-        100 - fv * LXUtils.wrapdistf(p.aziumuth, aziumuth, PI),
-        100 - fv2 * LXUtils.wrapdistf(p.aziumuth, aziumuth2, PI)
+        100 - fv * LXUtils.wrapdistf(p.azimuth, aziumuth, PI),
+        100 - fv2 * LXUtils.wrapdistf(p.azimuth, aziumuth2, PI)
       );
       if (b > 0) {
         colors[p.index] = palette.getColor(p, b);
@@ -177,8 +177,8 @@ public static class DiamondRain extends LXPattern {
     private final float MAX_LENGTH = 14*FEET;
     
     private final SawLFO yPos = new SawLFO(model.yMax + MAX_LENGTH, model.yMin - MAX_LENGTH, 4000 + Math.random() * 3000);
-    private float aziumuth;
-    private float aziumuthFalloff;
+    private float azimuth;
+    private float azimuthFalloff;
     private float yFalloff;
     
     Drop(LX lx) {
@@ -189,8 +189,8 @@ public static class DiamondRain extends LXPattern {
     
     private void init() {
       this.yPos.setPeriod(2500 + Math.random() * 11000);
-      aziumuth = (float) Math.random() * TWO_PI;
-      aziumuthFalloff = 140 + 340 * (float) Math.random();
+      azimuth = (float) Math.random() * TWO_PI;
+      azimuthFalloff = 140 + 340 * (float) Math.random();
       yFalloff = 100 / (2*FEET + 12*FEET * (float) Math.random());
     }
     
@@ -201,14 +201,29 @@ public static class DiamondRain extends LXPattern {
       }
       for (LXPoint p : model.points) {
         float yDist = abs(p.y - yPos);
-        float aziumuthDist = abs(p.aziumuth - aziumuth); 
-        float b = 100 - yFalloff*yDist - aziumuthFalloff*aziumuthDist;
+        float azimuthDist = abs(p.azimuth - azimuth); 
+        float b = 100 - yFalloff*yDist - azimuthFalloff*azimuthDist;
         if (b > 0) {
           addColor(p.index, palette.getColor(p, b));
         }
       }
     }
+  }  
+}
+
+public class Azimuth extends LXPattern {
+  
+  public final CompoundParameter azim = new CompoundParameter("Azimuth", 0, TWO_PI);  
+  
+  public Azimuth(LX lx) {
+    super(lx);
+    addParameter("azim", this.azim);
   }
   
+  public void run(double deltaMs) {
+    float azim = this.azim.getValuef();
+    for (Branch b : tree.branches) {
+      setColor(b, LX.hsb(0, 0, max(0, 100 - 400 * LXUtils.wrapdistf(b.azimuth, azim, TWO_PI))));
+    }
+  }
 }
-  

@@ -5,6 +5,8 @@ import java.nio.IntBuffer;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
+private static final int WOOD_FILL = #281403; 
+
 public class UILogo extends UI3dComponent {
   private final PImage logoImage = loadImage("tenere.png");
   
@@ -37,18 +39,86 @@ public class UILogo extends UI3dComponent {
   }
 }
 
+/**
+ * Utility class for drawing cylinders. Assumes the cylinder is oriented with the
+ * y-axis vertical. Use transforms to position accordingly.
+ */
+public static class UICylinder extends UI3dComponent {
+  
+  private final PVector[] base;
+  private final PVector[] top;
+  private final int detail;
+  public final float len;
+  
+  public UICylinder(float radius, float len, int detail) {
+    this(radius, radius, 0, len, detail);
+  }
+  
+  public UICylinder(float baseRadius, float topRadius, float len, int detail) {
+    this(baseRadius, topRadius, 0, len, detail);
+  }
+  
+  public UICylinder(float baseRadius, float topRadius, float yMin, float yMax, int detail) {
+    this.base = new PVector[detail];
+    this.top = new PVector[detail];
+    this.detail = detail;
+    this.len = yMax - yMin;
+    for (int i = 0; i < detail; ++i) {
+      float angle = i * TWO_PI / detail;
+      this.base[i] = new PVector(baseRadius * cos(angle), yMin, baseRadius * sin(angle));
+      this.top[i] = new PVector(topRadius * cos(angle), yMax, topRadius * sin(angle));
+    }
+  }
+  
+  public void onDraw(UI ui, PGraphics pg) {
+    pg.beginShape(TRIANGLE_STRIP);
+    for (int i = 0; i <= this.detail; ++i) {
+      int ii = i % this.detail;
+      pg.vertex(this.base[ii].x, this.base[ii].y, this.base[ii].z);
+      pg.vertex(this.top[ii].x, this.top[ii].y, this.top[ii].z);
+    }
+    pg.endShape(CLOSE);
+  }
+}
+
 public static class UITrunk extends UI3dComponent {
+  
+  private final UICylinder cylinder;
+  
+  public UITrunk() {
+    this.cylinder = new UICylinder(Tree.TRUNK_DIAMETER/2, Tree.TRUNK_DIAMETER/4, -Tree.LIMB_HEIGHT, 6*FEET, 8);
+    addChild(this.cylinder);
+  }
+  
   @Override
   protected void onDraw(heronarts.p3lx.ui.UI ui, PGraphics pg) {
     // MAJOR IMPROVEMENTS NEEDED HERE!
     // Quick hackup to draw a tree trunk.
     // Let's implement some shaders and have a nice simulation.
-    pg.fill(#281403);
+    pg.fill(WOOD_FILL);
     pg.noStroke();
-    pg.translate(0, -Tree.LIMB_HEIGHT/2, 0);
-    pg.box(Tree.TRUNK_DIAMETER, Tree.LIMB_HEIGHT, Tree.TRUNK_DIAMETER);
-    pg.translate(0, Tree.LIMB_HEIGHT/2, 0);
+    //this.cylinder.onDraw(ui, pg);
   }
+}
+
+public class UISimulation extends UI3dComponent {
+  UISimulation() {
+    addChild(new UILogo());
+    addChild(new UITrunk());
+    addChild(uiTreeStructure = new UITreeStructure(tree));
+  }
+  
+  protected void beginDraw(UI ui, PGraphics pg) {
+    float level = 255;
+    pg.pointLight(level, level, level, -10*FEET, 30*FEET, -30*FEET);
+    pg.pointLight(level, level, level, 30*FEET, 20*FEET, -20*FEET);
+    pg.pointLight(level, level, level, 0, 0, 30*FEET);
+  }
+  
+  protected void endDraw(UI ui, PGraphics pg) {
+    pg.noLights();
+  }
+
 }
 
 public class UITreeStructure extends UI3dComponent {
@@ -56,84 +126,142 @@ public class UITreeStructure extends UI3dComponent {
   
   public UITreeStructure(Tree tree) {
     this.tree = tree;
+    for (Limb limb : tree.limbs) {
+      addChild(new UILimb(limb));
+    }
     for (Branch branch : tree.branches) {
       addChild(new UIBranch(branch));
     }
   }
+ 
 }
 
-public class UIBranch extends UI3dComponent {
+public static class UILimb extends UI3dComponent {
+    
+  private final static UICylinder section1;
+  private final static UICylinder section2;
+  private final static UICylinder section3;
+  private final static UICylinder section4;
+  
+  static {
+    section1 = new UICylinder(Limb.SECTION_1.radius, Limb.SECTION_1.len, 5);
+    section2 = new UICylinder(Limb.SECTION_2.radius, Limb.SECTION_2.len, 5);
+    section3 = new UICylinder(Limb.SECTION_3.radius, Limb.SECTION_3.len, 5);
+    section4 = new UICylinder(Limb.SECTION_4.radius, Limb.SECTION_4.len, 5);
+  }
+  
+  private final float azimuth;
+  private final float y;
+  private final Limb.Size size;
+  
+  public UILimb(Limb limb) {
+    this(limb.y, limb.azimuth, limb.size);
+  }
+  
+  public UILimb(float azimuth, Limb.Size size) {
+    this(0, azimuth, size);
+  }
+  
+  public UILimb(float azimuth) {
+    this(0, azimuth);
+  }
+  
+  public UILimb(float y, float azimuth) {
+    this(y, azimuth, Limb.Size.FULL);
+  }
+    
+  public UILimb(float y, float azimuth, Limb.Size size) {
+    this.y = y;
+    this.azimuth = azimuth;
+    this.size = size;
+  }
+  
+  public void onDraw(UI ui, PGraphics pg) {
+    pg.noStroke();
+    pg.fill(WOOD_FILL);
+    
+    pg.pushMatrix();
+    pg.translate(0, this.y, 0);
+    pg.rotateY(PI/2 - this.azimuth);
+    pg.rotateX(PI/2 - PI/12);
+    
+    if (this.size == Limb.Size.FULL) {
+      section1.onDraw(ui, pg);
+      pg.translate(0, section1.len, 0);
+    }
+    if (this.size != Limb.Size.SMALL) {
+      section2.onDraw(ui, pg);
+      pg.translate(0, section2.len, 0);
+    }
+    pg.rotateX(-PI/6);
+    section3.onDraw(ui, pg);
+    pg.translate(0, section3.len, 0);
+    pg.rotateX(-PI/6);
+    section4.onDraw(ui, pg);
+    pg.popMatrix();
+  }
+}
+
+
+public static class UIBranch extends UI3dComponent {
 
   private final Branch branch;
   
-  private final static int CYLINDER_DETAIL = 8;
-  private final PVector[] cylinderBase = new PVector[CYLINDER_DETAIL];
-  private final PVector[] cylinderTop = new PVector[CYLINDER_DETAIL];
+  private final static UICylinder cylinder;
+  
+  static {
+    cylinder = new UICylinder(1*IN, .5*IN, 44*IN, 8);
+  }
   
   public UIBranch(Branch branch) {
     this.branch = branch;
     for (LeafAssemblage assemblage : branch.assemblages) {
       addChild(new UILeafAssemblage(assemblage));
     }
-    
-    final float baseRadius = .75*IN;
-    final float topRadius = .5*IN;
-    for (int i = 0; i < CYLINDER_DETAIL; ++i) {
-      float angle = i * TWO_PI / CYLINDER_DETAIL;
-      cylinderBase[i] = new PVector(baseRadius * cos(angle), 0, baseRadius * sin(angle));
-      cylinderTop[i] = new PVector(topRadius * cos(angle), 44*IN, topRadius * sin(angle));
-    }
+        
   }
   
   @Override
   protected void beginDraw(UI ui, PGraphics pg) {
     pg.pushMatrix();
-    pg.rotateY(-this.branch.position.azimuth);
-    pg.rotateZ(this.branch.position.elevation - HALF_PI);
-    pg.rotateY(-this.branch.position.tilt);
-    pg.translate(0, this.branch.position.radius);
+    pg.translate(this.branch.x, this.branch.y, this.branch.z);
+    pg.rotateY(HALF_PI - this.branch.orientation.azimuth);
+    pg.rotateX(HALF_PI - this.branch.orientation.elevation);
+    pg.rotateY(-this.branch.orientation.tilt);
   }
   
   @Override
   protected void onDraw(UI ui, PGraphics pg) {
-    pg.fill(#999999);
+    pg.fill(WOOD_FILL);
     pg.noStroke();
-    pg.beginShape(TRIANGLE_STRIP);
-    for (int i = 0; i <= CYLINDER_DETAIL; ++i) {
-      int ii = i % CYLINDER_DETAIL;
-      pg.vertex(cylinderBase[ii].x, cylinderBase[ii].y, cylinderBase[ii].z);
-      pg.vertex(cylinderTop[ii].x, cylinderTop[ii].y, cylinderTop[ii].z);
-    }
-    
-    pg.endShape(CLOSE);
+    cylinder.onDraw(ui, pg);
   }
   
   @Override
   protected void endDraw(UI ui, PGraphics pg) {
     pg.popMatrix();
   }
- 
 }
 
-private PImage LEAF_TEXTURE;
-
-public class UILeafAssemblage extends UI3dComponent {
+public static class UILeafAssemblage extends UI3dComponent {
 
   private final LeafAssemblage assemblage;
+  private static final UICylinder cylinder;
   
+  static {
+    cylinder = new UICylinder(.4*IN, .4*IN, -12*IN, LeafAssemblage.LEAVES[8].y, 5);
+  }
+
   public UILeafAssemblage(LeafAssemblage assemblage) {
     this.assemblage = assemblage;
-    if (LEAF_TEXTURE == null) {
-      LEAF_TEXTURE = loadImage("leaf.png");
-    }
   }
   
   @Override
   protected void beginDraw(heronarts.p3lx.ui.UI ui, PGraphics pg) {
     pg.pushMatrix();
-    pg.translate(this.assemblage.position.x, this.assemblage.position.y);
-    pg.rotateZ(-this.assemblage.position.theta);
-    pg.rotateY(-this.assemblage.position.tilt);
+    pg.translate(this.assemblage.orientation.x, this.assemblage.orientation.y);
+    pg.rotateZ(-this.assemblage.orientation.theta);
+    pg.rotateY(-this.assemblage.orientation.tilt);
   }
   
   @Override
@@ -143,15 +271,9 @@ public class UILeafAssemblage extends UI3dComponent {
   
   @Override
   protected void onDraw(heronarts.p3lx.ui.UI ui, PGraphics pg) {
-    
-    final float stemWidth = .1*IN;
-    pg.fill(#555555);
-    pg.beginShape(QUADS);
-    pg.vertex(-stemWidth, 0);
-    pg.vertex(stemWidth, 0);
-    pg.vertex(stemWidth, LeafAssemblage.LEAF_POSITIONS[8].y);
-    pg.vertex(-stemWidth, LeafAssemblage.LEAF_POSITIONS[8].y);
-    pg.endShape(CLOSE);
+    pg.fill(WOOD_FILL);
+    pg.noStroke();
+    cylinder.onDraw(ui, pg);
     
     // Now handled by UILeaves, left here for testing and/or reference...
     /*
@@ -230,6 +352,8 @@ public class UIShapeLeaves extends UILeaves {
       
       setTexture(texImage);
       setTextureMode(NORMAL);
+      setStroke(false);
+      setFill(false);
       beginShape(QUADS);
       for (Leaf leaf : tree.leaves) {
         vertex(leaf.coords[0].x, leaf.coords[0].y, leaf.coords[0].z, 0, 1);
