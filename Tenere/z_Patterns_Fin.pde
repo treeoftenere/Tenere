@@ -9,19 +9,46 @@ public static class Plasma extends LXPattern {
   int minShade = -100;
   int maxShade = 100;
   float nextCheck = 1;
+  float circleBoundary = 3;
   
     public final CompoundParameter size =
     new CompoundParameter("Size", 1, 5)
     .setDescription("Size");
     
         public final CompoundParameter rate =
-    new CompoundParameter("Rate", 1, 100)
+    new CompoundParameter("Rate", 5, 1)
     .setDescription("Rate");
+    
+        public final CompoundParameter CSpeedX =
+    new CompoundParameter("CSpeedX", 1000, 40000)
+    .setDescription("CSpeedX");
+    
+           public final CompoundParameter CSpeedY =
+    new CompoundParameter("CSpeedY", model.xMin, model.xMax)
+    .setDescription("CSpeedY");
+    
+
+    
+    public final SinLFO CircleMoveX = new SinLFO(
+      model.xMax*-1, // This is a lower bound
+      model.xMax*2, // This is an upper bound
+      CSpeedX     // This is 3 seconds, 3000 milliseconds
+    );
+    
+    public final SinLFO CircleMoveY = new SinLFO(
+      model.yMax*-1, // This is a lower bound
+      model.xMax*2, // This is an upper bound
+      13000     // This is 3 seconds, 3000 milliseconds
+    );
   
   public Plasma(LX lx) {
     super(lx);
     addParameter(size);
     addParameter(rate);
+    addParameter(CSpeedX);
+    addParameter(CSpeedY);
+    startModulator(CircleMoveX);
+    startModulator(CircleMoveY);
   }
     
   public void run(double deltaMs) {
@@ -35,14 +62,15 @@ public static class Plasma extends LXPattern {
       
       //shadeRed = SinVerticle(p.xn,p.yn,_size);
             //+ SinRotating(p.xn,p.yn,size) 
-      shadeGreen = SinCircle(p.xn,p.yn, _size);
+      shadeGreen = SinCircle(p.x,p.y, _size);
       
-    red =  map( sin(shadeRed*PI)*100, minShade, maxShade, 0, brightness);
-    green = map( sin(shadeGreen*PI+2*PI)*100, minShade, maxShade, 0, brightness);
-    //b = map( sin(shade*PI+4*PI*sin(movement/20))*100, minShade, maxShade, 0, brightness);
-    
-      colors[p.index] =  LX.rgb((int)red, (int)green, (int)blue);
+    //red =  map( sin(shadeRed*PI)*100, minShade, maxShade, 0, brightness);
+    //green = LX.hsb(shadeGreen, 100, 100);
+    //colors[p.index] =  LX.rgb((int)red, (int)green, (int)blue);
       
+     
+       
+      colors[p.index]  = LX.rgb((int)shadeGreen, 0, 0);
       //if(movement > nextCheck)
       //{
       //  println(sin(shade*PI)*100);
@@ -68,10 +96,9 @@ public static class Plasma extends LXPattern {
    
   float SinCircle(float x, float y, float size)
   {
-    float cx = model.xMax * sin(movement);
+    float cx =  (float)CircleMoveX.getValue();//(float)circleX.getValue();
     float cy = 0; //model.yMax * cos(movement);
-    float dist = sqrt(sq(cy-y) + sq(cx-x));
-    return sin((dist/size ) + movement );
+    return sin(sqrt(sq(cy-y) + sq(cx-x)));
   }
 
 
