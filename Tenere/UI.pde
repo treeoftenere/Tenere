@@ -182,8 +182,8 @@ public static class UILimb extends UI3dComponent {
     
     pg.pushMatrix();
     pg.translate(0, this.y, 0);
-    pg.rotateY(PI/2 - this.azimuth);
-    pg.rotateX(PI/2 - PI/12);
+    pg.rotateY(HALF_PI - this.azimuth);
+    pg.rotateX(HALF_PI - PI/12);
     
     if (this.size == Limb.Size.FULL) {
       section1.onDraw(ui, pg);
@@ -227,7 +227,7 @@ public static class UIBranch extends UI3dComponent {
     pg.translate(this.branch.x, this.branch.y, this.branch.z);
     pg.rotateY(HALF_PI - this.branch.orientation.azimuth);
     pg.rotateX(HALF_PI - this.branch.orientation.elevation);
-    pg.rotateY(-this.branch.orientation.tilt);
+    pg.rotateY(this.branch.orientation.tilt);
   }
   
   @Override
@@ -260,8 +260,8 @@ public static class UILeafAssemblage extends UI3dComponent {
   protected void beginDraw(heronarts.p3lx.ui.UI ui, PGraphics pg) {
     pg.pushMatrix();
     pg.translate(this.assemblage.orientation.x, this.assemblage.orientation.y);
-    pg.rotateZ(-this.assemblage.orientation.theta);
-    pg.rotateY(-this.assemblage.orientation.tilt);
+    pg.rotateZ(this.assemblage.orientation.theta);
+    pg.rotateY(this.assemblage.orientation.tilt);
   }
   
   @Override

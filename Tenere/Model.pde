@@ -148,44 +148,44 @@ public static class Limb extends LXModel {
     Fixture(float y, float azimuth, Size size) {
       LXTransform t = new LXTransform();
       t.translate(0, y, 0);
-      t.rotateY(-HALF_PI + azimuth);
-      t.rotateX(-HALF_PI + PI/12);
+      t.rotateY(HALF_PI - azimuth);
+      t.rotateX(HALF_PI - PI/12);
       if (size == Size.FULL) {
         t.translate(0, SECTION_1.len, 0);
       }
       if (size != Size.SMALL) {
         t.translate(0, SECTION_2.len, 0);
       }
-      t.rotateX(PI/6);
+      t.rotateX(-PI/6);
       t.translate(0, SECTION_3.len);
-      t.rotateX(PI/6);
+      t.rotateX(-PI/6);
       
       // Branch S.2 (3)
       t.push();
-      t.rotateX(-PI/4);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth, -PI/8);
       t.pop();
       
       t.translate(0, SECTION_4.len);
       
       // Double-branch S.2 (12)      
-      // First part
+      // First part (left)
       t.push();
-      t.rotateY(PI/3);
-      t.rotateX(-PI/4);
+      t.rotateY(-PI/3);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth + PI/3, -PI/6);
       t.pop();
       
-      // Second part
+      // Second part (right)
       t.push();
-      t.rotateY(-PI/3);
-      t.rotateX(-PI/4);
+      t.rotateY(PI/3);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth - PI/3, PI/8);
       t.pop();
     }
     
     private void addBranchCluster(LXTransform t, float azimuth, float baseElevation) {
-      // Loos interpretation of Branch S.2 (3)
+      // Loose interpretation of Branch S.2 (3)
       t.translate(0, 2*FT, 0);
       addBranch(t, azimuth, PI/3, baseElevation);
       t.translate(0, .5*FT, 0);
@@ -268,8 +268,8 @@ public static class Branch extends LXModel {
   public final float azimuth;
   public final float elevation;
    
-  private static final float RIGHT_THETA = QUARTER_PI;
-  private static final float LEFT_THETA = -QUARTER_PI;
+  private static final float RIGHT_THETA = -QUARTER_PI;
+  private static final float LEFT_THETA = QUARTER_PI;
   
   private static final float RIGHT_OFFSET = 12*IN;
   private static final float LEFT_OFFSET = -12*IN;
@@ -311,8 +311,8 @@ public static class Branch extends LXModel {
     Fixture(Orientation orientation) {
       LXTransform t = new LXTransform();
       t.translate(orientation.x, orientation.y, orientation.z);
-      t.rotateY(-HALF_PI + orientation.azimuth);
-      t.rotateX(-HALF_PI + orientation.elevation);
+      t.rotateY(HALF_PI - orientation.azimuth);
+      t.rotateX(HALF_PI - orientation.elevation);
       t.rotateY(orientation.tilt);      
 
       for (LeafAssemblage.Orientation assemblage : ASSEMBLAGES) {
@@ -368,16 +368,16 @@ public static class LeafAssemblage extends LXModel {
   // up the branch, away from the base stem.
   //
   // Third argument is the rotation of the leaf on the x-y plane, 0
-  // is the leaf pointing "up", HALF_PI is pointing to the right,
-  // -HALF_PI is pointing to the left, etc.
+  // is the leaf pointing "up", HALF_PI is pointing to the left,
+  // -HALF_PI is pointing to the right, etc.
   public static final Leaf.Orientation[] LEAVES = {    
-    new Leaf.Orientation( 6.4*IN,  8.8*IN, HALF_PI + QUARTER_PI), // A
-    new Leaf.Orientation( 6.9*IN, 10.0*IN, HALF_PI), // B
-    new Leaf.Orientation(10.4*IN, 14.7*IN, HALF_PI + .318), // C
-    new Leaf.Orientation(10.0*IN, 16.1*IN, .900), // D
-    new Leaf.Orientation( 1.2*IN, 13.9*IN, 1.08), // E
-    new Leaf.Orientation( 3.5*IN, 22.2*IN, HALF_PI + .2), // F
-    new Leaf.Orientation( 2.9*IN, 23.3*IN, .828), // G
+    new Leaf.Orientation( 6.4*IN,  8.8*IN, -HALF_PI - QUARTER_PI), // A
+    new Leaf.Orientation( 6.9*IN, 10.0*IN, -HALF_PI), // B
+    new Leaf.Orientation(10.4*IN, 14.7*IN, -HALF_PI - .318), // C
+    new Leaf.Orientation(10.0*IN, 16.1*IN, -.900), // D
+    new Leaf.Orientation( 1.2*IN, 13.9*IN, -1.08), // E
+    new Leaf.Orientation( 3.5*IN, 22.2*IN, -HALF_PI - .2), // F
+    new Leaf.Orientation( 2.9*IN, 23.3*IN, -.828), // G
     new Leaf.Orientation( 0.0*IN, 23.9*IN, 0), // H
     null, // I
     null, // J
