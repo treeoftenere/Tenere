@@ -68,16 +68,18 @@ public static class Plasma extends LXPattern {
     
     for (LXPoint p : model.points) {
      
+      //GET A UNIQUE SHADE FOR THIS PIXEL
       shade =
       + SinVertical( p.x, p.y, (float) size.getValue()) 
       + SinRotating( p.x, p.y, (float) size.getValue()) 
       + SinCircle(   p.x, p.y,p.z, (float) size.getValue()) /3;
       
+      //SELECTIVELY PULL OUT RED, GREEN, and BLUE 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
       //green =  map(sin(shade*PI+2), -1, 1, 0, brightness);
       blue = map(sin(shade*PI+(4*sin(movement/400))), -1, 1, 0, brightness);
 
-
+      //COMMIT THIS COLOR 
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
       
       //DEV
@@ -88,6 +90,7 @@ public static class Plasma extends LXPattern {
       //  nextCheck += checkEvery;
       //}
       
+      //USED FOR MAKING THE ANIMATION MOVE
       counter++;
     }
 
