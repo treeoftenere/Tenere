@@ -5,7 +5,6 @@ public static class Plasma extends LXPattern {
   float shadeRed, shadeGreen = 0;
   float movement = 0;
   float brightness = 255;
-  //float size = 0.2;
   int minShade = -100;
   int maxShade = 100;
   float nextCheck = 1;
@@ -15,19 +14,21 @@ public static class Plasma extends LXPattern {
     new CompoundParameter("Size", 1, 5)
     .setDescription("Size");
     
-        public final CompoundParameter rate =
+    public final CompoundParameter rate =
     new CompoundParameter("Rate", 5, 1)
     .setDescription("Rate");
     
-        public final CompoundParameter CSpeedX =
+    public final CompoundParameter scale =
+    new CompoundParameter("Scale", 2,500)
+    .setDescription("Scale");
+    
+    public final CompoundParameter CSpeedX =
     new CompoundParameter("CSpeedX", 1000, 40000)
     .setDescription("CSpeedX");
     
-           public final CompoundParameter CSpeedY =
+    public final CompoundParameter CSpeedY =
     new CompoundParameter("CSpeedY", model.xMin, model.xMax)
     .setDescription("CSpeedY");
-    
-
     
     public final SinLFO CircleMoveX = new SinLFO(
       model.xMax*-1, // This is a lower bound
@@ -45,6 +46,7 @@ public static class Plasma extends LXPattern {
     super(lx);
     addParameter(size);
     addParameter(rate);
+    addParameter(scale);
     addParameter(CSpeedX);
     addParameter(CSpeedY);
     startModulator(CircleMoveX);
@@ -61,16 +63,14 @@ public static class Plasma extends LXPattern {
   
       
       //shadeRed = SinVerticle(p.xn,p.yn,_size);
-            //+ SinRotating(p.xn,p.yn,size) 
-      shadeGreen = SinCircle(p.x,p.y, _size);
+      //+ SinRotating(p.xn,p.yn,size) 
+      shadeGreen = SinCircle(p.x,p.y, _size) * (float)scale.getValue();
       
-    //red =  map( sin(shadeRed*PI)*100, minShade, maxShade, 0, brightness);
-    //green = LX.hsb(shadeGreen, 100, 100);
-    //colors[p.index] =  LX.rgb((int)red, (int)green, (int)blue);
-      
-     
-       
+     //red =  map( sin(shadeRed*PI)*100, minShade, maxShade, 0, brightness);
+     //green = LX.hsb(shadeGreen, 100, 100);
+     //colors[p.index] =  LX.rgb((int)red, (int)green, (int)blue);
       colors[p.index]  = LX.rgb((int)shadeGreen, 0, 0);
+      
       //if(movement > nextCheck)
       //{
       //  println(sin(shade*PI)*100);
