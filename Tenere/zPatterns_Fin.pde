@@ -4,20 +4,22 @@ public static class Plasma extends LXPattern {
   float red, green, blue;
   float shade;
   float movement = 0;
-  float brightness = 255;
   int minShade = -100;
   int maxShade = 100;
   
 
   float circleBoundary = 3;
   
-  int counter = 0;
-  int nextCheck = 100000;
-  int checkEvery = 100000;
+  long counter = 0;
+  long nextCheck = 500000;
+  long checkEvery = 500000;
     
+    public final CompoundParameter brightness =
+    new CompoundParameter("bright", 255, 255)
+    .setDescription("bright");
     
     public final CompoundParameter size =
-    new CompoundParameter("Size", 100, 1000)
+    new CompoundParameter("Size", 1, 5)
     .setDescription("Size");
     
     public final CompoundParameter rate =
@@ -31,32 +33,23 @@ public static class Plasma extends LXPattern {
     public final CompoundParameter CSpeedX =
     new CompoundParameter("CSpeedX", 20000, 40000)
     .setDescription("CSpeedX");
-    
-    public final CompoundParameter CSpeedY =
-    new CompoundParameter("CSpeedY", model.xMin, model.xMax)
-    .setDescription("CSpeedY");
+  
     
     public final SinLFO CircleMoveX = new SinLFO(
       model.xMax*-1, // This is a lower bound
       model.xMax*2, // This is an upper bound
       CSpeedX     // This is 3 seconds, 3000 milliseconds
     );
-    
-    public final SinLFO CircleMoveY = new SinLFO(
-      model.yMax*-1, // This is a lower bound
-      model.xMax*2, // This is an upper bound
-      13000     // This is 3 seconds, 3000 milliseconds
-    );
+
   
   public Plasma(LX lx) {
     super(lx);
     addParameter(size);
     addParameter(rate);
     addParameter(scale);
+    addParameter(brightness);
     addParameter(CSpeedX);
-    addParameter(CSpeedY);
     startModulator(CircleMoveX);
-    startModulator(CircleMoveY);
   }
     
   public void run(double deltaMs) {
@@ -71,9 +64,9 @@ public static class Plasma extends LXPattern {
       //      + SinRotating( p.xn, p.yn, _size)
       //      + SinCircle(   p.x,  p.y,  _size);
       
-      shade = SinCircle(p.x,p.y, _size) * (float)scale.getValue();
+      shade = SinCircle(p.x,p.y, _size) ;
       
-      red = sin(shade*PI); 
+      red = map(sin(shade*PI), -1,1,0, (float)brightness.getValue());
       //green = sin(shade*PI+2);
       //blue = sin(shade*PI+4); 
 
@@ -84,6 +77,7 @@ public static class Plasma extends LXPattern {
       {
         print("shade="); print(shade);
         print(" red="); print(red);
+        print(" size="); print(size.getValue());
         println();
         nextCheck += checkEvery;
       }
@@ -107,7 +101,7 @@ public static class Plasma extends LXPattern {
   {
     float cx =  (float)CircleMoveX.getValue();//(float)circleX.getValue();
     float cy = 0; //model.yMax * cos(movement);
-    return sin( sqrt(sq(cy-y) + sq(cx-x))/size );
+    return sin( sqrt(sq(cy-y) + sq(cx-x)) / model.xMax /size  );
   }
 
 
