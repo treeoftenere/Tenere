@@ -33,7 +33,7 @@ public static class Plasma extends LXPattern {
     .setDescription("CSpeedX");
     
         public final SinLFO RateLfo = new SinLFO(
-      40000, 
+      60000, 
       maxRate, 
       60000     
     );
@@ -70,25 +70,25 @@ public static class Plasma extends LXPattern {
      
       //GET A UNIQUE SHADE FOR THIS PIXEL
       shade =
-      + SinVertical( p.x, p.y, (float) size.getValue()) 
-      + SinRotating( p.x, p.y, (float) size.getValue()) 
-      + SinCircle(   p.x, p.y,p.z, (float) size.getValue()) /3;
+      + SinVertical( p.x, (float) size.getValue()) 
+      + SinRotating( p.x, p.y, p.z, (float) size.getValue()) 
+      + SinCircle(   p.x, p.y, p.z, (float) size.getValue()) /3;
       
       //SELECTIVELY PULL OUT RED, GREEN, and BLUE 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
-      //green =  map(sin(shade*PI+2), -1, 1, 0, brightness);
+      green =  map(sin(shade*PI+(2*cos(movement/330))), -1, 1, 0, brightness);
       blue = map(sin(shade*PI+(4*sin(movement/400))), -1, 1, 0, brightness);
 
       //COMMIT THIS COLOR 
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
       
-      //DEV
-      //if(counter > nextCheck)
-      //{
-      //  print("RateLfo="); print(RateLfo.getValue());
-      //  println();
-      //  nextCheck += checkEvery;
-      //}
+      //DEV Display variables
+      if(counter > nextCheck)
+      {
+        print("RateLfo="); print(RateLfo.getValue());
+        println();
+        nextCheck += checkEvery;
+      }
       
       //USED FOR MAKING THE ANIMATION MOVE
       counter++;
@@ -99,14 +99,14 @@ public static class Plasma extends LXPattern {
    
   }
   
-  float SinVertical(float x, float y,  float size)
+  float SinVertical(float x, float size)
   {
     return sin(   ( x / model.xMax / size) + (movement / 100 ));
   }
   
-  float SinRotating(float x, float y, float size)
+  float SinRotating(float x, float y, float z, float size)
   {
-    return sin( ( ( y / model.xMax / size) * sin( movement /134 )) + (x / model.yMax / size) * (cos(movement / 200))  ) ;
+    return sin( ( ( y / model.yMax / size) * sin( movement /134 )) + (z / model.zMax / size) * (cos(movement / 200))  ) ;
   }
    
   float SinCircle(float x, float y,float z, float size)
