@@ -23,13 +23,20 @@ public static class Plasma extends LXPattern {
     new CompoundParameter("Size", 0.15, 0.05, 0.5)
     .setDescription("Size");
     
-    public final CompoundParameter rate =
-    new CompoundParameter("Rate", 10000, 20000, 1000 )
-    .setDescription("Rate");
+        public final CompoundParameter maxRate =
+    new CompoundParameter("MaxRate", 6000, 10000, 3500)
+    .setDescription("MaxRate");
+   
    
     public final CompoundParameter CSpeedX =
-    new CompoundParameter("CSpeedX", 20000, 10000, 40000)
+    new CompoundParameter("CSpeedX", 2000, 10000, 40000)
     .setDescription("CSpeedX");
+    
+        public final SinLFO RateLfo = new SinLFO(
+      40000, 
+      maxRate, 
+      60000     
+    );
   
     public final SinLFO CircleMoveX = new SinLFO(
       model.xMax*-1, 
@@ -48,23 +55,18 @@ public static class Plasma extends LXPattern {
     super(lx);
     
     addParameter(size);
-    addParameter(rate);
+    addParameter(maxRate);
     addParameter(CSpeedX);
     
     startModulator(CircleMoveX);
     startModulator(CircleMoveY);
-    
+    startModulator(RateLfo);
   }
     
   public void run(double deltaMs) {
    
     
     for (LXPoint p : model.points) {
-  
-      //shade = SinVerticle( p.x, p.y, _size);
-      //      + SinRotating( p.x, p.y, _size)
-      //      + SinCircle(   p.x,  p.y,  _size);
-      
      
       shade =
       + SinVertical( p.x, p.y, (float) size.getValue()) 
@@ -73,7 +75,7 @@ public static class Plasma extends LXPattern {
       
       red = map(sin(shade*PI), -1, 1, 0, brightness);
       //green =  map(sin(shade*PI+2), -1, 1, 0, brightness);
-      blue = map(sin(shade*PI+4), -1, 1, 0, brightness);
+      blue = map(sin(shade*PI+(4*sin(movement/400))), -1, 1, 0, brightness);
 
 
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
@@ -81,8 +83,7 @@ public static class Plasma extends LXPattern {
       //DEV
       //if(counter > nextCheck)
       //{
-      //  print("shade="); print(shade);
-      //  print(" movement="); print(movement);
+      //  print("RateLfo="); print(RateLfo.getValue());
       //  println();
       //  nextCheck += checkEvery;
       //}
@@ -91,7 +92,7 @@ public static class Plasma extends LXPattern {
     }
 
   //advance through time. Sclaed down as LX does some millions of itternations per second.
-   movement = counter/(float)rate.getValue();
+   movement = counter/(float)RateLfo.getValue();
    
   }
   
