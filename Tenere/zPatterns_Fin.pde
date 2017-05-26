@@ -7,9 +7,15 @@ public static class Plasma extends LXPattern {
   float brightness = 255;
   int minShade = -100;
   int maxShade = 100;
-  double nextCheck = 1000;
+  
+
   float circleBoundary = 3;
   
+  int counter = 0;
+  int nextCheck = 100000;
+  int checkEvery = 100000;
+    
+    
     public final CompoundParameter size =
     new CompoundParameter("Size", 100, 1000)
     .setDescription("Size");
@@ -74,14 +80,15 @@ public static class Plasma extends LXPattern {
 
       colors[p.index]  = LX.rgb((int)red, 0, 0);
       
-      if(deltaMs > nextCheck)
-      
+      if(counter > nextCheck)
+      {
         print("shade="); print(shade);
         print(" red="); print(red);
         println();
-        nextCheck = deltaMs+1000;
+        nextCheck += checkEvery;
       }
-    
+      counter++;
+    }
 
 
   }
