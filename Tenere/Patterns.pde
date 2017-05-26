@@ -141,17 +141,16 @@ public static class Rotors extends LXPattern {
     float falloff2 = this.falloff2.getValuef();
     for (LXPoint p : model.points) {
       float yn = (1 - .8 * (p.y - model.yMin) / model.yRange);
-      float fv = falloff * yn;
-      float fv2 = falloff2 * yn;
+      float fv = .3 * falloff * yn;
+      float fv2 = .3 * falloff2 * yn;
       float b = max(
         100 - fv * LXUtils.wrapdistf(p.azimuth, aziumuth, PI),
         100 - fv2 * LXUtils.wrapdistf(p.azimuth, aziumuth2, PI)
       );
-      if (b > 0) {
-        colors[p.index] = palette.getColor(p, b);
-      } else {
-        colors[p.index] = #000000;
-      }
+      b = max(30, b);
+      float s = constrain(50 + b/2, 0, 100);
+      colors[p.index] = palette.getColor(p, s, b);
+      
     }
   }
 }
@@ -224,6 +223,82 @@ public class Azimuth extends LXPattern {
     float azim = this.azim.getValuef();
     for (Branch b : tree.branches) {
       setColor(b, LX.hsb(0, 0, max(0, 100 - 400 * LXUtils.wrapdistf(b.azimuth, azim, TWO_PI))));
+    }
+  }
+}
+
+public class AxisTest extends LXPattern {
+  
+  public final CompoundParameter xPos = new CompoundParameter("X", 0);
+  public final CompoundParameter yPos = new CompoundParameter("Y", 0);
+  public final CompoundParameter zPos = new CompoundParameter("Z", 0);
+  
+  public AxisTest(LX lx) {
+    super(lx);
+    addParameter("xPos", xPos);
+    addParameter("yPos", yPos);
+    addParameter("zPos", zPos);
+  }
+  
+  public void run(double deltaMs) {
+    float x = this.xPos.getValuef();
+    float y = this.yPos.getValuef();
+    float z = this.zPos.getValuef();
+    for (LXPoint p : model.points) {
+      float d = abs(p.xn - x);
+      d = min(d, abs(p.yn - y));
+      d = min(d, abs(p.zn - z));
+      colors[p.index] = palette.getColor(p, max(0, 100 - 1000*d));
+    }
+  }
+}
+
+public class Swarm extends LXPattern {
+  
+  private static final int NUM_GROUPS = 5;
+  
+  public final CompoundParameter speed = new CompoundParameter("Speed", 2000, 10000, 500);
+  public final CompoundParameter base = new CompoundParameter("Base", 10, 60, 1);
+  
+  public final LXModulator[] pos = new LXModulator[NUM_GROUPS];
+  
+  public final LXModulator swarmX = startModulator(new SinLFO(
+    startModulator(new SinLFO(0, .2, startModulator(new SinLFO(3000, 9000, 17000).randomBasis()))),
+    startModulator(new SinLFO(.8, 1, startModulator(new SinLFO(4000, 7000, 15000).randomBasis()))),
+    startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
+  ).randomBasis());
+  
+  public final LXModulator swarmY = startModulator(new SinLFO(
+    startModulator(new SinLFO(0, .2, startModulator(new SinLFO(3000, 9000, 19000).randomBasis()))),
+    startModulator(new SinLFO(.8, 1, startModulator(new SinLFO(4000, 7000, 13000).randomBasis()))),
+    startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
+  ).randomBasis());
+  
+  public Swarm(LX lx) {
+    super(lx);
+    addParameter("speed", speed);
+    addParameter("base", base);
+    for (int i = 0; i < pos.length; ++i) {
+      final int ii = i;
+      pos[i] = new SawLFO(0, LeafAssemblage.NUM_LEAVES, new FunctionalParameter() {
+        public double getValue() {
+          return speed.getValue() + ii*500; 
+      }}).randomBasis();
+      startModulator(pos[i]);
+    }
+  }
+  
+  public void run(double deltaMs) {
+    int i = 0;
+    float base = this.base.getValuef();
+    float swarmX = this.swarmX.getValuef();
+    float swarmY = this.swarmY.getValuef();
+    for (LeafAssemblage assemblage : tree.assemblages) {
+      float pos = this.pos[i++ % NUM_GROUPS].getValuef();
+      for (Leaf leaf : assemblage.leaves) {
+        float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, swarmX, swarmY));  
+        colors[leaf.point.index] = palette.getColor(leaf.point, max(20, 100 - falloff*LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length)));
+      }
     }
   }
 }

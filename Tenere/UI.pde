@@ -5,7 +5,8 @@ import java.nio.IntBuffer;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
-private static final int WOOD_FILL = #281403; 
+private static final int WOOD_FILL = #281403;
+private static final int DUST_FILL = #A7784C;
 
 public class UILogo extends UI3dComponent {
   private final PImage logoImage = loadImage("tenere.png");
@@ -81,23 +82,49 @@ public static class UICylinder extends UI3dComponent {
   }
 }
 
-public static class UITrunk extends UI3dComponent {
+public class UITrunk extends UI3dComponent {
   
   private final UICylinder cylinder;
+  private final PImage dust;
+  private final PImage person;
   
   public UITrunk() {
     this.cylinder = new UICylinder(Tree.TRUNK_DIAMETER/2, Tree.TRUNK_DIAMETER/4, -Tree.LIMB_HEIGHT, 6*FEET, 8);
+    this.dust = loadImage("dust.png");
+    this.person = loadImage("person.png");
     addChild(this.cylinder);
   }
   
   @Override
   protected void onDraw(heronarts.p3lx.ui.UI ui, PGraphics pg) {
-    // MAJOR IMPROVEMENTS NEEDED HERE!
-    // Quick hackup to draw a tree trunk.
-    // Let's implement some shaders and have a nice simulation.
+    pg.tint(DUST_FILL);
+    pg.textureMode(NORMAL);
+    pg.beginShape();
+    pg.texture(this.dust);
+    pg.vertex(-100*FEET, -Tree.LIMB_HEIGHT - 1*FEET, -100*FEET, 0, 0);
+    pg.vertex(100*FEET, -Tree.LIMB_HEIGHT - 1*FEET, -100*FEET, 0, 1);
+    pg.vertex(100*FEET, -Tree.LIMB_HEIGHT - 1*FEET, 100*FEET, 1, 1);
+    pg.vertex(-100*FEET, -Tree.LIMB_HEIGHT - 1*FEET, 100*FEET, 1, 0);
+    pg.endShape(CLOSE);
+    
+    float personY = -Tree.LIMB_HEIGHT - 1*FEET;
+    drawPerson(pg, -10*FEET, personY, 10*FEET, 1.5*FEET, 1.5*FEET);
+    drawPerson(pg, 8*FEET, personY, 12*FEET, -1.5*FEET, 1.5*FEET);
+    drawPerson(pg, 2*FEET, personY, 8*FEET, -2*FEET, 1*FEET);
+    
     pg.fill(WOOD_FILL);
     pg.noStroke();
-    //this.cylinder.onDraw(ui, pg);
+  }
+  
+  void drawPerson(PGraphics pg, float personX, float personY, float personZ, float personXW, float personZW) {
+    pg.tint(#393939);
+    pg.beginShape();
+    pg.texture(this.person);
+    pg.vertex(personX, personY, personZ, 0, 1);
+    pg.vertex(personX + personXW, personY, personZ + personZW, 1, 1);
+    pg.vertex(personX + personXW, personY + 5*FEET, personZ + personZW, 1, 0);
+    pg.vertex(personX, personY + 5*FEET, personZ, 0, 0);
+    pg.endShape(CLOSE);
   }
 }
 
@@ -414,13 +441,17 @@ public class UIShapeLeaves extends UILeaves {
 
 public class UITreeControls extends UICollapsibleSection {
   
+  public final UIButton pointsVisible;
+  public final UIButton leavesVisible;
+  public final UIButton structureVisible;
+  
   public UITreeControls(final LXStudio.UI ui) {
     super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 200);
     setTitle("RENDER");
     setLayout(UI2dContainer.Layout.VERTICAL);
     setChildMargin(2);
     
-    new UIButton(0, 0, getContentWidth(), 18) {
+    this.pointsVisible = (UIButton) new UIButton(0, 0, getContentWidth(), 18) {
       public void onToggle(boolean on) {
         ui.preview.pointCloud.setVisible(on);
       }
@@ -429,7 +460,7 @@ public class UITreeControls extends UICollapsibleSection {
     .setActive(ui.preview.pointCloud.isVisible())
     .addToContainer(this);
     
-    new UIButton(0, 0, getContentWidth(), 18) {
+    this.leavesVisible = (UIButton) new UIButton(0, 0, getContentWidth(), 18) {
       public void onToggle(boolean on) {
         uiLeaves.setVisible(on);
       }
@@ -438,7 +469,7 @@ public class UITreeControls extends UICollapsibleSection {
     .setActive(uiLeaves.isVisible())
     .addToContainer(this);
     
-    new UIButton(0, 0, getContentWidth(), 18) {
+    this.structureVisible = (UIButton) new UIButton(0, 0, getContentWidth(), 18) {
       public void onToggle(boolean on) {
         uiTreeStructure.setVisible(on);
       }
