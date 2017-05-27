@@ -39,7 +39,7 @@ void setup() {
       }
       
       public void onUIReady(LXStudio lx, LXStudio.UI ui) {
-        ui.preview.setRadius(80*FEET).setPhi(-PI/12).setTheta(PI/12);
+        ui.preview.setRadius(80*FEET).setPhi(-PI/18).setTheta(PI/12);
         ui.preview.setCenter(0, model.cy - 2*FEET, 0);
         ui.preview.addComponent(new UISimulation());
         ui.preview.addComponent(uiLeaves = new UIShapeLeaves());
