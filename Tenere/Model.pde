@@ -19,8 +19,9 @@ public static class Tree extends LXModel {
   public static final float LIMB_HEIGHT = 10*FEET;
   public static final int NUM_LIMBS = 12;
   
-  public final List<Branch> branches;
   public final List<Limb> limbs;
+  public final List<Branch> branches;
+  public final List<LeafAssemblage> assemblages;
   public final List<Leaf> leaves;
   
   public Tree(ModelMode mode) {
@@ -31,13 +32,16 @@ public static class Tree extends LXModel {
     
     // Collect up all the leaves for top-level reference
     final List<Leaf> leaves = new ArrayList<Leaf>();
+    final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     for (Branch branch : this.branches) {
       for (LeafAssemblage assemblage : branch.assemblages) {
+        assemblages.add(assemblage);
         for (Leaf leaf : assemblage.leaves) {
           leaves.add(leaf);
         }
       }
     }
+    this.assemblages = Collections.unmodifiableList(assemblages);
     this.leaves = Collections.unmodifiableList(leaves);
   }
 
@@ -148,44 +152,44 @@ public static class Limb extends LXModel {
     Fixture(float y, float azimuth, Size size) {
       LXTransform t = new LXTransform();
       t.translate(0, y, 0);
-      t.rotateY(-HALF_PI + azimuth);
-      t.rotateX(-HALF_PI + PI/12);
+      t.rotateY(HALF_PI - azimuth);
+      t.rotateX(HALF_PI - PI/12);
       if (size == Size.FULL) {
         t.translate(0, SECTION_1.len, 0);
       }
       if (size != Size.SMALL) {
         t.translate(0, SECTION_2.len, 0);
       }
-      t.rotateX(PI/6);
+      t.rotateX(-PI/6);
       t.translate(0, SECTION_3.len);
-      t.rotateX(PI/6);
+      t.rotateX(-PI/6);
       
       // Branch S.2 (3)
       t.push();
-      t.rotateX(-PI/4);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth, -PI/8);
       t.pop();
       
       t.translate(0, SECTION_4.len);
       
       // Double-branch S.2 (12)      
-      // First part
+      // First part (left)
       t.push();
-      t.rotateY(PI/3);
-      t.rotateX(-PI/4);
+      t.rotateY(-PI/3);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth + PI/3, -PI/6);
       t.pop();
       
-      // Second part
+      // Second part (right)
       t.push();
-      t.rotateY(-PI/3);
-      t.rotateX(-PI/4);
+      t.rotateY(PI/3);
+      t.rotateX(PI/4);
       addBranchCluster(t, azimuth - PI/3, PI/8);
       t.pop();
     }
     
     private void addBranchCluster(LXTransform t, float azimuth, float baseElevation) {
-      // Loos interpretation of Branch S.2 (3)
+      // Loose interpretation of Branch S.2 (3)
       t.translate(0, 2*FT, 0);
       addBranch(t, azimuth, PI/3, baseElevation);
       t.translate(0, .5*FT, 0);
@@ -268,8 +272,8 @@ public static class Branch extends LXModel {
   public final float azimuth;
   public final float elevation;
    
-  private static final float RIGHT_THETA = QUARTER_PI;
-  private static final float LEFT_THETA = -QUARTER_PI;
+  private static final float RIGHT_THETA = -QUARTER_PI;
+  private static final float LEFT_THETA = QUARTER_PI;
   
   private static final float RIGHT_OFFSET = 12*IN;
   private static final float LEFT_OFFSET = -12*IN;
@@ -311,8 +315,8 @@ public static class Branch extends LXModel {
     Fixture(Orientation orientation) {
       LXTransform t = new LXTransform();
       t.translate(orientation.x, orientation.y, orientation.z);
-      t.rotateY(-HALF_PI + orientation.azimuth);
-      t.rotateX(-HALF_PI + orientation.elevation);
+      t.rotateY(HALF_PI - orientation.azimuth);
+      t.rotateX(HALF_PI - orientation.elevation);
       t.rotateY(orientation.tilt);      
 
       for (LeafAssemblage.Orientation assemblage : ASSEMBLAGES) {
@@ -368,17 +372,17 @@ public static class LeafAssemblage extends LXModel {
   // up the branch, away from the base stem.
   //
   // Third argument is the rotation of the leaf on the x-y plane, 0
-  // is the leaf pointing "up", HALF_PI is pointing to the right,
-  // -HALF_PI is pointing to the left, etc.
+  // is the leaf pointing "up", HALF_PI is pointing to the left,
+  // -HALF_PI is pointing to the right, etc.
   public static final Leaf.Orientation[] LEAVES = {    
-    new Leaf.Orientation( 6.4*IN,  8.8*IN, HALF_PI + QUARTER_PI), // A
-    new Leaf.Orientation( 6.9*IN, 10.0*IN, HALF_PI), // B
-    new Leaf.Orientation(10.4*IN, 14.7*IN, HALF_PI + .318), // C
-    new Leaf.Orientation(10.0*IN, 16.1*IN, .900), // D
-    new Leaf.Orientation( 1.2*IN, 13.9*IN, 1.08), // E
-    new Leaf.Orientation( 3.5*IN, 22.2*IN, HALF_PI + .2), // F
-    new Leaf.Orientation( 2.9*IN, 23.3*IN, .828), // G
-    new Leaf.Orientation( 0.0*IN, 23.9*IN, 0), // H
+    new Leaf.Orientation(0,  6.4*IN,  8.8*IN, -HALF_PI - QUARTER_PI), // A
+    new Leaf.Orientation(1,  6.9*IN, 10.0*IN, -HALF_PI), // B
+    new Leaf.Orientation(2, 10.4*IN, 14.7*IN, -HALF_PI - .318), // C
+    new Leaf.Orientation(3, 10.0*IN, 16.1*IN, -.900), // D
+    new Leaf.Orientation(4,  1.2*IN, 13.9*IN, -1.08), // E
+    new Leaf.Orientation(5,  3.5*IN, 22.2*IN, -HALF_PI - .2), // F
+    new Leaf.Orientation(6,  2.9*IN, 23.3*IN, -.828), // G
+    new Leaf.Orientation(7,  0.0*IN, 23.9*IN, 0), // H
     null, // I
     null, // J
     null, // K
@@ -396,8 +400,8 @@ public static class LeafAssemblage extends LXModel {
     // the y-axis.
     for (int i = 0; i < 7; ++i) {
       Leaf.Orientation thisLeaf = LEAVES[i];
-      LEAVES[LEAVES.length - 1 - i] =
-        new Leaf.Orientation(-thisLeaf.x, thisLeaf.y, -thisLeaf.theta);
+      int index = LEAVES.length - 1 - i; 
+      LEAVES[index] = new Leaf.Orientation(index, -thisLeaf.x, thisLeaf.y, -thisLeaf.theta);
     }
   }
   
@@ -441,6 +445,9 @@ public static class Leaf extends LXModel {
   
   // Orientation of a leaf relative to leaf assemblage
   public static class Orientation {
+    
+    public final int index;
+    
     // X-Y position relative to leaf assemblage base
     // y-axis pointing "up" the leaf assemblage 
     public final float x;
@@ -452,13 +459,16 @@ public static class Leaf extends LXModel {
     // Tilt of the individual leaf
     public final float tilt;
     
-    Orientation(float x, float y, float theta) {
+    Orientation(int index, float x, float y, float theta) {
+      this.index = index;
       this.x = x;
       this.y = y;
       this.theta = theta;
       this.tilt = -QUARTER_PI + HALF_PI * (float) Math.random();
     }
   }
+  
+  public final LXPoint point;
   
   public final float x;
   public final float y;
@@ -473,7 +483,7 @@ public static class Leaf extends LXModel {
   }
   
   public Leaf(LXTransform t) {
-    this(t, new Orientation(0, 0, 0));
+    this(t, new Orientation(0, 0, 0, 0));
   }
   
   public Leaf(LXTransform t, Orientation orientation) {
@@ -482,6 +492,7 @@ public static class Leaf extends LXModel {
     this.x = t.x();
     this.y = t.y();
     this.z = t.z();
+    this.point = this.points[0];
     
     // Precompute boundary coordinates for faster rendering, these
     // can be dumped into a VBO for a shader.
