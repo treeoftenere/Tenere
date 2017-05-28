@@ -20,22 +20,20 @@ public static class Plasma extends LXPattern {
     
     
     public final CompoundParameter size =
-    new CompoundParameter("Size", 0.15, 0.05, 0.5)
+    new CompoundParameter("Size", 0.4, 0.05, 0.5)
     .setDescription("Size");
-    
-        public final CompoundParameter maxRate =
-    new CompoundParameter("MaxRate", 6000, 10000, 3500)
-    .setDescription("MaxRate");
    
-   
+    // This is used to make a subtle change to the uniqueness of the plasma, by 
+    // movement of the cirlce on the x axis accross the tree. 
+    //It is apparent only when the plasma is slow, and helps iliminate repeating patterns. 
     public final CompoundParameter CSpeedX =
     new CompoundParameter("CSpeedX", 2000, 10000, 40000)
     .setDescription("CSpeedX");
     
-        public final SinLFO RateLfo = new SinLFO(
-      60000, 
-      maxRate, 
-      60000     
+    public final SinLFO RateLfo = new SinLFO(
+      0.1, 
+      0.8, 
+      10000     
     );
   
     public final SinLFO CircleMoveX = new SinLFO(
@@ -55,7 +53,6 @@ public static class Plasma extends LXPattern {
     super(lx);
     
     addParameter(size);
-    addParameter(maxRate);
     addParameter(CSpeedX);
     
     startModulator(CircleMoveX);
@@ -69,10 +66,12 @@ public static class Plasma extends LXPattern {
     for (LXPoint p : model.points) {
      
       //GET A UNIQUE SHADE FOR THIS PIXEL
+      float _size = (float) size.getValue();
+      
       shade =
-      + SinVertical( p.x, (float) size.getValue()) 
-      + SinRotating( p.x, p.y, p.z, (float) size.getValue()) 
-      + SinCircle(   p.x, p.y, p.z, (float) size.getValue()) /3;
+      + SinVertical( p.x, _size) 
+      + SinRotating( p.x, p.y, p.z, _size) 
+      + SinCircle(   p.x, p.y, p.z, _size) /3;
       
       //SELECTIVELY PULL OUT RED, GREEN, and BLUE 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
@@ -83,19 +82,19 @@ public static class Plasma extends LXPattern {
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
       
       //DEV Display variables
-      if(counter > nextCheck)
-      {
-        print("RateLfo="); print(RateLfo.getValue());
-        println();
-        nextCheck += checkEvery;
-      }
+      //if(counter > nextCheck)
+      //{
+      //  print("RateLfo="); print(RateLfo.getValue());
+      //  println();
+      //  nextCheck += checkEvery;
+      //}
       
       //USED FOR MAKING THE ANIMATION MOVE
       counter++;
     }
 
   //advance through time. Sclaed down as LX does some millions of itternations per second.
-   movement = counter/(float)RateLfo.getValue();
+   movement += (counter * (float)RateLfo.getValue()) * 0.000001;
    
   }
   
