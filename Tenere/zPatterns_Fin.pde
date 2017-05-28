@@ -31,9 +31,9 @@ public static class Plasma extends LXPattern {
     .setDescription("CSpeedX");
     
     public final SinLFO RateLfo = new SinLFO(
-      0.1, 
-      0.8, 
-      10000     
+      2, 
+      20, 
+      60000     
     );
   
     public final SinLFO CircleMoveX = new SinLFO(
@@ -58,7 +58,14 @@ public static class Plasma extends LXPattern {
     startModulator(CircleMoveX);
     startModulator(CircleMoveY);
     startModulator(RateLfo);
-  }
+    
+    print("Model Geometory");
+    print("Averages ax, ay, az: "); print(model.ax);print(",");println(model.ay);print(",");println(model.az);
+    print("Cerntres cx, cy, cz: ");print(model.cx);print(",");println(model.cy);print(",");println(model.cz);
+    print("Maximums xMax, yMax zMax: ");print(model.xMax);print(",");println(model.yMax);print(",");println(model.zMax);
+    print("Minimums xMin, yMin zMin: ");print(model.xMin);print(",");println(model.yMin);print(",");println(model.zMin);
+    
+}
     
   public void run(double deltaMs) {
    
@@ -94,7 +101,7 @@ public static class Plasma extends LXPattern {
     }
 
   //advance through time. Sclaed down as LX does some millions of itternations per second.
-   movement += (counter * (float)RateLfo.getValue()) * 0.000001;
+   movement += (counter * (float)RateLfo.getValue()) * 0.00000001; //surely there is a beter way to count frames!
    
   }
   
