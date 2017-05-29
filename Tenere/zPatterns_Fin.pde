@@ -87,13 +87,13 @@ public static class Plasma extends LXPattern {
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
       
       //DEV Display variables
-      if(counter > nextCheck)
-      {
-        float distance =  pointAsVector.dist(circle);
-        print("movement="); print(movement);
-        println();
-        nextCheck += checkEvery;
-      }
+      //if(counter > nextCheck)
+      //{
+      //  float distance =  pointAsVector.dist(circle);
+      //  print("movement="); print(movement);
+      //  println();
+      //  nextCheck += checkEvery;
+      //}
       
       //USED FOR MAKING THE ANIMATION MOVE
       counter++;
