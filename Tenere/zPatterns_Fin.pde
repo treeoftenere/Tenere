@@ -13,7 +13,7 @@ public static class Plasma extends LXPattern {
   
   LXVector circle;
   
-  long counter = 0;
+  
   long nextCheck = 500000;
   long checkEvery = 500000;
     
@@ -25,8 +25,8 @@ public static class Plasma extends LXPattern {
     
     public final SinLFO RateLfo = new SinLFO(
       2, 
-      10, 
-      60000     
+      20, 
+      45000     
     );
   
     public final SinLFO CircleMoveX = new SinLFO(
@@ -53,11 +53,11 @@ public static class Plasma extends LXPattern {
     
     circle = new LXVector(0,0,0);
     
-    print("Model Geometory");
-    print("Averages ax, ay, az: "); print(model.ax);print(",");println(model.ay);print(",");println(model.az);
-    print("Cerntres cx, cy, cz: ");print(model.cx);print(",");println(model.cy);print(",");println(model.cz);
-    print("Maximums xMax, yMax zMax: ");print(model.xMax);print(",");println(model.yMax);print(",");println(model.zMax);
-    print("Minimums xMin, yMin zMin: ");print(model.xMin);print(",");println(model.yMin);print(",");println(model.zMin);
+    println("Model Geometory");
+    print("Averages ax, ay, az: "); print(model.ax);print(",");print(model.ay);print(",");println(model.az);
+    print("Cerntres cx, cy, cz: ");print(model.cx);print(",");print(model.cy);print(",");println(model.cz);
+    print("Maximums xMax, yMax zMax: ");print(model.xMax);print(",");print(model.yMax);print(",");println(model.zMax);
+    print("Minimums xMin, yMin zMin: ");print(model.xMin);print(",");print(model.yMin);print(",");println(model.zMin);
     
 }
     
@@ -80,8 +80,8 @@ public static class Plasma extends LXPattern {
       
       //SELECTIVELY PULL OUT RED, GREEN, and BLUE 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
-      green =  map(sin(shade*PI+(2*cos(movement*10))), -1, 1, 0, brightness);
-      blue = map(sin(shade*PI+(4*sin(movement*15))), -1, 1, 0, brightness);
+      green =  map(sin(shade*PI+(2*cos(movement*490))), -1, 1, 0, brightness);
+      blue = map(sin(shade*PI+(4*sin(movement*300))), -1, 1, 0, brightness);
 
       //COMMIT THIS COLOR 
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
@@ -91,17 +91,18 @@ public static class Plasma extends LXPattern {
       //{
       //  float distance =  pointAsVector.dist(circle);
       //  print("movement="); print(movement);
+      //  print(" RateLfo="); println(RateLfo.getValue());
+        
       //  println();
       //  nextCheck += checkEvery;
       //}
       
       //USED FOR MAKING THE ANIMATION MOVE
-      counter++;
+     
     }
+    
+    movement =+ ((float)RateLfo.getValue() / 1000);
 
-  //advance through time. Sclaed down as LX does some millions of itternations per second.
-  float advance = (counter * (float)RateLfo.getValue()) * 0.00000001;
-   movement +=  advance / 100; //surely there is a beter way to count frames!
    
   }
   
