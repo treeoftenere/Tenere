@@ -11,8 +11,7 @@ public static class Plasma extends LXPattern {
   int minShade = -100;
   int maxShade = 100;
   
-
-  float circleBoundary = 3;
+  LXVector circle;
   
   long counter = 0;
   long nextCheck = 500000;
@@ -20,32 +19,26 @@ public static class Plasma extends LXPattern {
     
     
     public final CompoundParameter size =
-    new CompoundParameter("Size", 0.4, 0.05, 0.5)
+    new CompoundParameter("Size", 0.8, 0.1, 1)
     .setDescription("Size");
-   
-    // This is used to make a subtle change to the uniqueness of the plasma, by 
-    // movement of the cirlce on the x axis accross the tree. 
-    //It is apparent only when the plasma is slow, and helps iliminate repeating patterns. 
-    public final CompoundParameter CSpeedX =
-    new CompoundParameter("CSpeedX", 2000, 10000, 40000)
-    .setDescription("CSpeedX");
+  
     
     public final SinLFO RateLfo = new SinLFO(
       2, 
-      20, 
+      10, 
       60000     
     );
   
     public final SinLFO CircleMoveX = new SinLFO(
       model.xMax*-1, 
       model.xMax*2, 
-      CSpeedX     
+      40000     
     );
     
         public final SinLFO CircleMoveY = new SinLFO(
       model.xMax*-1, 
       model.yMax*2, 
-      13000 
+      22000 
     );
 
   
@@ -53,11 +46,12 @@ public static class Plasma extends LXPattern {
     super(lx);
     
     addParameter(size);
-    addParameter(CSpeedX);
     
     startModulator(CircleMoveX);
     startModulator(CircleMoveY);
     startModulator(RateLfo);
+    
+    circle = new LXVector(0,0,0);
     
     print("Model Geometory");
     print("Averages ax, ay, az: "); print(model.ax);print(",");println(model.ay);print(",");println(model.az);
@@ -69,59 +63,68 @@ public static class Plasma extends LXPattern {
     
   public void run(double deltaMs) {
    
+    MoveCircle();
     
     for (LXPoint p : model.points) {
      
       //GET A UNIQUE SHADE FOR THIS PIXEL
-      float _size = (float) size.getValue();
+
+      //convert to vector so we can use the distance method
+      LXVector pointAsVector = new LXVector(p);
+      float _size = (float) size.getValue(); 
       
       shade =
-      + SinVertical( p.x, _size) 
-      + SinRotating( p.x, p.y, p.z, _size) 
-      + SinCircle(   p.x, p.y, p.z, _size) /3;
+      + (SinVertical(  pointAsVector, _size) 
+      + SinRotating(  pointAsVector, _size)) 
+      + SinCircle(    pointAsVector, circle, _size) ;
       
       //SELECTIVELY PULL OUT RED, GREEN, and BLUE 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
-      green =  map(sin(shade*PI+(2*cos(movement/330))), -1, 1, 0, brightness);
-      blue = map(sin(shade*PI+(4*sin(movement/400))), -1, 1, 0, brightness);
+      green =  map(sin(shade*PI+(2*cos(movement*10))), -1, 1, 0, brightness);
+      blue = map(sin(shade*PI+(4*sin(movement*15))), -1, 1, 0, brightness);
 
       //COMMIT THIS COLOR 
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
       
       //DEV Display variables
-      //if(counter > nextCheck)
-      //{
-      //  print("RateLfo="); print(RateLfo.getValue());
-      //  println();
-      //  nextCheck += checkEvery;
-      //}
+      if(counter > nextCheck)
+      {
+        float distance =  pointAsVector.dist(circle);
+        print("movement="); print(movement);
+        println();
+        nextCheck += checkEvery;
+      }
       
       //USED FOR MAKING THE ANIMATION MOVE
       counter++;
     }
 
   //advance through time. Sclaed down as LX does some millions of itternations per second.
-   movement += (counter * (float)RateLfo.getValue()) * 0.00000001; //surely there is a beter way to count frames!
+  float advance = (counter * (float)RateLfo.getValue()) * 0.00000001;
+   movement +=  advance / 100; //surely there is a beter way to count frames!
    
   }
   
-  float SinVertical(float x, float size)
+  float SinVertical(LXVector p, float size)
   {
-    return sin(   ( x / model.xMax / size) + (movement / 100 ));
+    return sin(   ( p.x / model.xMax / size) + (movement / 100 ));
   }
   
-  float SinRotating(float x, float y, float z, float size)
+  float SinRotating(LXVector p, float size)
   {
-    return sin( ( ( y / model.yMax / size) * sin( movement /134 )) + (z / model.zMax / size) * (cos(movement / 200))  ) ;
+    return sin( ( ( p.y / model.yMax / size) * sin( movement /66 )) + (p.z / model.zMax / size) * (cos(movement / 100))  ) ;
   }
    
-  float SinCircle(float x, float y,float z, float size)
+  float SinCircle(LXVector p, LXVector circle, float size)
   {
-    float cx =  (float)CircleMoveX.getValue();
-    float cy = (float)CircleMoveY.getValue();
-    return sin( (sqrt(sq(cy-y) + sq(cx-x) )+ movement + (z/model.zMax)) / model.xMax / size );
+    float distance =  p.dist(circle);
+    return sin( (( distance + movement + (p.z/model.zMax) ) / model.xMax / size) * 2 ); 
   }
 
-
+  void MoveCircle()
+  {
+    circle.x = (float)CircleMoveX.getValue();
+    circle.y = (float)CircleMoveY.getValue();
+  }
 
 }
