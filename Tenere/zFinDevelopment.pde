@@ -1,9 +1,9 @@
 public static class TheFourSeasons extends LXPattern {
   // by Fin McCarthy finchronicity@gmail.com
   
-  long counter = 0;
-  long nextCheck = 30;
-  long checkEvery = 30;
+  //January is summer. No complaining or I convert the tree model to metric! 
+  
+  int dayOfTheYear = 0;
   
   enum season {SUMMER, AUTUMN, WINTER, SPRING}
   
@@ -20,6 +20,8 @@ public static class TheFourSeasons extends LXPattern {
     
   public void run(double deltaMs) {
 
+    
+    
       /*
      
     //SPRING : Sprouting Leaves, flying birds
@@ -53,6 +55,6 @@ public static class TheFourSeasons extends LXPattern {
       colors[p.index] =  #00ff00;
     }
     
-     counter++;
+
   }
 }
