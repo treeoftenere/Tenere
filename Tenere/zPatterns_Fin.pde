@@ -7,7 +7,7 @@ public static class Plasma extends LXPattern {
   int brightness = 255;
   float red, green, blue;
   float shade;
-  float movement = 0;
+  float movement = 0.1;
   
   PlasmaGenerator plasmaGenerator;
   
@@ -49,7 +49,9 @@ public static class Plasma extends LXPattern {
     startModulator(RateLfo);
     
     plasmaGenerator =  new PlasmaGenerator(model.xMax, model.yMax, model.zMax);
-
+    UpdateCirclePosition();
+    
+    PrintModelGeometory();
 }
     
   public void run(double deltaMs) {
@@ -59,12 +61,10 @@ public static class Plasma extends LXPattern {
       //GET A UNIQUE SHADE FOR THIS PIXEL
 
       //convert this point to vector so we can use the dist method in the plasma generator
-      LXVector pointAsVector = new LXVector(p);
-      
       float _size = (float) size.getValue(); 
       
       //combine the individual plasma patterns 
-      shade = plasmaGenerator.GetThreeTierPlasma(pointAsVector, _size, movement );
+      shade = plasmaGenerator.GetThreeTierPlasma(p, _size, movement );
  
       //separate out a red, green and blue shade from the plasma wave 
       red = map(sin(shade*PI), -1, 1, 0, brightness);
@@ -89,12 +89,17 @@ public static class Plasma extends LXPattern {
     
    movement =+ ((float)RateLfo.getValue() / 1000); //advance the animation through time. 
    
-   plasmaGenerator.UpdateCirclePosition(
+  UpdateCirclePosition();
+    
+  }
+  
+  void UpdateCirclePosition()
+  {
+      plasmaGenerator.UpdateCirclePosition(
       (float)CircleMoveX.getValue(), 
       (float)CircleMoveY.getValue(),
       0
       );
-    
   }
 
   void PrintModelGeometory()
@@ -138,9 +143,9 @@ public static class Plasma extends LXPattern {
         return sin( (( distance + movement + (p.z/zmax) ) / xmax / size) * 2 ); 
       }
     
-      float GetThreeTierPlasma(LXVector pointAsVector, float size, float movement)
+      float GetThreeTierPlasma(LXPoint p, float size, float movement)
       {
-        
+        LXVector pointAsVector = new LXVector(p);
         return  SinVertical(  pointAsVector, size, movement) +
         SinRotating(  pointAsVector, size, movement) +
         SinCircle( pointAsVector, size, movement);
