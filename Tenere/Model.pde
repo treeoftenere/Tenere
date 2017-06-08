@@ -262,6 +262,7 @@ public static class Branch extends LXModel {
   public final Orientation orientation;
     
   public final List<LeafAssemblage> assemblages;
+  public final List<Leaf> leaves;
   
   // Position of the branch in global space
   public final float x;
@@ -306,6 +307,13 @@ public static class Branch extends LXModel {
     this.elevation = atan2(orientation.y, dist(0, 0, orientation.x, orientation.z));
     Fixture f = (Fixture) this.fixtures.get(0);
     this.assemblages = Collections.unmodifiableList(f.assemblages);
+    List<Leaf> leaves = new ArrayList<Leaf>();
+    for (LeafAssemblage assemblage : this.assemblages) {
+      for (Leaf leaf : assemblage.leaves) {
+        leaves.add(leaf);
+      }
+    }
+    this.leaves = Collections.unmodifiableList(leaves);
   }
   
   private static class Fixture extends LXAbstractFixture {

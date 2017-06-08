@@ -403,6 +403,7 @@ public class UIShapeLeaves extends UILeaves {
       // This is hacky as fuck! But couldn't find a better way to do this.
       // This reaches inside the PShapeOpenGL guts and updates ONLY the
       // vertex color buffer object with new data on each rendering pass.
+      
       this.tintBuffer.rewind();
       if (BIG_ENDIAN) {
         for (int i = 0; i < colors.length; ++i) {

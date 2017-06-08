@@ -34,7 +34,38 @@ void setup() {
         lx.engine.registerComponent("tenereSettings", new Settings(lx, ui));
         lx.registerEffect(BlurEffect.class);
         lx.registerEffect(DesaturationEffect.class);
-        // TODO: the UDP output instantiation will go in here!
+        
+        // End-to-end test, sending one branch worth of data
+        // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
+        try {
+          // Update appropriately for testing!
+          final String OPC_ADDRESS = "192.168.0.10"; 
+          final int OPC_PORT = 7890;
+          
+          final int PIXELS_PER_LEAF = Leaf.NUM_LEDS;
+          // final int PIXELS_PER_LEAF = 1; // Use this version to test one value per leaf 
+          
+          // Construct list of output points to go in the datagram
+          Branch branch = tree.branches.get(0); // Just test the first branch
+          int li = 0;
+          int[] branchIndices = new int[branch.leaves.size() * PIXELS_PER_LEAF];
+          for (Leaf leaf : branch.leaves) {
+            for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
+              branchIndices[li++] = leaf.point.index;
+            }
+          }
+          
+          // Add a new datagram output driver with the branch datagram message
+          lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
+            new OPCDatagram(branchIndices, OPCConstants.CHANNEL_BROADCAST)
+            .setAddress(OPC_ADDRESS)
+            .setPort(OPC_PORT)
+          ));
+        } catch (Exception x) {
+          println("Failed to construct UDP output: " + x);
+          x.printStackTrace();
+        }
+        
         t.log("Initialized LXStudio");
       }
       
@@ -54,6 +85,7 @@ void setup() {
       }
     };
   } catch (Exception x) {
+    println("Initialization error: " + x);
     x.printStackTrace();
   }
 }
