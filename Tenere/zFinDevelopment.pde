@@ -9,14 +9,11 @@ public static class TheFourSeasons extends LXPattern {
   int startupPause = 50;
   
   LXVector[] leaves;
-  int leafDiameter = 60;
+  int leafDiameter = 120;
   
   public final CompoundParameter xPos = new CompoundParameter("X", 0,model.xMin,model.xMax);
- public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
-
+  public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
   public final CompoundParameter zPos = new CompoundParameter("Z", 0,model.zMin,model.zMax);
-  
-  
 
   public TheFourSeasons(LX lx) {
     super(lx);
@@ -30,7 +27,7 @@ public static class TheFourSeasons extends LXPattern {
   }
     
   public void run(double deltaMs) {
-
+    
     //AdvanceTime();
     ActionSeason();
     
@@ -41,7 +38,6 @@ public static class TheFourSeasons extends LXPattern {
       3 wind blows accross the tree
       
     //SUMMER
-      1 hmmmm
       2 Flames around the base? Smoke effect?
     
     //AUTUMN
@@ -158,37 +154,62 @@ public static class TheFourSeasons extends LXPattern {
   
     void Spring()
   {
-          LXVector leaf = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
-      println(xPos.getValue());
+     // LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
+     //println(xPos.getValue());
+    float distance = 0;
     
-    for (LXPoint p : model.points) {
-      LXVector pointAsVector = new LXVector(p);
-
+    for (Branch targetBranch : tree.branches) {
+             
+        colors[p.index] =  #000000; //first, reset the led for this frame
       
+    
+
       //itterate over all the leaves, if close, light up green
-      //for(LXVector l : leaves)
+      for(LXVector l : leaves)
       {
-        if(leaf.dist(pointAsVector) < leafDiameter)
+        distance = dist(pointAsVector) ;
+        if(distance < leafDiameter)
         {
           colors[p.index] =  #00ff00;
         }
-        else{
-        colors[p.index] =  #000000;}
       }
-    } 
+      
+    } //foreach point
     
-    
-  }
+  }//spring
   
    void InitializeLeaves()
    {
+     int xCount = 12; 
+     int zCount = 12;
+     int yCount = 7;
+     
+     int xStart = -1100;
+     int yStart = 0;
+     int zStart = -1100;
+     
+     
+     leaves = new LXVector[xCount*yCount*zCount]; //<>//
+     
+     //proceduraly make a 3D grid of leaves
+     for(int x = 0; x<xCount; x++)
+     {
+       for(int y = 0; y<yCount; y++)
+       {
+         for(int z = 0; z<zCount; z++)
+         {
+           leaves[x + (y*xCount) + (z*xCount * yCount)] = new LXVector(xStart + (200 * x),
+           yStart + (200 * y),zStart + (200 * z));
+         }
+       }
+     }
      
     // Maximums xMax, yMax zMax:  1156.9141,  1249.6746,  1115.6749
     // Minimums xMin, yMin zMin: -1104.0668, -17.902443, -1087.3219
 
-     leaves = new LXVector[2];
-     leaves[0] = new LXVector(100,100,100);
-     leaves[1] = new LXVector(500,500,500);
+     
+     //leaves[0] = new LXVector(100,100,100);
+     //leaves[1] = new LXVector(500,500,500);
    }
   //HELPERS
   

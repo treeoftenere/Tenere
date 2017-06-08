@@ -51,7 +51,7 @@ public static class Plasma extends LXPattern {
     plasmaGenerator =  new PlasmaGenerator(model.xMax, model.yMax, model.zMax);
     UpdateCirclePosition();
     
-    PrintModelGeometory();
+    //PrintModelGeometory();
 }
     
   public void run(double deltaMs) {
@@ -61,7 +61,7 @@ public static class Plasma extends LXPattern {
       //GET A UNIQUE SHADE FOR THIS PIXEL
 
       //convert this point to vector so we can use the dist method in the plasma generator
-      float _size = (float) size.getValue(); 
+      float _size = size.getValuef(); 
       
       //combine the individual plasma patterns 
       shade = plasmaGenerator.GetThreeTierPlasma(p, _size, movement );
@@ -115,6 +115,70 @@ public static class Plasma extends LXPattern {
 
 
 
+public class ItemLocationsTest extends LXPattern {
+  
+  
+   int i = 0;
+   
+     public final CompoundParameter branch =
+    new CompoundParameter("branch", 0, 0, 60)
+    .setDescription("branch number");
+   
+    public final CompoundParameter ass =
+    new CompoundParameter("ass", 0, 0, 7)
+    .setDescription("assemblage number");
+   
+    public final CompoundParameter leaf =
+    new CompoundParameter("leaf", 0, 0, 14)
+    .setDescription("leaf number");
+   
+   
+  public ItemLocationsTest(LX lx) {
+    
+   super(lx);
+    
+   addParameter("branch", branch);
+   addParameter("ass", ass);
+   addParameter("leaf", leaf);
+   
+  }
+  
+  public void run(double deltaMs) {
+    
+    //clear colors
+   for (LXPoint p : model.points) {
+     colors[p.index] = #000000;
+   }
+   
+   
+   int branchNumber = (int)branch.getValue();
+   int assNumber = (int)ass.getValue();
+   int leafNumber = (int)leaf.getValue();
+    
+    
+    //show a given branch as red
+    Branch targetBranch = tree.branches.get(branchNumber);
+    for (LeafAssemblage targetAss : targetBranch.assemblages) {
+    for (Leaf targetLeaf : targetAss.leaves) {
+      colors[targetLeaf.point.index] = #ff0000;
+    }
+    
+    //show a given assemblage as green
+    LeafAssemblage assx = targetBranch.assemblages.get(assNumber);
+    for (Leaf targetLeaf : assx.leaves) {
+      colors[targetLeaf.point.index] = #00ff00;
+    }
+    
+    //show a given leaf as blue
+    Leaf lx = assx.leaves.get(leafNumber);
+    colors[lx.point.index] = #0000ff;
+    }
+  }
+}
+
+
+
+          
 
 /* ------------------------------------------------------------------------------------------------------------------------*/
 
@@ -168,3 +232,28 @@ public static class Plasma extends LXPattern {
       
   }
   
+  
+  
+  
+  
+  // REFERENCE
+  
+/*
+LIMBS = NUM_LIMBS = 12;
+BRANCHES = 
+ASSEMBLAGES = 
+LEAVES = 
+
+Each Limb has ? Branches
+Each branch has 8 LeafAssemblages [branch.assemblage]
+Each LeafAssemblage has 15 Leaves
+Each Leaf has 7 NUM_LEDS (not yet implemented in code June 5th)
+
+Model Geometory
+Averages ax, ay, az: -34.620586,678.9678,73.70307
+Cerntres cx, cy, cz: -18.998901,601.6301,17.694458
+Maximums xMax, yMax zMax: 1127.384,1275.5334,1166.446
+Minimums xMin, yMin zMin: -1165.382,-72.27326,-1131.0573
+
+
+*/
