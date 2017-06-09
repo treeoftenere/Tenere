@@ -480,3 +480,67 @@ public class UITreeControls extends UICollapsibleSection {
     .addToContainer(this);
   }
 }
+
+public class UISensors extends UICollapsibleSection {
+  
+  private final static int HEART_RATE_WIDTH = 48;
+  private final static int ICON_SIZE = 16;
+  private final static int PADDING = 4;
+  
+  public UISensors(UI ui, float w) {
+    super(ui, 0, 0, w, 60);
+    setTitle("SENSORS");
+    
+    new UIImage(loadImage("heart.png")) {
+      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+        sensors.heartBeat.trigger();
+      }
+    }.addToContainer(this);
+    new UIParameterMeter(ui, sensors.heartBeat, ICON_SIZE + PADDING, 0, getContentWidth() - ICON_SIZE - HEART_RATE_WIDTH - 2*PADDING, 16).addToContainer(this);  
+    new UIDoubleBox(getContentWidth() - HEART_RATE_WIDTH, 0, HEART_RATE_WIDTH, 16).setParameter(sensors.heartRate).addToContainer(this);
+    
+    new UIImage(loadImage("brain.png"), 0, 20) {
+      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+        sensors.muse.setNormalized(random(1));
+      }
+    }.addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(sensors.muse).addToContainer(this);
+  }
+  
+  class UIParameterMeter extends UI2dComponent implements UIModulationSource {
+    
+    private float level;
+    private final LXNormalizedParameter parameter; 
+    
+    public UIParameterMeter(UI ui, final LXNormalizedParameter parameter, float x, float y, float w, float h) {
+      super(x, y, w, h);
+      setBackgroundColor(ui.theme.getControlBackgroundColor());
+      setBorderColor(ui.theme.getControlBorderColor());
+      this.parameter = parameter;
+      this.level = parameter.getNormalizedf();
+      addLoopTask(new LXLoopTask() {
+        public void loop(double deltaMs) {
+          float l2 = parameter.getNormalizedf();
+          if (l2 != level) {
+            level = l2;
+            redraw();
+          }
+        }
+      });
+    }
+    
+    public void onDraw(UI ui, PGraphics pg) {
+      pg.noStroke();
+      pg.fill(ui.theme.getPrimaryColor());
+      pg.rect(0, 0, getWidth() * this.level, getHeight());
+    }
+    
+    public String getDescription() {
+      return this.parameter.getDescription();
+    }
+    
+    public LXNormalizedParameter getModulationSource() {
+      return this.parameter;
+    }
+  }
+}

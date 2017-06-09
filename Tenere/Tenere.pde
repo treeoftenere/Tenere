@@ -15,6 +15,7 @@ final static int _height = 960;
 // Our engine and our model
 LXStudio lx;
 Tree tree;
+Sensors sensors;
 PApplet applet = Tenere.this;
 
 // Global UI objects
@@ -31,9 +32,17 @@ void setup() {
   try {
     lx = new LXStudio(this, tree, false) {
       public void initialize(LXStudio lx, LXStudio.UI ui) {
-        lx.engine.registerComponent("tenereSettings", new Settings(lx, ui));
+        // Register a couple top-level effects
         lx.registerEffect(BlurEffect.class);
-        lx.registerEffect(DesaturationEffect.class);
+        lx.registerEffect(DesaturationEffect.class);        
+        
+        // Register the settings component
+        lx.engine.registerComponent("tenereSettings", new Settings(lx, ui));
+        
+        // Register the sensor integrations
+        sensors = new Sensors(lx);
+        lx.engine.registerComponent("sensors", sensors);
+        lx.engine.addLoopTask(sensors);
         
         // End-to-end test, sending one branch worth of data
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
@@ -80,7 +89,12 @@ void setup() {
         // Narrow angle lens, for a fuller visualization
         ui.preview.perspective.setValue(30);
 
-        uiTreeControls = (UITreeControls) new UITreeControls(ui).addToContainer(ui.leftPane.global);
+        // Sensor integrations
+        new UISensors(ui, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
+        
+        // Custom tree rendering controls
+        uiTreeControls = (UITreeControls) new UITreeControls(ui).addToContainer(ui.leftPane.global);        
+        
         t.log("Initialized LX UI");
       }
     };
