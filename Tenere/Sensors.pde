@@ -40,13 +40,14 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
    * This method handles OSC message dispatch for the specific sensor listeners. 
    */
   public void oscMessage(OscMessage message) {
-    println(Thread.currentThread().getName());
     if (message.matches("/heart/beat")) {
       this.heartBeat.trigger();
     } else if (message.matches("/heart/rate")) {
       this.heartRate.setValue(message.getFloat());
     } else if (message.matches("/muse")) {
       this.muse.setValue(message.getFloat());
+    } else {
+      println("Unrecognized sensor OSC message: " + message.getAddressPattern());
     }
   }
 }

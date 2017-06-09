@@ -499,11 +499,7 @@ public class UISensors extends UICollapsibleSection {
     new UIParameterMeter(ui, sensors.heartBeat, ICON_SIZE + PADDING, 0, getContentWidth() - ICON_SIZE - HEART_RATE_WIDTH - 2*PADDING, 16).addToContainer(this);  
     new UIDoubleBox(getContentWidth() - HEART_RATE_WIDTH, 0, HEART_RATE_WIDTH, 16).setParameter(sensors.heartRate).addToContainer(this);
     
-    new UIImage(loadImage("brain.png"), 0, 20) {
-      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
-        sensors.muse.setNormalized(random(1));
-      }
-    }.addToContainer(this);
+    new UIImage(loadImage("brain.png"), 0, 20).addToContainer(this);
     new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(sensors.muse).addToContainer(this);
   }
   
