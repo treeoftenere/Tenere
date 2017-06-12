@@ -154,27 +154,10 @@ public static class TheFourSeasons extends LXPattern {
   
     void Spring()
   {
-     // LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
-     //println(xPos.getValue());
+    LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
     float distance = 0;
     
-    for (Branch targetBranch : tree.branches) {
-             
-        colors[p.index] =  #000000; //first, reset the led for this frame
-      
-    
 
-      //itterate over all the leaves, if close, light up green
-      for(LXVector l : leaves)
-      {
-        distance = dist(pointAsVector) ;
-        if(distance < leafDiameter)
-        {
-          colors[p.index] =  #00ff00;
-        }
-      }
-      
-    } //foreach point
     
   }//spring
   
@@ -212,6 +195,6 @@ public static class TheFourSeasons extends LXPattern {
      //leaves[1] = new LXVector(500,500,500);
    }
   //HELPERS
-  
-  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
+   enum  Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
 }
+ 
