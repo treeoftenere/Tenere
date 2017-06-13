@@ -155,6 +155,7 @@ public class TheFourSeasons extends LXPattern {
   
   void Spring()
   {
+<<<<<<< HEAD
     //while this does work....it is slow. need to optimize better.  
     
     float distance = 0;
@@ -178,6 +179,12 @@ public class TheFourSeasons extends LXPattern {
           
         }
       
+=======
+    LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
+    float distance = 0;
+    
+
+>>>>>>> 0f2f70a80f08c4c2deb197a4b8446db50a7143d4
     
   }//spring
   
@@ -213,6 +220,7 @@ public class TheFourSeasons extends LXPattern {
      //leaves[1] = new LXVector(500,500,500);
 
   //HELPERS
+<<<<<<< HEAD
   
  public static class PseudoLeaf 
 {
@@ -233,3 +241,8 @@ public static class SeasonsHelpers
 {
  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
 }
+=======
+   enum  Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
+}
+ 
+>>>>>>> 0f2f70a80f08c4c2deb197a4b8446db50a7143d4
