@@ -155,11 +155,9 @@ public class TheFourSeasons extends LXPattern {
   
   void Spring()
   {
-<<<<<<< HEAD
-    //while this does work....it is slow. need to optimize better.  
+    //while this does work....it is slow. need to optimize.  
     
     float distance = 0;
-   
 
       //itterate over all the leaves, if close, light up green
       for(PseudoLeaf pl : pseudoLeaves)
@@ -179,13 +177,6 @@ public class TheFourSeasons extends LXPattern {
           
         }
       
-=======
-    LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
-    float distance = 0;
-    
-
->>>>>>> 0f2f70a80f08c4c2deb197a4b8446db50a7143d4
-    
   }//spring
   
    void InitializeLeaves()
@@ -194,9 +185,9 @@ public class TheFourSeasons extends LXPattern {
      //make a pseudoleaf for each assemblage. 
        pseudoLeaves = new ArrayList<PseudoLeaf>(); //<>//
        int idx = 0;
-        //<>//
+        //<>// //<>//
        for(LeafAssemblage assemblage : tree.assemblages)
-       {
+       { //<>//
          //get the leaf nearest the centre so we can get the avg coordinate of this assemblage
          Leaf centreLeaf = assemblage.leaves.get(7);
          
@@ -220,8 +211,7 @@ public class TheFourSeasons extends LXPattern {
      //leaves[1] = new LXVector(500,500,500);
 
   //HELPERS
-<<<<<<< HEAD
-  
+
  public static class PseudoLeaf 
 {
   float x, y, z;
@@ -241,8 +231,3 @@ public static class SeasonsHelpers
 {
  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
 }
-=======
-   enum  Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
-}
- 
->>>>>>> 0f2f70a80f08c4c2deb197a4b8446db50a7143d4
