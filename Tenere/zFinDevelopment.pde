@@ -1,37 +1,9 @@
-public static class TheFourSeasons extends LXPattern {
+public class TheFourSeasons extends LXPattern {
   // by Fin McCarthy finchronicity@gmail.com
   
-  //January is summer. No complaining or I convert the tree model to metric! 
   
-  Seasons season = Seasons.SPRING;
-  int dayOfTheSeason;
-  int seasonChange = 100; //frames
-  int startupPause = 50;
   
-  LXVector[] leaves;
-  int leafDiameter = 120;
-  
-  public final CompoundParameter xPos = new CompoundParameter("X", 0,model.xMin,model.xMax);
-  public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
-  public final CompoundParameter zPos = new CompoundParameter("Z", 0,model.zMin,model.zMax);
-
-  public TheFourSeasons(LX lx) {
-    super(lx);
-    
-    addParameter("xPos", xPos);
-    addParameter("yPos", yPos);
-    addParameter("zPos", zPos);
-    
-    InitializeLeaves();
-
-  }
-    
-  public void run(double deltaMs) {
-    
-    //AdvanceTime();
-    ActionSeason();
-    
-      /*
+   /*
     //SPRING : Sprouting Leaves, flying birds
       1 fade in leaves as they grow
       2 birds flap around.
@@ -53,16 +25,45 @@ public static class TheFourSeasons extends LXPattern {
      */
    
     
+  
+  SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.SPRING;
+  int dayOfTheSeason;
+  int seasonChange = 100; //frames
+  int startupPause = 50;
+  
+  ArrayList<PseudoLeaf> pseudoLeaves;
+  int pseudoLeafDiameter = 60;
+  
+  public final CompoundParameter xPos = new CompoundParameter("X", 0,model.xMin,model.xMax);
+  public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
+  public final CompoundParameter zPos = new CompoundParameter("Z", 0,model.zMin,model.zMax);
+
+  public TheFourSeasons(LX lx) {
+    super(lx);
+    
+    addParameter("xPos", xPos);
+    addParameter("yPos", yPos);
+    addParameter("zPos", zPos);
+    
+    InitializeLeaves();
+
+  }
+    
+  public void run(double deltaMs) {
+    
+    //AdvanceTime();
+    ActionSeason();
+     
   }
   
   void AdvanceTime()
   {
-    if(season == Seasons.STARTUP)
+    if(season == SeasonsHelpers.Seasons.STARTUP)
     {
       dayOfTheSeason++;
       if(dayOfTheSeason > startupPause)
       {
-        season = Seasons.SPRING;
+        season = SeasonsHelpers.Seasons.SPRING;
         dayOfTheSeason = 0;
       }
     }
@@ -72,23 +73,23 @@ public static class TheFourSeasons extends LXPattern {
       switch(season)
       {
         case SUMMER:
-          season = Seasons.AUTUMN;
+          season = SeasonsHelpers.Seasons.AUTUMN;
           println("Autum.");
           break;
         case AUTUMN:
-          season = Seasons.WINTER;
+          season = SeasonsHelpers.Seasons.WINTER;
           println("Winter.");
           break;
         case WINTER:
-          season = Seasons.SPRING;
+          season = SeasonsHelpers.Seasons.SPRING;
           println("Spring. Watch out for swooping Magpies.");
           break;
         case SPRING:
-          season = Seasons.SUMMER;
+          season = SeasonsHelpers.Seasons.SUMMER;
           println("Summertime");
           break;
         default :
-          season = Seasons.SPRING;
+          season = SeasonsHelpers.Seasons.SPRING;
           println("Spring. Default season triggered.");
           break;
       }
@@ -122,7 +123,7 @@ public static class TheFourSeasons extends LXPattern {
       }
   }
   
-    void Startup()
+  void Startup()
   {
     //starting blank so the effect of leaves growing works nicely. 
     for (LXPoint p : model.points) {
@@ -152,66 +153,83 @@ public static class TheFourSeasons extends LXPattern {
     }  
   }
   
-    void Spring()
+  void Spring()
   {
-     // LXVector l = new LXVector((float)xPos.getValue(),(float)yPos.getValue(),(float)zPos.getValue());
-     //println(xPos.getValue());
+    //while this does work....it is slow. need to optimize better.  
+    
     float distance = 0;
-    
-    for (Branch targetBranch : tree.branches) {
-             
-        colors[p.index] =  #000000; //first, reset the led for this frame
-      
-    
+   
 
       //itterate over all the leaves, if close, light up green
-      for(LXVector l : leaves)
+      for(PseudoLeaf pl : pseudoLeaves)
       {
-        distance = dist(pointAsVector) ;
-        if(distance < leafDiameter)
-        {
-          colors[p.index] =  #00ff00;
+          //get the associated assemblage
+          LeafAssemblage ass = tree.assemblages.get(pl.assemblageIndex);
+          
+            for(Leaf l : ass.leaves)
+            {
+               distance = dist(l.x, l.y,l.z, pl.x,pl.y,pl.z);
+              if(distance < pseudoLeafDiameter) //close enough to bother about
+              {
+                int bright = (int)(255 - distance);
+                colors[l.point.index] = LX.rgb(0,bright,0);
+              }
+            }
+          
         }
-      }
       
-    } //foreach point
     
   }//spring
   
    void InitializeLeaves()
    {
-     int xCount = 12; 
-     int zCount = 12;
-     int yCount = 7;
      
-     int xStart = -1100;
-     int yStart = 0;
-     int zStart = -1100;
-     
-     
-     leaves = new LXVector[xCount*yCount*zCount]; //<>//
-     
-     //proceduraly make a 3D grid of leaves
-     for(int x = 0; x<xCount; x++)
-     {
-       for(int y = 0; y<yCount; y++)
+     //make a pseudoleaf for each assemblage. 
+       pseudoLeaves = new ArrayList<PseudoLeaf>(); //<>//
+       int idx = 0;
+        //<>//
+       for(LeafAssemblage assemblage : tree.assemblages)
        {
-         for(int z = 0; z<zCount; z++)
-         {
-           leaves[x + (y*xCount) + (z*xCount * yCount)] = new LXVector(xStart + (200 * x),
-           yStart + (200 * y),zStart + (200 * z));
-         }
+         //get the leaf nearest the centre so we can get the avg coordinate of this assemblage
+         Leaf centreLeaf = assemblage.leaves.get(7);
+         
+         //make a pseudoleaf marking the same coordinate as the assmeblages middle leaf
+         this.pseudoLeaves.add( new PseudoLeaf(
+         centreLeaf.point.x,
+         centreLeaf.point.y,
+         centreLeaf.point.z,
+         idx) //idx of the associated assemblage so we can get to it fast
+         
+         );
+         
+         idx++;
        }
+       
      }
-     
+}
     // Maximums xMax, yMax zMax:  1156.9141,  1249.6746,  1115.6749
-    // Minimums xMin, yMin zMin: -1104.0668, -17.902443, -1087.3219
-
-     
+    // Minimums xMin, yMin zMin: -1104.0668, -17.902443, -1087.321
      //leaves[0] = new LXVector(100,100,100);
      //leaves[1] = new LXVector(500,500,500);
-   }
+
   //HELPERS
   
-  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
+ public static class PseudoLeaf 
+{
+  float x, y, z;
+  int assemblageIndex;
+ 
+  public PseudoLeaf(float _x, float _y, float _z, int _idx)
+  {
+    x = _x;
+    y = _y; 
+    z = _z;
+    assemblageIndex = _idx;
+  }
+}
+
+
+public static class SeasonsHelpers
+{
+ enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
 }

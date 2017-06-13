@@ -145,6 +145,9 @@ public class ItemLocationsTest extends LXPattern {
   
   public void run(double deltaMs) {
     
+    for (Branch b : tree.branches) {
+    }
+    
     //clear colors
    for (LXPoint p : model.points) {
      colors[p.index] = #000000;
@@ -154,8 +157,7 @@ public class ItemLocationsTest extends LXPattern {
    int branchNumber = (int)branch.getValue();
    int assNumber = (int)ass.getValue();
    int leafNumber = (int)leaf.getValue();
-    
-    
+
     //show a given branch as red
     Branch targetBranch = tree.branches.get(branchNumber);
     for (LeafAssemblage targetAss : targetBranch.assemblages) {
@@ -254,6 +256,7 @@ Averages ax, ay, az: -34.620586,678.9678,73.70307
 Cerntres cx, cy, cz: -18.998901,601.6301,17.694458
 Maximums xMax, yMax zMax: 1127.384,1275.5334,1166.446
 Minimums xMin, yMin zMin: -1165.382,-72.27326,-1131.0573
+
 
 
 */

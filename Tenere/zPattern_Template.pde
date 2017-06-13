@@ -1,4 +1,4 @@
-public static class MyNewAnimation extends LXPattern {
+public  class MyNewAnimation extends LXPattern {
   
   //Variables go here
   //See Tutorial for use of Modulators and Parameters
@@ -11,7 +11,8 @@ public static class MyNewAnimation extends LXPattern {
   
   //run(), works like draw(). 
   public void run(double deltaMs) {
-      
+    
+     
     //ittreate colors[] array, populating colrs
     for (LXPoint p : model.points) {
       colors[p.index]  = LX.rgb(255,0,0); //make it all red
