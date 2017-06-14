@@ -76,3 +76,29 @@ public static class Tutorial extends LXPattern {
     }
   }
 }
+
+public class Plane extends LXPattern {
+  
+  public final CompoundParameter yPos = (CompoundParameter)
+    new CompoundParameter("YPos", model.cy, model.yMin, model.yMax)
+    .setDescription("Position of the plane on the Y-axis");
+    
+  public final CompoundParameter size = (CompoundParameter)
+    new CompoundParameter("Size", 8*FT, 1*FT, 20*FT)
+    .setDescription("Size of the plane");
+  
+  public Plane(LX lx) {
+    super(lx);
+    addParameter("yPos", this.yPos);
+    addParameter("size", this.size);
+  }
+  
+  public void run(double deltaMs) {
+    float falloff = 100 / this.size.getValuef();
+    float yPos = this.yPos.getValuef();
+    for (LXPoint p : model.points) {
+      float b = 100 - falloff * abs(p.y - yPos); 
+      colors[p.index] = (b > 0) ? palette.getColor(p, b) : #000000;
+    }
+  }
+}
