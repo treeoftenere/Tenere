@@ -231,8 +231,9 @@ public class ItemLocationsTest extends LXPattern {
       circle.y = y;
       circle.z = z;
     }
-      
-  }
+    
+  }//end plasma generator
+
   
   
   
