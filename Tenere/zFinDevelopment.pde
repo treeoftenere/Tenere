@@ -28,13 +28,13 @@ public class TheFourSeasons extends LXPattern {
   
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
-  int seasonChange = 400; //frames
+  int seasonChange = 1200; //frames
   int startupPause = 50;
   
   int deltaMs2;
   
   ArrayList<PseudoLeaf> pseudoLeaves;
-  int pseudoLeafDiameter = 60;
+  int pseudoLeafDiameter = 55;
   
   public final CompoundParameter xPos = new CompoundParameter("X", 0,model.xMin,model.xMax);
   public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
@@ -185,9 +185,9 @@ public class TheFourSeasons extends LXPattern {
          Leaf centreLeaf = assemblage.leaves.get(4);
          
          //make a pseudoleaf marking the same coordinate as the assmeblages middle leaf
-         this.pseudoLeaves.add( new PseudoLeaf( //<>//
+         this.pseudoLeaves.add( new PseudoLeaf( //<>// //<>//
          centreLeaf.point.x,
-         centreLeaf.point.y, //<>//
+         centreLeaf.point.y, //<>// //<>//
          centreLeaf.point.z,
          idx) //idx of the associated assemblage so we can get to it fast
          
@@ -202,7 +202,7 @@ public class TheFourSeasons extends LXPattern {
      {
        for(PseudoLeaf pleaf : pseudoLeaves)
         {
-          if(pleaf.size < pseudoLeafDiameter ) pleaf.size += random(.9);
+          if(pleaf.size < pseudoLeafDiameter ) pleaf.size += random(.2);
           
         }
      }
