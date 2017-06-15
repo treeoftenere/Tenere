@@ -28,24 +28,22 @@ public class TheFourSeasons extends LXPattern {
   
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
-  int seasonChange = 1200; //frames
+  int summerDays = 100;
+  int autumnDays = 100;
+  int winterDays = 100;
+  int springDays = 800;
+  int nextSeasonChange = 800; //frames
   int startupPause = 50;
+  
   
   int deltaMs2;
   
   ArrayList<PseudoLeaf> pseudoLeaves;
-  int pseudoLeafDiameter = 55;
+  int pseudoLeafDiameter = 80;
   
-  public final CompoundParameter xPos = new CompoundParameter("X", 0,model.xMin,model.xMax);
-  public final CompoundParameter yPos = new CompoundParameter("Y", 0,model.yMin,model.yMax);
-  public final CompoundParameter zPos = new CompoundParameter("Z", 0,model.zMin,model.zMax);
 
   public TheFourSeasons(LX lx) {
     super(lx);
-    
-    addParameter("xPos", xPos);
-    addParameter("yPos", yPos);
-    addParameter("zPos", zPos);
     
     InitializeLeaves();
 
@@ -69,26 +67,31 @@ public class TheFourSeasons extends LXPattern {
         dayOfTheSeason = 0;
       }
     }
-    else if(dayOfTheSeason > seasonChange)
+    else if(dayOfTheSeason > nextSeasonChange)
     {
+      
       //Time to change seasons.
       switch(season)
       {
         case SUMMER:
           season = SeasonsHelpers.Seasons.AUTUMN;
+          nextSeasonChange = autumnDays;
           println("Autum");
           break;
         case AUTUMN:
           season = SeasonsHelpers.Seasons.WINTER;
+          nextSeasonChange = winterDays;
           println("Winter");
           break;
         case WINTER:
           season = SeasonsHelpers.Seasons.SPRING;
+          nextSeasonChange = springDays;
           InitializeLeaves();
           println("Spring - Watch out for swooping Magpies");
           break;
         case SPRING:
           season = SeasonsHelpers.Seasons.SUMMER;
+          nextSeasonChange = summerDays;
           println("Summertime");
           break;
         default :
@@ -96,6 +99,11 @@ public class TheFourSeasons extends LXPattern {
           println("Spring. Default season triggered.");
           break;
       }
+      
+      
+      //season = SeasonsHelpers.Seasons.SPRING;
+        //  InitializeLeaves();
+          
       dayOfTheSeason = 0; //reset the counter
     }
     else
@@ -138,7 +146,7 @@ public class TheFourSeasons extends LXPattern {
   void Summer()
   {
     for (LXPoint p : model.points) {
-      colors[p.index] =  #ff0000;
+      colors[p.index] =  #00ff00;
     }
   }
   
@@ -159,15 +167,12 @@ public class TheFourSeasons extends LXPattern {
   void Spring()
   {
     //make the leaves grow
-    GrowLeaves();
-    RenderLeaves();
+      GrowLeaves();
+      RenderSpringLeaves();
     
     //make the wind blow
-    
     //change leaves to brown
-    
-      
-      
+
   }//spring
   
    void InitializeLeaves()
@@ -180,14 +185,14 @@ public class TheFourSeasons extends LXPattern {
        int size = 0;
         //<>//
        for(LeafAssemblage assemblage : tree.assemblages)
-       {
+       { //<>//
          //get the leaf nearest the centre so we can get the avg coordinate of this assemblage
-         Leaf centreLeaf = assemblage.leaves.get(4);
+         Leaf centreLeaf = assemblage.leaves.get(4); //<>//
          
          //make a pseudoleaf marking the same coordinate as the assmeblages middle leaf
-         this.pseudoLeaves.add( new PseudoLeaf( //<>// //<>//
+         this.pseudoLeaves.add( new PseudoLeaf( //<>//
          centreLeaf.point.x,
-         centreLeaf.point.y, //<>// //<>//
+         centreLeaf.point.y, //<>//
          centreLeaf.point.z,
          idx) //idx of the associated assemblage so we can get to it fast
          
@@ -207,7 +212,7 @@ public class TheFourSeasons extends LXPattern {
         }
      }
      
-     void RenderLeaves()
+     void RenderSpringLeaves()
      {
        
      float distance = 0;
@@ -224,7 +229,7 @@ public class TheFourSeasons extends LXPattern {
               if(distance < pleaf.size) //close enough to bother about
               {
                 int bright = (int)((255 - distance) * ( pleaf.size / pseudoLeafDiameter));
-                pleaf.colour = LX.rgb(0,bright,0);
+                pleaf.colour = LX.rgb(bright,bright/6, bright/3);
                 colors[l.point.index] = pleaf.colour;
               }
            }
