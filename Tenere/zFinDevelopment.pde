@@ -31,8 +31,9 @@ public class TheFourSeasons extends LXPattern {
   int summerDays = 100;
   int autumnDays = 100;
   int winterDays = 100;
-  int springDays = 800;
-  int nextSeasonChange = 800; //frames
+  int springDays = 1600;
+  int currentDayOfSpring = 0;
+  int nextSeasonChange = 1600; //frames
   int startupPause = 50;
   
   
@@ -44,9 +45,7 @@ public class TheFourSeasons extends LXPattern {
 
   public TheFourSeasons(LX lx) {
     super(lx);
-    
-    InitializeLeaves();
-
+   
   }
     
   public void run(double deltaMs) {
@@ -86,7 +85,6 @@ public class TheFourSeasons extends LXPattern {
         case WINTER:
           season = SeasonsHelpers.Seasons.SPRING;
           nextSeasonChange = springDays;
-          InitializeLeaves();
           println("Spring - Watch out for swooping Magpies");
           break;
         case SPRING:
@@ -99,8 +97,7 @@ public class TheFourSeasons extends LXPattern {
           println("Spring. Default season triggered.");
           break;
       }
-      
-      
+
       //season = SeasonsHelpers.Seasons.SPRING;
         //  InitializeLeaves();
           
@@ -166,20 +163,39 @@ public class TheFourSeasons extends LXPattern {
   
   void Spring()
   {
+    if(dayOfTheSeason == 0)
+    {
+      ClearColors();
+      InitializePseudoLeaves();
+    }
+    
     //make the leaves grow
+    if(dayOfTheSeason < 700)
+    {
       GrowLeaves();
-      RenderSpringLeaves();
+      RenderSpringBlossums();
+    }
+    else if(dayOfTheSeason == 700)
+    {
+      InitializePseudoLeaves();
+      GrowLeaves();
+      RenderSpringGreenLeaves();
+    }
+    else if(dayOfTheSeason > 700)
+    {
+      GrowLeaves();
+      RenderSpringGreenLeaves();
+    }
     
     //make the wind blow
     //change leaves to brown
 
   }//spring
   
-   void InitializeLeaves()
+   void InitializePseudoLeaves()
    {
-     ClearColors();
-     
-     //make a pseudoleaf for each assemblage. 
+
+       //make a pseudoleaf for each assemblage. 
        pseudoLeaves = new ArrayList<PseudoLeaf>(); //<>//
        int idx = 0;
        int size = 0;
@@ -195,12 +211,9 @@ public class TheFourSeasons extends LXPattern {
          centreLeaf.point.y, //<>//
          centreLeaf.point.z,
          idx) //idx of the associated assemblage so we can get to it fast
-         
          );
-         
          idx++;
        }
-       
      }
      
      void GrowLeaves()
@@ -212,10 +225,10 @@ public class TheFourSeasons extends LXPattern {
         }
      }
      
-     void RenderSpringLeaves()
+     void RenderSpringBlossums()
      {
        
-     float distance = 0;
+       float distance = 0;
 
        //itterate over all the leaves, if close, light up green
        for(PseudoLeaf pleaf : pseudoLeaves)
@@ -231,6 +244,30 @@ public class TheFourSeasons extends LXPattern {
                 int bright = (int)((255 - distance) * ( pleaf.size / pseudoLeafDiameter));
                 pleaf.colour = LX.rgb(bright,bright/6, bright/3);
                 colors[l.point.index] = pleaf.colour;
+              }
+           }
+        }
+     }
+     
+     void RenderSpringGreenLeaves()
+     {
+       
+       float distance = 0;
+
+       //itterate over all the leaves, if close, light up green
+       for(PseudoLeaf pleaf : pseudoLeaves)
+       {
+           //get the associated assemblage
+           LeafAssemblage ass = tree.assemblages.get(pleaf.assemblageIndex);
+           
+           for(Leaf l : ass.leaves)
+           {
+               distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
+              if(distance < pleaf.size) //close enough to bother about
+              {
+                int bright = (int)((255 - distance) * ( pleaf.size / pseudoLeafDiameter));
+                pleaf.colour = LX.rgb(0,bright, 0);
+                colors[l.point.index] = LXColor.lerp(pleaf.colour,colors[l.point.index]);
               }
            }
         }
