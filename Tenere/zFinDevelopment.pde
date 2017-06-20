@@ -1,8 +1,6 @@
 public class TheFourSeasons extends LXPattern {
   // by Fin McCarthy finchronicity@gmail.com
   
-  
-  
    /*
     //SPRING : Sprouting Leaves, flying birds
       1 fade in leaves as they grow
@@ -28,7 +26,7 @@ public class TheFourSeasons extends LXPattern {
   
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
-  int summerDays = 100;
+  int summerDays = 800;
   int autumnDays = 100;
   int winterDays = 100;
   int springDays = 1600;
@@ -142,9 +140,13 @@ public class TheFourSeasons extends LXPattern {
   //SEASON ACTION 
   void Summer()
   {
-    for (LXPoint p : model.points) {
-      colors[p.index] =  #00ff00;
+    if (dayOfTheSeason == 0) //<>//
+    {
+      InitializePseudoLeaves();
     }
+  
+    RenderSummerGreenLeaves();
+   
   }
   
   void Autumn()
@@ -170,7 +172,7 @@ public class TheFourSeasons extends LXPattern {
     }
     
     //make the leaves grow
-    if(dayOfTheSeason < 700)
+    else if(dayOfTheSeason < 700)
     {
       GrowLeaves();
       RenderSpringBlossums();
@@ -186,7 +188,7 @@ public class TheFourSeasons extends LXPattern {
       GrowLeaves();
       RenderSpringGreenLeaves();
     }
-    
+
     //make the wind blow
     //change leaves to brown
 
@@ -196,19 +198,19 @@ public class TheFourSeasons extends LXPattern {
    {
 
        //make a pseudoleaf for each assemblage. 
-       pseudoLeaves = new ArrayList<PseudoLeaf>(); //<>//
+       pseudoLeaves = new ArrayList<PseudoLeaf>();
        int idx = 0;
        int size = 0;
-        //<>//
+       
        for(LeafAssemblage assemblage : tree.assemblages)
-       { //<>//
+       {
          //get the leaf nearest the centre so we can get the avg coordinate of this assemblage
-         Leaf centreLeaf = assemblage.leaves.get(4); //<>//
+         Leaf centreLeaf = assemblage.leaves.get(4);
          
          //make a pseudoleaf marking the same coordinate as the assmeblages middle leaf
-         this.pseudoLeaves.add( new PseudoLeaf( //<>//
+         this.pseudoLeaves.add( new PseudoLeaf(
          centreLeaf.point.x,
-         centreLeaf.point.y, //<>//
+         centreLeaf.point.y,
          centreLeaf.point.z,
          idx) //idx of the associated assemblage so we can get to it fast
          );
@@ -241,7 +243,7 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                int bright = (int)((255 - distance) * ( pleaf.size / pseudoLeafDiameter));
+                int bright = (int)((255 - distance) * (pleaf.size/ pseudoLeafDiameter));
                 pleaf.colour = LX.rgb(bright,bright/6, bright/3);
                 colors[l.point.index] = pleaf.colour;
               }
@@ -265,9 +267,54 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                int bright = (int)((255 - distance) * ( pleaf.size / pseudoLeafDiameter));
-                pleaf.colour = LX.rgb(0,bright, 0);
-                colors[l.point.index] = LXColor.lerp(pleaf.colour,colors[l.point.index]);
+                pleaf.colour = LX.rgb(20,255, 20);
+                colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.colour,1);
+              }
+           }
+        }
+     }
+     
+     void RenderSummerGreenLeaves()
+     {
+       
+       float distance = 0;
+ //<>//
+       //itterate over all the leaves, if close, light up green
+       for(PseudoLeaf pleaf : pseudoLeaves)
+       {
+           //get the associated assemblage
+           LeafAssemblage ass = tree.assemblages.get(pleaf.assemblageIndex);
+           
+           for(Leaf l : ass.leaves)
+           {
+               distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
+              if(distance < pleaf.size) //close enough to bother about
+              {
+                 pleaf.colour = LX.rgb(0,255, 0); //<>//
+                colors[l.point.index] = pleaf.colour;
+              }
+           }
+        }
+     }
+     
+      void RenderAutumnLeaves()
+     {
+       
+       float distance = 0;
+
+       //itterate over all the leaves, if close, light up green
+       for(PseudoLeaf pleaf : pseudoLeaves)
+       {
+           //get the associated assemblage
+           LeafAssemblage ass = tree.assemblages.get(pleaf.assemblageIndex);
+           
+           for(Leaf l : ass.leaves)
+           {
+               distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
+              if(distance < pleaf.size) //close enough to bother about
+              {
+                 pleaf.colour = LX.rgb(128,100, 0);
+                colors[l.point.index] = pleaf.colour;
               }
            }
         }
