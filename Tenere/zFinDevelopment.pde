@@ -24,10 +24,10 @@ public class TheFourSeasons extends LXPattern {
 
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
-  int summerDays = 800;
-  int autumnDays = 1400;
-  int winterDays = 100;
-  int springDays = 1200;
+  int summerDays = 600;
+  int autumnDays = 2200;
+  int winterDays = 300;
+  int springDays = 1100;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames
   int startupPause = 50;
@@ -136,7 +136,7 @@ public class TheFourSeasons extends LXPattern {
   //SEASON ACTION 
   void Summer()
   {
- //<>//
+
     if (dayOfTheSeason < 500) //fade is some
     {
       GrowLeaves();
@@ -147,7 +147,7 @@ public class TheFourSeasons extends LXPattern {
   
   void Autumn()
   {
-    if (dayOfTheSeason == 0) //<>//
+    if (dayOfTheSeason == 0)
     {
       InitializePseudoLeaves();
     }
@@ -192,13 +192,8 @@ public class TheFourSeasons extends LXPattern {
   
   
   
-  
-  
-  
-  
   /* ACTION METHODS ACTION METHODS ACTION METHODS ACTION METHODS ACTION METHODS */
-  
-  
+
    void InitializePseudoLeaves()
    {
 
@@ -208,6 +203,7 @@ public class TheFourSeasons extends LXPattern {
        int branchIdx = 0;
        for(Branch branch : tree.branches)
        {
+         //Branch branch = tree.branches.get(0);
          assemblageIdx=0;
        for(LeafAssemblage assemblage : branch.assemblages)
        {
@@ -224,7 +220,7 @@ public class TheFourSeasons extends LXPattern {
          );
          assemblageIdx++;
        }
-       branchIdx++; //<>//
+       branchIdx++;
      }
      }
      
@@ -273,6 +269,13 @@ public class TheFourSeasons extends LXPattern {
              if(pleaf.brownTime == 1000)
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //exit browning
+               println("PLeaf " + pleaf.branchIndex + "-" + pleaf.assemblageIndex + " Falling");
+               
+               //capture the current colour
+               Branch branch = tree.branches.get(pleaf.branchIndex);
+               LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+               Leaf l = ass.leaves.get(4);
+               pleaf.colour = colors[l.point.index];
              }
              
              //get the associated assemblage
@@ -288,14 +291,14 @@ public class TheFourSeasons extends LXPattern {
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING)
            {
-             pleaf.y--;
+             pleaf.y--; //<>//
              
-             if(pleaf.y < -200)//completed fall //<>//
+             if(pleaf.y < -200)//completed fall
              {
-               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
+               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing. //<>//
              }
              
-             else
+             else //make the leaves fall
              {
                //find nearby assemblages and color nearby leaves
                //search assemblages on this branch! 
@@ -305,12 +308,19 @@ public class TheFourSeasons extends LXPattern {
                 float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
                 if(distance < pseudoLeafDiameter*4)
                 {
+                  
+                  //DECIDE ON LEAF COLOUR
                   for(Leaf ll : ass.leaves)
                   {
-                    float dist = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
+                    float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
                     if(dist < pseudoLeafDiameter)
                     {
-                      colors[ll.point.index] = pleaf.colour;
+                        colors[ll.point.index] = LXColor.scaleBrightness(pleaf.colour,max(0,100-(dist*2)));
+                    }
+  
+                    else
+                    {//blacken
+                        colors[ll.point.index] = 0; //<>//
                     }
                   }
                 }
@@ -346,7 +356,7 @@ public class TheFourSeasons extends LXPattern {
   float size = 0;
   SeasonsHelpers.LeafStatus status = SeasonsHelpers.LeafStatus.GROWING;
   int brownTime = 0;
-  int browningColor = LX.rgb(220,(int)random(60,200),0);
+  int browningColor = LX.rgb(150,(int)random(40,130),0);
   
  
   public PseudoLeaf(float _x, float _y, float _z, int _branchIdx, int _assemblageIdx)
