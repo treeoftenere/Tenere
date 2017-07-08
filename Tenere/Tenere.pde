@@ -11,7 +11,7 @@ final static float FEET = 12*INCHES;
 final static float FT = FEET;
 final static int _width = 1200;
 final static int _height = 960;
-
+final static byte OPC_CHANNEL_FOUR = 4;
 // Our engine and our model
 LXStudio lx;
 Tree tree;
@@ -48,8 +48,8 @@ void setup() {
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
         try {
           // Update appropriately for testing!
-          final String OPC_ADDRESS = "192.168.0.10"; 
-          final int OPC_PORT = 7890;
+          final String OPC_ADDRESS = "192.168.1.79"; 
+          final int OPC_PORT = 1337;
           
           final int PIXELS_PER_LEAF = Leaf.NUM_LEDS;
           // final int PIXELS_PER_LEAF = 1; // Use this version to test one value per leaf 
@@ -57,11 +57,24 @@ void setup() {
           // Construct list of output points to go in the datagram
           Branch branch = tree.branches.get(0); // Just test the first branch
           int li = 0;
-          int[] branchIndices = new int[branch.leaves.size() * PIXELS_PER_LEAF];
+          int li2 =0;
+          int[] branchIndices = new int[(branch.leaves.size()* PIXELS_PER_LEAF)/2];
+          int[] branchIndices2 = new int[(branch.leaves.size()* PIXELS_PER_LEAF)/2];
+          int leafNum = 0;
           for (Leaf leaf : branch.leaves) {
+            if (leafNum < branch.leaves.size()/2) {
             for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
               branchIndices[li++] = leaf.point.index;
             }
+          }
+           else {
+            for (int j = 0; j< Leaf.NUM_LEDS; ++j) {
+              branchIndices2[li2++] = leaf.point.index;
+              println("branchIndices2: " + branchIndices2 + "leaf point index " + leaf.point.index);
+              }
+
+           }
+            leafNum++;
           }
           
           // Add a new datagram output driver with the branch datagram message
@@ -69,6 +82,13 @@ void setup() {
             new OPCDatagram(branchIndices, OPCConstants.CHANNEL_BROADCAST)
             .setAddress(OPC_ADDRESS)
             .setPort(OPC_PORT)
+
+          ));
+          lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
+            new OPCDatagram(branchIndices, OPC_CHANNEL_FOUR)
+            .setAddress(OPC_ADDRESS)
+            .setPort(OPC_PORT)
+
           ));
         } catch (Exception x) {
           println("Failed to construct UDP output: " + x);
