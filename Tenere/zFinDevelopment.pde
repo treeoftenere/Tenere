@@ -294,7 +294,7 @@ public class TheFourSeasons extends LXPattern {
                Branch branch = tree.branches.get(pleaf.branchIndex);
                LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
                Leaf l = ass.leaves.get(4); //middle leaf
-               pleaf.colour = colors[l.point.index];
+               pleaf.colour = LXColor.lerp(colors[l.point.index],pleaf.browningColor,0.05);
              }
              
              //1ST: Continue Browning
@@ -313,7 +313,7 @@ public class TheFourSeasons extends LXPattern {
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //write over static leaves with falling leaf
            {
-            pleaf.y -= 5; //<>//
+            pleaf.y -= 10; //<>//
              
              if(pleaf.y < -400)//completed fall
              {
@@ -322,13 +322,7 @@ public class TheFourSeasons extends LXPattern {
              
              else //make the leaves fall
              {
-               //cheack if each brance is in the fall path of this pLeaf.
-               //Color any nearby leaves
-               
-               //search assemblages on this branch! 
-               
-                //Branch branch = tree.branches.get(pleaf.branchIndex);
-                //LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+               //Check if each branch is in the fall path of this pLeaf.
                 
                 //foreach branch //<>//
                  for(Branch branch : tree.branches)
@@ -347,13 +341,13 @@ public class TheFourSeasons extends LXPattern {
                 if(distance < pseudoLeafDiameter*4)
                 {
                   
-                  //Fill leaf based on distance to falling leaf.
+                  //If nearby, calculate actual distances
                   for(Leaf ll : ass.leaves)
                   {
                     float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
                     if(dist < pseudoLeafDiameter)
                     {
-                        colors[ll.point.index] = pleaf.colour;
+                        colors[ll.point.index] = pleaf.browningColor;
                     }
   
                     else
