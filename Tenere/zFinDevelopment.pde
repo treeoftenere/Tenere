@@ -187,8 +187,6 @@ public class TheFourSeasons extends LXPattern {
       FadeInLeaves(LX.rgb(20,200, 20)); //grow green leaves
     }
 
-    //make the wind blow
-    //change leaves to brown
 
   }//spring
   
@@ -256,19 +254,35 @@ public class TheFourSeasons extends LXPattern {
            }
         }
      }
-     
+
      
      void BrownAutumnLeaves()
      {
+       //cache colors
+       if(dayOfTheSeason == 0) //get the green colors
+       {
+         CaptureColours();
+       }
+       
        //clear all colors
        ClearColors();
 
-       //raindomly turn some to 'browning', then fade
+       //raindomly turn some to 'browning'
        
        //itterate over all the leaves, if close, light up green
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
-        
+        if(pleaf.status == SeasonsHelpers.LeafStatus.GROWING)
+        {
+          //make green
+             Branch branch = tree.branches.get(pleaf.branchIndex);
+             LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+             for(Leaf l : ass.leaves)
+             {
+                colors[l.point.index] = pleaf.colour;
+             }
+          
+        }
            if(pleaf.status == SeasonsHelpers.LeafStatus.BROWNING) //BROWNING
            {
              if(pleaf.brownTime == 1000) //change to falling state
@@ -279,11 +293,11 @@ public class TheFourSeasons extends LXPattern {
                //capture the current colour
                Branch branch = tree.branches.get(pleaf.branchIndex);
                LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
-               Leaf l = ass.leaves.get(4);
+               Leaf l = ass.leaves.get(4); //middle leaf
                pleaf.colour = colors[l.point.index];
              }
              
-             //1ST: COntinue Browning
+             //1ST: Continue Browning
              //get the associated assemblage
               Branch branch = tree.branches.get(pleaf.branchIndex);
               LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
@@ -299,9 +313,9 @@ public class TheFourSeasons extends LXPattern {
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //write over static leaves with falling leaf
            {
-             pleaf.y--; //<>//
+            pleaf.y -= 5; //<>//
              
-             if(pleaf.y < -200)//completed fall
+             if(pleaf.y < -400)//completed fall
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing. //<>//
              }
@@ -316,7 +330,7 @@ public class TheFourSeasons extends LXPattern {
                 //Branch branch = tree.branches.get(pleaf.branchIndex);
                 //LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
                 
-                //foreach branch
+                //foreach branch //<>//
                  for(Branch branch : tree.branches)
                  {
                   //if branch is in the fall zone
@@ -367,6 +381,17 @@ public class TheFourSeasons extends LXPattern {
     void ClearColors()
     {
       for (LXPoint p : model.points) { colors[p.index] = #000000;}
+    }
+    
+    void  CaptureColours()
+    {
+       for(PseudoLeaf pleaf : pseudoLeaves)
+       {
+             Branch branch = tree.branches.get(pleaf.branchIndex);
+             LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+             Leaf l = ass.leaves.get(4);
+             pleaf.colour = colors[l.point.index];
+       }
     }
     
 }
