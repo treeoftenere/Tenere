@@ -24,10 +24,10 @@ public class TheFourSeasons extends LXPattern {
 
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
-  int summerDays = 600;
+  int summerDays = 10;
   int autumnDays = 2200;
   int winterDays = 300;
-  int springDays = 1100;
+  int springDays = 900;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames
   int startupPause = 50;
@@ -136,12 +136,14 @@ public class TheFourSeasons extends LXPattern {
   //SEASON ACTION 
   void Summer()
   {
-
-    if (dayOfTheSeason < 500) //fade is some
-    {
-      GrowLeaves();
-      FadeInLeaves(LX.rgb(0,255,0));
-    }
+    //WHAT SHOULD WE DO FOR SUMMER? (plasma wind?)
+    
+    
+   // if (dayOfTheSeason < 500) //fade is some
+    //{
+   //   GrowLeaves();
+   //   FadeInLeaves(LX.rgb(0,255,0));
+    //}
    
   }
   
@@ -175,7 +177,7 @@ public class TheFourSeasons extends LXPattern {
       GrowLeaves();
       FadeInLeaves(LX.rgb(255,70,170)); //grow pink blossums
     }
-    else if(dayOfTheSeason == 400)
+    else if(dayOfTheSeason == 400) 
     {
       InitializePseudoLeaves(); //reset ready for next growth
     }
@@ -249,7 +251,7 @@ public class TheFourSeasons extends LXPattern {
               if(distance < pleaf.size) //close enough to bother about
               {
                 pleaf.colour = c;
-                colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.colour,1);
+                colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.colour,0.02);
               }
            }
         }
@@ -258,18 +260,21 @@ public class TheFourSeasons extends LXPattern {
      
      void BrownAutumnLeaves()
      {
-       
+       //clear all colors
+       ClearColors();
+
        //raindomly turn some to 'browning', then fade
        
        //itterate over all the leaves, if close, light up green
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
+        
            if(pleaf.status == SeasonsHelpers.LeafStatus.BROWNING) //BROWNING
            {
-             if(pleaf.brownTime == 1000)
+             if(pleaf.brownTime == 1000) //change to falling state
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //exit browning
-               println("PLeaf " + pleaf.branchIndex + "-" + pleaf.assemblageIndex + " Falling");
+               //println("PLeaf " + pleaf.branchIndex + "-" + pleaf.assemblageIndex + " Falling");
                
                //capture the current colour
                Branch branch = tree.branches.get(pleaf.branchIndex);
@@ -278,18 +283,21 @@ public class TheFourSeasons extends LXPattern {
                pleaf.colour = colors[l.point.index];
              }
              
+             //1ST: COntinue Browning
              //get the associated assemblage
               Branch branch = tree.branches.get(pleaf.branchIndex);
               LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+              
+              pleaf.colour  = LXColor.lerp(pleaf.colour,pleaf.browningColor,0.05); //transform
              
              for(Leaf l : ass.leaves)
              {
-                colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.browningColor,0.2);
-                
+                colors[l.point.index] = pleaf.colour;
              }
+             
              pleaf.brownTime++;
            }
-           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING)
+           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //write over static leaves with falling leaf
            {
              pleaf.y--; //<>//
              
@@ -300,32 +308,50 @@ public class TheFourSeasons extends LXPattern {
              
              else //make the leaves fall
              {
-               //find nearby assemblages and color nearby leaves
+               //cheack if each brance is in the fall path of this pLeaf.
+               //Color any nearby leaves
+               
                //search assemblages on this branch! 
-                Branch branch = tree.branches.get(pleaf.branchIndex);
-                LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+               
+                //Branch branch = tree.branches.get(pleaf.branchIndex);
+                //LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+                
+                //foreach branch
+                 for(Branch branch : tree.branches)
+                 {
+                  //if branch is in the fall zone
+                  if( dist(branch.x, branch.z, pleaf.x ,pleaf.z) < 300)
+                  {
+                    
+                   
+                 for(LeafAssemblage ass : branch.assemblages)
+                 {
+                   
+                   //check if the assemblage is nearby
                 Leaf l = ass.leaves.get(4);
                 float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
                 if(distance < pseudoLeafDiameter*4)
                 {
                   
-                  //DECIDE ON LEAF COLOUR
+                  //Fill leaf based on distance to falling leaf.
                   for(Leaf ll : ass.leaves)
                   {
                     float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
                     if(dist < pseudoLeafDiameter)
                     {
-                        colors[ll.point.index] = LXColor.scaleBrightness(pleaf.colour,max(0,100-(dist*2)));
+                        colors[ll.point.index] = pleaf.colour;
                     }
   
                     else
                     {//blacken
-                        colors[ll.point.index] = 0; //<>//
+                     //   colors[ll.point.index] = 0; //<>//
                     }
                   }
                 }
              }
-             
+                  }
+                 }
+             }
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
            {

@@ -25,6 +25,7 @@ public static class Wave extends LXPattern {
     float falloff = 100 / size.getValuef();
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
+      println(bins[i] + "-"+i);
     }
     for (LXPoint p : model.points) {
       int idx = Math.round((bins.length-1) * (p.x - model.xMin) / model.xRange);
