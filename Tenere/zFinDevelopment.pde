@@ -27,9 +27,9 @@ public class TheFourSeasons extends LXPattern {
   int summerDays = 10;
   int autumnDays = 2200;
   int winterDays = 300;
-  int springDays = 900;
+  int springDays = 1200;
   int currentDayOfSpring = 0;
-  int nextSeasonChange = 1600; //frames
+  int nextSeasonChange = 1600; //frames    
   int startupPause = 50;
   
   
@@ -272,43 +272,31 @@ public class TheFourSeasons extends LXPattern {
        //itterate over all the leaves, if close, light up green
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
-        if(pleaf.status == SeasonsHelpers.LeafStatus.GROWING)
-        {
-          //make green
-             Branch branch = tree.branches.get(pleaf.branchIndex);
-             LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
-             for(Leaf l : ass.leaves)
-             {
-                colors[l.point.index] = pleaf.colour;
-             }
+          if(pleaf.status == SeasonsHelpers.LeafStatus.GROWING)
+          {
+            //make green
+               IlluminateNearby(pleaf, pleaf.colour);
+          }
           
-        }
            if(pleaf.status == SeasonsHelpers.LeafStatus.BROWNING) //BROWNING
            {
-             if(pleaf.brownTime == 1000) //change to falling state
+             //Been Brown a long time, leave will now fall. 
+             if(pleaf.brownTime == 500) //change to falling state
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //exit browning
                //println("PLeaf " + pleaf.branchIndex + "-" + pleaf.assemblageIndex + " Falling");
                
                //capture the current colour
-               Branch branch = tree.branches.get(pleaf.branchIndex);
-               LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
-               Leaf l = ass.leaves.get(4); //middle leaf
-               pleaf.colour = LXColor.lerp(colors[l.point.index],pleaf.browningColor,0.05);
+               //Branch branch = tree.branches.get(pleaf.branchIndex);
+               //LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
+              // Leaf l = ass.leaves.get(4); //middle leaf
+              // pleaf.colour = LXColor.lerp(colors[l.point.index],pleaf.browningColor,0.05);
              }
              
-             //1ST: Continue Browning
-             //get the associated assemblage
-              Branch branch = tree.branches.get(pleaf.branchIndex);
-              LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
-              
+             //Continue Browning
               pleaf.colour  = LXColor.lerp(pleaf.colour,pleaf.browningColor,0.05); //transform
-             
-             for(Leaf l : ass.leaves)
-             {
-                colors[l.point.index] = pleaf.colour;
-             }
-             
+              IlluminateNearby(pleaf, pleaf.colour);
+
              pleaf.brownTime++;
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //write over static leaves with falling leaf
@@ -323,42 +311,7 @@ public class TheFourSeasons extends LXPattern {
              else //make the leaves fall
              {
                //Check if each branch is in the fall path of this pLeaf.
-                
-                //foreach branch //<>//
-                 for(Branch branch : tree.branches)
-                 {
-                  //if branch is in the fall zone
-                  if( dist(branch.x, branch.z, pleaf.x ,pleaf.z) < 300)
-                  {
-                    
-                   
-                 for(LeafAssemblage ass : branch.assemblages)
-                 {
-                   
-                   //check if the assemblage is nearby
-                Leaf l = ass.leaves.get(4);
-                float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
-                if(distance < pseudoLeafDiameter*4)
-                {
-                  
-                  //If nearby, calculate actual distances
-                  for(Leaf ll : ass.leaves)
-                  {
-                    float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
-                    if(dist < pseudoLeafDiameter)
-                    {
-                        colors[ll.point.index] = pleaf.browningColor;
-                    }
-  
-                    else
-                    {//blacken
-                     //   colors[ll.point.index] = 0; //<>//
-                    }
-                  }
-                }
-             }
-                  }
-                 }
+               IlluminateNearby(pleaf, pleaf.browningColor); //<>// //<>//
              }
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
@@ -386,6 +339,37 @@ public class TheFourSeasons extends LXPattern {
              Leaf l = ass.leaves.get(4);
              pleaf.colour = colors[l.point.index];
        }
+    }
+    
+    void IlluminateNearby(PseudoLeaf pleaf, int colour)
+    {
+                    //foreach branch
+                 for(Branch branch : tree.branches)
+                 {
+                  //if branch is in the fall zone
+                  if( dist(branch.x, branch.z, pleaf.x ,pleaf.z) < 300)
+                  {
+                     for(LeafAssemblage ass : branch.assemblages)
+                     {
+                       //check if the assemblage is nearby
+                          Leaf l = ass.leaves.get(4);
+                          float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
+                          if(distance < pseudoLeafDiameter*4)
+                          {
+                            //If nearby, calculate actual distances
+                            for(Leaf ll : ass.leaves)
+                            {
+                              float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
+                              if(dist < pseudoLeafDiameter)
+                              {
+                                  colors[ll.point.index] = colour; // pleaf.browningColor;
+                              }
+                            }
+                          }
+                       }
+                    }
+                 }//illuminate nearby
+    
     }
     
 }
