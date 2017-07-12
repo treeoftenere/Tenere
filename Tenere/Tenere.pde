@@ -48,7 +48,8 @@ void setup() {
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
         try {
           // Update appropriately for testing!
-          final String OPC_ADDRESS = "192.168.1.79"; 
+          final String OPC_ADDRESS = "192.168.1.80"; 
+          //final String OPC_ADDRESS_2 = "192.168.1.80"; 
           final int OPC_PORT = 1337;
           
           final int PIXELS_PER_LEAF = Leaf.NUM_LEDS;
@@ -79,13 +80,14 @@ void setup() {
           
           // Add a new datagram output driver with the branch datagram message
           lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
-            new OPCDatagram(branchIndices, OPCConstants.CHANNEL_BROADCAST)
+            new OPCDatagram(branchIndices, OPC_CHANNEL_FOUR)
             .setAddress(OPC_ADDRESS)
             .setPort(OPC_PORT)
 
           ));
+
           lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
-            new OPCDatagram(branchIndices, OPC_CHANNEL_FOUR)
+            new OPCDatagram(branchIndices, OPCConstants.CHANNEL_BROADCAST)
             .setAddress(OPC_ADDRESS)
             .setPort(OPC_PORT)
 
