@@ -297,7 +297,7 @@ public class Swarm extends LXPattern {
       float pos = this.pos[i++ % NUM_GROUPS].getValuef();
       for (Leaf leaf : assemblage.leaves) {
         float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, swarmX, swarmY));  
-        colors[leaf.point.index] = palette.getColor(leaf.point, max(20, 100 - falloff*LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length)));
+        setColor(leaf, palette.getColor(leaf.point, max(20, 100 - falloff*LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length))));
       }
     }
   }

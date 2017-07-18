@@ -448,6 +448,7 @@ public static class LeafAssemblage extends LXModel {
  */
 public static class Leaf extends LXModel {
   public static final int NUM_LEDS = 7;
+  public static final float LED_SPACING = 1*IN;
   public static final float WIDTH = 5*IN; 
   public static final float LENGTH = 6.5*IN;
   
@@ -495,12 +496,12 @@ public static class Leaf extends LXModel {
   }
   
   public Leaf(LXTransform t, Orientation orientation) {
-    super(new Fixture(t));
+    super(new Fixture(t, orientation));
     this.orientation = orientation;
     this.x = t.x();
     this.y = t.y();
     this.z = t.z();
-    this.point = this.points[0];
+    this.point = this.points[4];
     
     // Precompute boundary coordinates for faster rendering, these
     // can be dumped into a VBO for a shader.
@@ -517,12 +518,23 @@ public static class Leaf extends LXModel {
   }
   
   private static class Fixture extends LXAbstractFixture {
-    Fixture(LXTransform t) {
-      // TODO: do we model multiple LEDs here or not? This
-      // simulation only renders textures at leaf granularity.
-      // Possibly add "shimmer" modes and effects for leaves
-      // downstream?
+    Fixture(LXTransform t, Orientation orientation) {
+      t.push();
+      t.translate(.25*INCHES, LED_SPACING, 0);
       addPoint(new LXPoint(t));
+      t.translate(0, LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.translate(0, LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.translate(-.25*INCHES, LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.translate(-.25*INCHES, -LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.translate(0, -LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.translate(0, -LED_SPACING, 0);
+      addPoint(new LXPoint(t));
+      t.pop();
     }
   }
 }

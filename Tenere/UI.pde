@@ -406,7 +406,7 @@ public class UIShapeLeaves extends UILeaves {
       
       this.tintBuffer.rewind();
       if (BIG_ENDIAN) {
-        for (int i = 0; i < colors.length; ++i) {
+        for (int i = 0; i < colors.length; i += Leaf.NUM_LEDS) {
           int nativeARGB = (colors[i] >>> 24) | (colors[i] << 8);
           this.tintBuffer.put(nativeARGB);
           this.tintBuffer.put(nativeARGB);
@@ -414,7 +414,7 @@ public class UIShapeLeaves extends UILeaves {
           this.tintBuffer.put(nativeARGB);
         }
       } else {
-        for (int i = 0; i < colors.length; ++i) {
+        for (int i = 0; i < colors.length; i += Leaf.NUM_LEDS) {
           int rb = colors[i] & 0x00ff00ff;
           int nativeARGB = (colors[i] & 0xff00ff00) | (rb << 16) | (rb >> 16);
           this.tintBuffer.put(nativeARGB);
