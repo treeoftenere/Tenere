@@ -425,7 +425,7 @@ public class UIShapeLeaves extends UILeaves {
       }
       this.tintBuffer.position(0);
       pgl.bindBuffer(PGL.ARRAY_BUFFER, bufPolyColor.glId);
-      pgl.bufferData(PGL.ARRAY_BUFFER, colors.length * 4 * Integer.SIZE/8, this.tintBuffer, PGL.STREAM_DRAW);
+      pgl.bufferData(PGL.ARRAY_BUFFER, tree.leaves.size() * 4 * Integer.SIZE/8, this.tintBuffer, PGL.STREAM_DRAW);
       pgl.bindBuffer(PGL.ARRAY_BUFFER, 0);
     }
   }

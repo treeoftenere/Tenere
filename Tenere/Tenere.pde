@@ -26,6 +26,7 @@ UITreeControls uiTreeControls;
 // Processing's main invocation, build our model and set up LX
 void setup() {
   size(1200, 960, P3D);
+  frameRate(60.1); // Weird hack, Windows box does 30 FPS when set to 60 for unclear reasons
   final Timer t = new Timer();
   tree = buildTree();
   t.log("Built Tree Model");
