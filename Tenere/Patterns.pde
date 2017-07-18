@@ -1,4 +1,4 @@
-public static class Wave extends LXPattern {
+public class Wave extends LXPattern {
   // by Mark C. Slee
   
   public final CompoundParameter size =
@@ -26,19 +26,19 @@ public static class Wave extends LXPattern {
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
     }
-    for (LXPoint p : model.points) {
-      int idx = Math.round((bins.length-1) * (p.x - model.xMin) / model.xRange);
+    for (Leaf leaf : tree.leaves) {
+      int idx = Math.round((bins.length-1) * (leaf.x - model.xMin) / model.xRange);
       float y1 = (float) bins[idx];
       float y2 = (float) bins[(idx*4 / 3 + bins.length/2) % bins.length];
-      float b1 = max(0, 100 - falloff * abs(p.y - y1));
-      float b2 = max(0, 100 - falloff * abs(p.y - y2));
+      float b1 = max(0, 100 - falloff * abs(leaf.y - y1));
+      float b2 = max(0, 100 - falloff * abs(leaf.y - y2));
       float b = max(b1, b2);
-      colors[p.index] = b > 0 ? palette.getColor(p, b) : #000000;
+      setColor(leaf, b > 0 ? palette.getColor(leaf.point, b) : #000000);
     }
   }
 }
 
-public static class Swirl extends LXPattern {
+public class Swirl extends LXPattern {
   // by Mark C. Slee
   
   private final SinLFO xPos = new SinLFO(model.xMin, model.xMax, startModulator(
@@ -97,17 +97,17 @@ public static class Swirl extends LXPattern {
     final float ySlope = this.ySlope.getValuef();
     final float zSlope = this.zSlope.getValuef();
     
-    for (LXPoint p : model.points) {
-      float radix = (xSlope*(p.x-model.cx) + ySlope*(p.y-model.cy) + zSlope*(p.z-model.cz)) % swarmSize; // (p.x - model.xMin + p.y - model.yMin) % swarmSize;
-      float dist = dist(p.x, p.y, xPos, yPos); 
+    for (Leaf leaf : tree.leaves) {
+      float radix = (xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swarmSize; // (p.x - model.xMin + p.y - model.yMin) % swarmSize;
+      float dist = dist(leaf.x, leaf.y, xPos, yPos); 
       float size = max(20*INCHES, 2*swarmSize - .5*dist);
       float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swarmSize, swarmSize);
-      colors[p.index] = (b > 0) ? palette.getColor(p, b) : #000000;
+      setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
     }
   }
 }
 
-public static class Rotors extends LXPattern {
+public class Rotors extends LXPattern {
   // by Mark C. Slee
   
   private final SawLFO aziumuth = new SawLFO(0, PI, startModulator(
@@ -139,23 +139,22 @@ public static class Rotors extends LXPattern {
     float aziumuth2 = this.aziumuth2.getValuef();
     float falloff = this.falloff.getValuef();
     float falloff2 = this.falloff2.getValuef();
-    for (LXPoint p : model.points) {
-      float yn = (1 - .8 * (p.y - model.yMin) / model.yRange);
+    for (Leaf leaf : tree.leaves) {
+      float yn = (1 - .8 * (leaf.y - model.yMin) / model.yRange);
       float fv = .3 * falloff * yn;
       float fv2 = .3 * falloff2 * yn;
       float b = max(
-        100 - fv * LXUtils.wrapdistf(p.azimuth, aziumuth, PI),
-        100 - fv2 * LXUtils.wrapdistf(p.azimuth, aziumuth2, PI)
+        100 - fv * LXUtils.wrapdistf(leaf.point.azimuth, aziumuth, PI),
+        100 - fv2 * LXUtils.wrapdistf(leaf.point.azimuth, aziumuth2, PI)
       );
       b = max(30, b);
       float s = constrain(50 + b/2, 0, 100);
-      colors[p.index] = palette.getColor(p, s, b);
-      
+      setColor(leaf, palette.getColor(leaf.point, s, b));
     }
   }
 }
 
-public static class DiamondRain extends LXPattern {
+public class DiamondRain extends LXPattern {
   // by Mark C. Slee
  
   private final static int NUM_DROPS = 24; 
@@ -198,12 +197,12 @@ public static class DiamondRain extends LXPattern {
       if (this.yPos.loop()) {
         init();
       }
-      for (LXPoint p : model.points) {
-        float yDist = abs(p.y - yPos);
-        float azimuthDist = abs(p.azimuth - azimuth); 
+      for (Leaf leaf : tree.leaves) {
+        float yDist = abs(leaf.y - yPos);
+        float azimuthDist = abs(leaf.point.azimuth - azimuth); 
         float b = 100 - yFalloff*yDist - azimuthFalloff*azimuthDist;
         if (b > 0) {
-          addColor(p.index, palette.getColor(p, b));
+          addColor(leaf, palette.getColor(leaf.point, b));
         }
       }
     }

@@ -70,7 +70,7 @@ void setup() {
             } else {
               for (int j = 0; j< Leaf.NUM_LEDS; ++j) {
                 branchIndices2[li2++] = leaf.point.index;
-                println("branchIndices2: " + branchIndices2 + "leaf point index " + leaf.point.index);
+                // println("branchIndices2: " + branchIndices2 + "leaf point index " + leaf.point.index);
               }
             }
             leafNum++;
