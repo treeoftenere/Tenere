@@ -540,3 +540,45 @@ public class UISensors extends UICollapsibleSection {
     }
   }
 }
+
+public class UIOutputControls extends UICollapsibleSection {
+  public UIOutputControls(final LXStudio.UI ui) {
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 140);
+    setTitle("OUTPUT");
+    
+    List<OutputItem> items = new ArrayList<OutputItem>();
+    for (OPCDatagram datagram : datagrams) {
+      items.add(new OutputItem(datagram));
+    }
+    UIItemList.ScrollList list =  new UIItemList.ScrollList(ui, 0, 0, getContentWidth(), getContentHeight());
+    list.setShowCheckboxes(true);
+    list.setItems(items);
+    list.addToContainer(this);
+  }
+  
+  class OutputItem extends UIItemList.AbstractItem {
+    
+    private final OPCDatagram datagram;
+    
+    public OutputItem(OPCDatagram datagram) {
+      this.datagram = datagram;
+    }
+        
+    public boolean isChecked() {
+      return this.datagram.enabled.isOn();
+    }
+    
+    public void onActivate() {
+      this.datagram.enabled.toggle();
+      redraw();
+    }
+    
+    public void onCheck(boolean checked) {
+      this.datagram.enabled.setValue(checked);
+    }
+        
+    public String getLabel() {
+      return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
+    }
+  }
+}
