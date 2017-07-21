@@ -406,7 +406,7 @@ public class UIShapeLeaves extends UILeaves {
       
       this.tintBuffer.rewind();
       if (BIG_ENDIAN) {
-        for (int i = 0; i < colors.length; ++i) {
+        for (int i = 0; i < colors.length; i += Leaf.NUM_LEDS) {
           int nativeARGB = (colors[i] >>> 24) | (colors[i] << 8);
           this.tintBuffer.put(nativeARGB);
           this.tintBuffer.put(nativeARGB);
@@ -414,7 +414,7 @@ public class UIShapeLeaves extends UILeaves {
           this.tintBuffer.put(nativeARGB);
         }
       } else {
-        for (int i = 0; i < colors.length; ++i) {
+        for (int i = 0; i < colors.length; i += Leaf.NUM_LEDS) {
           int rb = colors[i] & 0x00ff00ff;
           int nativeARGB = (colors[i] & 0xff00ff00) | (rb << 16) | (rb >> 16);
           this.tintBuffer.put(nativeARGB);
@@ -425,7 +425,7 @@ public class UIShapeLeaves extends UILeaves {
       }
       this.tintBuffer.position(0);
       pgl.bindBuffer(PGL.ARRAY_BUFFER, bufPolyColor.glId);
-      pgl.bufferData(PGL.ARRAY_BUFFER, colors.length * 4 * Integer.SIZE/8, this.tintBuffer, PGL.STREAM_DRAW);
+      pgl.bufferData(PGL.ARRAY_BUFFER, tree.leaves.size() * 4 * Integer.SIZE/8, this.tintBuffer, PGL.STREAM_DRAW);
       pgl.bindBuffer(PGL.ARRAY_BUFFER, 0);
     }
   }
@@ -537,6 +537,48 @@ public class UISensors extends UICollapsibleSection {
     
     public LXNormalizedParameter getModulationSource() {
       return this.parameter;
+    }
+  }
+}
+
+public class UIOutputControls extends UICollapsibleSection {
+  public UIOutputControls(final LXStudio.UI ui) {
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 140);
+    setTitle("OUTPUT");
+    
+    List<OutputItem> items = new ArrayList<OutputItem>();
+    for (OPCDatagram datagram : datagrams) {
+      items.add(new OutputItem(datagram));
+    }
+    UIItemList.ScrollList list =  new UIItemList.ScrollList(ui, 0, 0, getContentWidth(), getContentHeight());
+    list.setShowCheckboxes(true);
+    list.setItems(items);
+    list.addToContainer(this);
+  }
+  
+  class OutputItem extends UIItemList.AbstractItem {
+    
+    private final OPCDatagram datagram;
+    
+    public OutputItem(OPCDatagram datagram) {
+      this.datagram = datagram;
+    }
+        
+    public boolean isChecked() {
+      return this.datagram.enabled.isOn();
+    }
+    
+    public void onActivate() {
+      this.datagram.enabled.toggle();
+      redraw();
+    }
+    
+    public void onCheck(boolean checked) {
+      this.datagram.enabled.setValue(checked);
+    }
+        
+    public String getLabel() {
+      return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
     }
   }
 }

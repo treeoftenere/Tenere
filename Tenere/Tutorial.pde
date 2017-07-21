@@ -13,7 +13,7 @@
  *
  * Take a few minutes to play with this code 
  */
-public static class Tutorial extends LXPattern {
+public class Tutorial extends LXPattern {
 
   // This is a parameter, it has a label, an intial value and a range 
   public final CompoundParameter yPos =
@@ -50,15 +50,15 @@ public static class Tutorial extends LXPattern {
     double position = this.yPos.getValue() + this.basicMotion.getValue();
     double lineWidth = 2*FEET + sizeMotion.getValue();
 
-    // Let's iterate over all the points...
-    for (LXPoint p : model.points) {
+    // Let's iterate over all the leaves...
+    for (Leaf leaf : tree.leaves) {
       // We can get the position of this point via p.x, p.y, p.z
 
       // Compute a brightness that dims as we move away from the line 
-      double brightness = 100 - (100/lineWidth) * Math.abs(p.y - position);
+      double brightness = 100 - (100/lineWidth) * Math.abs(leaf.y - position);
       if (brightness > 0) {
         // There's a color here! Let's use the global color palette
-        colors[p.index] = palette.getColor(p, brightness);
+        setColor(leaf, palette.getColor(leaf.point, brightness));
         
         // Alternatively, if we wanted to do our own color scheme, we
         // could do a manual color computation:
@@ -71,7 +71,7 @@ public static class Tutorial extends LXPattern {
       } else {
         // This point is not even on! Best practice is to skip calling
         // the color palette if we don't need it, just set nothing.
-        colors[p.index] = #000000;
+        setColor(leaf, #000000);
       }
     }
   }
@@ -96,9 +96,9 @@ public class Plane extends LXPattern {
   public void run(double deltaMs) {
     float falloff = 100 / this.size.getValuef();
     float yPos = this.yPos.getValuef();
-    for (LXPoint p : model.points) {
-      float b = 100 - falloff * abs(p.y - yPos); 
-      colors[p.index] = (b > 0) ? palette.getColor(p, b) : #000000;
+    for (Leaf leaf : tree.leaves) {
+      float b = 100 - falloff * abs(leaf.y - yPos); 
+      setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
     }
   }
 }

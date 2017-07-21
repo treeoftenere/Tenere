@@ -11,7 +11,7 @@ final static float FEET = 12*INCHES;
 final static float FT = FEET;
 final static int _width = 1200;
 final static int _height = 960;
-final static byte OPC_CHANNEL_FOUR = 4;
+
 // Our engine and our model
 LXStudio lx;
 Tree tree;
@@ -21,11 +21,16 @@ PApplet applet = Tenere.this;
 // Global UI objects
 UITreeStructure uiTreeStructure;
 UILeaves uiLeaves;
+UISensors uiSensors;
 UITreeControls uiTreeControls;
+UIOutputControls uiOutputControls;
+
+List<OPCDatagram> datagrams = new ArrayList<OPCDatagram>();
 
 // Processing's main invocation, build our model and set up LX
 void setup() {
   size(1200, 960, P3D);
+  frameRate(60.1); // Weird hack, Windows box does 30 FPS when set to 60 for unclear reasons
   final Timer t = new Timer();
   tree = buildTree();
   t.log("Built Tree Model");
@@ -46,52 +51,36 @@ void setup() {
         
         // End-to-end test, sending one branch worth of data
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
-        try {
+        try {          
+          
           // Update appropriately for testing!
           final String OPC_ADDRESS = "192.168.1.80"; 
-          //final String OPC_ADDRESS_2 = "192.168.1.80"; 
           final int OPC_PORT = 1337;
           
-          final int PIXELS_PER_LEAF = Leaf.NUM_LEDS;
-          // final int PIXELS_PER_LEAF = 1; // Use this version to test one value per leaf 
-          
-          // Construct list of output points to go in the datagram
-          Branch branch = tree.branches.get(0); // Just test the first branch
-          int li = 0;
-          int li2 =0;
-          int[] branchIndices = new int[(branch.leaves.size()* PIXELS_PER_LEAF)/2];
-          int[] branchIndices2 = new int[(branch.leaves.size()* PIXELS_PER_LEAF)/2];
-          int leafNum = 0;
-          for (Leaf leaf : branch.leaves) {
-            if (leafNum < branch.leaves.size()/2) {
-            for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
-              branchIndices[li++] = leaf.point.index;
+          for (Branch branch : tree.branches) {
+            int pointsPerPacket = branch.points.length / 2;
+            int[] channels14 = new int[pointsPerPacket];
+            int[] channels58 = new int[pointsPerPacket];
+            for (int i = 0; i < pointsPerPacket; ++i) {
+              channels14[i] = branch.points[i].index;
+              channels58[i] = branch.points[i + pointsPerPacket].index;
             }
-          }
-           else {
-            for (int j = 0; j< Leaf.NUM_LEDS; ++j) {
-              branchIndices2[li2++] = leaf.point.index;
-              println("branchIndices2: " + branchIndices2 + "leaf point index " + leaf.point.index);
-              }
-
-           }
-            leafNum++;
+            
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
+            
+            // Only one branch for now... skip the rest!
+            break;
           }
           
-          // Add a new datagram output driver with the branch datagram message
-          lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
-            new OPCDatagram(branchIndices, OPC_CHANNEL_FOUR)
-            .setAddress(OPC_ADDRESS)
-            .setPort(OPC_PORT)
+          LXDatagramOutput datagramOutput = new LXDatagramOutput(lx); 
+          for (OPCDatagram datagram : datagrams) {
+            datagramOutput.addDatagram(datagram);
+          }
+          
+          // Add to the output
+          lx.engine.output.addChild(datagramOutput);
 
-          ));
-
-          lx.engine.output.addChild(new LXDatagramOutput(lx).addDatagram(
-            new OPCDatagram(branchIndices, OPCConstants.CHANNEL_BROADCAST)
-            .setAddress(OPC_ADDRESS)
-            .setPort(OPC_PORT)
-
-          ));
         } catch (Exception x) {
           println("Failed to construct UDP output: " + x);
           x.printStackTrace();
@@ -112,10 +101,11 @@ void setup() {
         ui.preview.perspective.setValue(30);
 
         // Sensor integrations
-        new UISensors(ui, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
+        uiSensors = (UISensors) new UISensors(ui, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
         
         // Custom tree rendering controls
-        uiTreeControls = (UITreeControls) new UITreeControls(ui).addToContainer(ui.leftPane.global);        
+        uiTreeControls = (UITreeControls) new UITreeControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
+        uiOutputControls = (UIOutputControls) new UIOutputControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
         
         t.log("Initialized LX UI");
       }
@@ -139,6 +129,8 @@ private class Settings extends LXComponent {
   private static final String KEY_LEAVES_VISIBLE = "leavesVisible";
   private static final String KEY_STRUCTURE_VISIBLE = "structureVisible";
   private static final String KEY_CONTROLS_EXPANDED = "controlsExpanded";
+  private static final String KEY_SENSORS_EXPANDED = "sensorsExpanded";
+  private static final String KEY_OUTPUT_EXPANDED = "outputExpanded";
   
   @Override
   public void save(LX lx, JsonObject obj) {
@@ -146,6 +138,8 @@ private class Settings extends LXComponent {
     obj.addProperty(KEY_LEAVES_VISIBLE, uiLeaves.isVisible());
     obj.addProperty(KEY_STRUCTURE_VISIBLE, uiTreeStructure.isVisible());
     obj.addProperty(KEY_CONTROLS_EXPANDED, uiTreeControls.isExpanded());
+    obj.addProperty(KEY_SENSORS_EXPANDED, uiSensors.isExpanded());
+    obj.addProperty(KEY_OUTPUT_EXPANDED, uiOutputControls.isExpanded());
   }
   
   @Override
@@ -161,6 +155,12 @@ private class Settings extends LXComponent {
     }
     if (obj.has(KEY_CONTROLS_EXPANDED)) {
       uiTreeControls.setExpanded(obj.get(KEY_CONTROLS_EXPANDED).getAsBoolean());
+    }
+    if (obj.has(KEY_SENSORS_EXPANDED)) {
+      uiSensors.setExpanded(obj.get(KEY_SENSORS_EXPANDED).getAsBoolean());
+    }
+    if (obj.has(KEY_OUTPUT_EXPANDED)) {
+      uiOutputControls.setExpanded(obj.get(KEY_OUTPUT_EXPANDED).getAsBoolean());
     }
   }
 }
