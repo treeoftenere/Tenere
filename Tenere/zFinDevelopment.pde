@@ -22,12 +22,12 @@ public class TheFourSeasons extends LXPattern {
       
      */
 
-  SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
+  SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.WINTER;
   int dayOfTheSeason;
   int summerDays = 10;
   int autumnDays = 1800;
-  int winterDays = 300;
-  int springDays = 1200;
+  int winterDays = 1000;
+  int springDays = 1100;
   int blossumTime = 300;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
@@ -72,11 +72,13 @@ public class TheFourSeasons extends LXPattern {
         case SUMMER:
           season = SeasonsHelpers.Seasons.AUTUMN;
           nextSeasonChange = autumnDays;
+         
           println("Autum");
           break;
         case AUTUMN:
           season = SeasonsHelpers.Seasons.WINTER;
           nextSeasonChange = winterDays;
+          InitializeWinter();
           println("Winter");
           break;
         case WINTER:
@@ -101,6 +103,19 @@ public class TheFourSeasons extends LXPattern {
     else
     {
       dayOfTheSeason++;
+    }
+  }
+  
+  void InitializeWinter()
+  {
+    InitializePseudoLeaves();
+    for(PseudoLeaf l : pseudoLeaves)
+    {
+      l.wx = l.x;
+      l.wy = l.y;
+      l.wz = l.z;
+      l.y = l.y + model.yMax+100; //up high, ready for snowfall
+       l.colour = LX.rgb(100,100,100);
     }
   }
   
@@ -138,13 +153,6 @@ public class TheFourSeasons extends LXPattern {
   void Summer()
   {
     //WHAT SHOULD WE DO FOR SUMMER? (plasma wind?)
-    
-    
-   // if (dayOfTheSeason < 500) //fade is some
-    //{
-   //   GrowLeaves();
-   //   FadeInLeaves(LX.rgb(0,255,0));
-    //}
    
   }
   
@@ -198,7 +206,7 @@ public class TheFourSeasons extends LXPattern {
 
    void InitializePseudoLeaves()
    {
-println("InitializePseudoLeaves");
+        //println("InitializePseudoLeaves");
        //make a pseudoleaf for each assemblage. 
        pseudoLeaves = new ArrayList<PseudoLeaf>();
        int assemblageIdx = 0;
@@ -258,15 +266,40 @@ println("InitializePseudoLeaves");
         }
      }
 
+     void SnowFall()
+     {
+
+       //clear all colors
+       ClearColors();
+
+       //itterate over all the leaves, if close illumiate
+       for(PseudoLeaf pleaf : pseudoLeaves)
+       {
+           if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
+           {
+             pleaf.y -= 10;
+             
+             if(pleaf.y <= pleaf.wy)//completed fall
+             {
+               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
+             }
+             
+           }
+           else if(random(150) < 1) //randomly set leaf to falling
+           {
+             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+           }
+           
+            IlluminateNearby(pleaf, pleaf.colour);
+        }
+     }
      
      void BrownAutumnLeaves()
      {
-       //cache colors
-       if(dayOfTheSeason == 0) //get the green colors
-       {
+        if(dayOfTheSeason == 0)
+        {
          CaptureColours();
-       }
-       
+        }
        //clear all colors
        ClearColors();
 
@@ -284,7 +317,7 @@ println("InitializePseudoLeaves");
            if(pleaf.status == SeasonsHelpers.LeafStatus.BROWNING) //BROWNING
            {
              //Been Brown a long time, leave will now fall. 
-             if(pleaf.brownTime == 500) //change to falling state
+             if(pleaf.brownTime == 400) //change to falling state
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //exit browning
              }
@@ -314,7 +347,7 @@ println("InitializePseudoLeaves");
            {
              pleaf.status =pleaf.status; //catch debugger
            }
-           else if(random(200) < 1) //randomly set leaf to browning
+           else if(random(150) < 1) //randomly set leaf to browning
            {
              pleaf.status = SeasonsHelpers.LeafStatus.BROWNING;
            }
@@ -375,6 +408,7 @@ println("InitializePseudoLeaves");
  public class PseudoLeaf 
 {
   float x, y, z;
+  float wx, wy, wz;
   int assemblageIndex;
   int branchIndex;
   int colour = LX.rgb(0,0,0);
@@ -399,7 +433,7 @@ println("InitializePseudoLeaves");
 public static class SeasonsHelpers
 {
  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
- enum LeafStatus {GROWING, BROWNING, FALLING, FALLEN}
+ enum LeafStatus {GROWING, BROWNING, FALLING, FALLEN, WINTERWAITING}
 
    
 }
