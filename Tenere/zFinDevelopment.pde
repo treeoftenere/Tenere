@@ -25,9 +25,10 @@ public class TheFourSeasons extends LXPattern {
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
   int dayOfTheSeason;
   int summerDays = 10;
-  int autumnDays = 2200;
+  int autumnDays = 1800;
   int winterDays = 300;
   int springDays = 1200;
+  int blossumTime = 300;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
   int startupPause = 50;
@@ -158,8 +159,9 @@ public class TheFourSeasons extends LXPattern {
   
   void Winter()
   {
-    for (LXPoint p : model.points) {
-      colors[p.index] =  #aaaaaa;
+    for (Leaf l : tree.leaves) {
+      
+      setColor(l, #aaaaaa);
     }  
   }
   
@@ -172,16 +174,16 @@ public class TheFourSeasons extends LXPattern {
     }
     
     //make the leaves grow
-    else if(dayOfTheSeason < 400)
+    else if(dayOfTheSeason < blossumTime)
     {
       GrowLeaves();
       FadeInLeaves(LX.rgb(255,70,170)); //grow pink blossums
     }
-    else if(dayOfTheSeason == 400) 
+    else if(dayOfTheSeason == blossumTime) 
     {
       InitializePseudoLeaves(); //reset ready for next growth
     }
-    else if(dayOfTheSeason > 400)
+    else if(dayOfTheSeason > blossumTime)
     {
       GrowLeaves();
       FadeInLeaves(LX.rgb(20,200, 20)); //grow green leaves
@@ -196,7 +198,7 @@ public class TheFourSeasons extends LXPattern {
 
    void InitializePseudoLeaves()
    {
-
+println("InitializePseudoLeaves");
        //make a pseudoleaf for each assemblage. 
        pseudoLeaves = new ArrayList<PseudoLeaf>();
        int assemblageIdx = 0;
@@ -249,8 +251,9 @@ public class TheFourSeasons extends LXPattern {
               if(distance < pleaf.size) //close enough to bother about
               {
                 pleaf.colour = c;
-                colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.colour,0.02);
-              }
+                //colors[l.point.index] = LXColor.lerp(colors[l.point.index],pleaf.colour,0.02);
+                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.colour,0.02)); 
+            }
            }
         }
      }
@@ -284,13 +287,6 @@ public class TheFourSeasons extends LXPattern {
              if(pleaf.brownTime == 500) //change to falling state
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //exit browning
-               //println("PLeaf " + pleaf.branchIndex + "-" + pleaf.assemblageIndex + " Falling");
-               
-               //capture the current colour
-               //Branch branch = tree.branches.get(pleaf.branchIndex);
-               //LeafAssemblage ass = branch.assemblages.get(pleaf.assemblageIndex);
-              // Leaf l = ass.leaves.get(4); //middle leaf
-              // pleaf.colour = LXColor.lerp(colors[l.point.index],pleaf.browningColor,0.05);
              }
              
              //Continue Browning
@@ -343,35 +339,35 @@ public class TheFourSeasons extends LXPattern {
     
     void IlluminateNearby(PseudoLeaf pleaf, int colour)
     {
-                    //foreach branch
-                 for(Branch branch : tree.branches)
-                 {
-                  //if branch is in the fall zone
-                  if( dist(branch.x, branch.z, pleaf.x ,pleaf.z) < 300)
+          //foreach branch
+       for(Branch branch : tree.branches)
+       {
+        //if branch is in the fall zone
+        if( dist(branch.x, branch.z, pleaf.x ,pleaf.z) < 300)
+        {
+           for(LeafAssemblage ass : branch.assemblages)
+           {
+             //check if the assemblage is nearby
+                Leaf l = ass.leaves.get(4);
+                float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
+                if(distance < pseudoLeafDiameter*4)
+                {
+                  //If nearby, calculate actual distances
+                  for(Leaf ll : ass.leaves)
                   {
-                     for(LeafAssemblage ass : branch.assemblages)
-                     {
-                       //check if the assemblage is nearby
-                          Leaf l = ass.leaves.get(4);
-                          float distance = dist(l.x, l.y, l.z, pleaf.x, pleaf.y, pleaf.z);
-                          if(distance < pseudoLeafDiameter*4)
-                          {
-                            //If nearby, calculate actual distances
-                            for(Leaf ll : ass.leaves)
-                            {
-                              float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
-                              if(dist < pseudoLeafDiameter)
-                              {
-                                  colors[ll.point.index] = colour; // pleaf.browningColor;
-                              }
-                            }
-                          }
-                       }
+                    float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
+                    if(dist < pseudoLeafDiameter)
+                    {
+                       // colors[ll.point.index] = colour; // pleaf.browningColor;
+                       pleaf.colour = LXColor.lerp(pleaf.colour,colour,0.02);
+                       setColor(ll, pleaf.colour);
                     }
-                 }//illuminate nearby
-    
+                  }
+                }
+             }
+          }
+       }//illuminate nearby
     }
-    
 }
 
 
