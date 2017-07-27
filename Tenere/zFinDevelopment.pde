@@ -42,7 +42,7 @@ public class TheFourSeasons extends LXPattern {
 
   public TheFourSeasons(LX lx) {
     super(lx);
-   
+   InitializeWinter();
   }
     
   public void run(double deltaMs) {
@@ -50,6 +50,12 @@ public class TheFourSeasons extends LXPattern {
     AdvanceTime();
     ActionSeason();
      
+  }
+  
+  public void onActive() 
+  {
+    season = SeasonsHelpers.Seasons.STARTUP;
+    dayOfTheSeason =0;
   }
   
   void AdvanceTime()
@@ -167,10 +173,7 @@ public class TheFourSeasons extends LXPattern {
   
   void Winter()
   {
-    for (Leaf l : tree.leaves) {
-      
-      setColor(l, #aaaaaa);
-    }  
+    SnowFall();
   }
   
   void Spring()
@@ -284,6 +287,10 @@ public class TheFourSeasons extends LXPattern {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
              }
              
+           }
+           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING)
+           {
+             //rest untill spring melt
            }
            else if(random(150) < 1) //randomly set leaf to falling
            {
