@@ -488,7 +488,7 @@ public class UISensors extends UICollapsibleSection {
   private final static int PADDING = 4;
   
   public UISensors(UI ui, float w) {
-    super(ui, 0, 0, w, 60);
+    super(ui, 0, 0, w, 120);
     setTitle("SENSORS");
     
     new UIImage(loadImage("heart.png")) {
@@ -501,6 +501,24 @@ public class UISensors extends UICollapsibleSection {
     
     new UIImage(loadImage("brain.png"), 0, 20).addToContainer(this);
     new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(sensors.muse).addToContainer(this);
+    new UIImage(loadImage("heart.png"), 0, 40) {
+      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+        sensors.commandPattern.trigger();
+      }
+    }.addToContainer(this);
+
+    new UIParameterMeter(ui, sensors.commandPattern, ICON_SIZE + PADDING, 40, getContentWidth() - ICON_SIZE - HEART_RATE_WIDTH - 2*PADDING, 16).addToContainer(this);  
+    new UIDoubleBox(getContentWidth() - HEART_RATE_WIDTH, 40, HEART_RATE_WIDTH, 16).setParameter(sensors.heartRate).addToContainer(this);
+
+    new UIImage(loadImage("heart.png"), 0, 60) {
+      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+        sensors.commandMeditation.trigger();
+      }
+    }.addToContainer(this);
+
+
+    new UIParameterMeter(ui, sensors.commandMeditation, ICON_SIZE + PADDING, 60, getContentWidth() - ICON_SIZE - HEART_RATE_WIDTH - 2*PADDING, 16).addToContainer(this);  
+    new UIDoubleBox(getContentWidth() - HEART_RATE_WIDTH, 60, HEART_RATE_WIDTH, 16).setParameter(sensors.heartRate).addToContainer(this);
   }
   
   class UIParameterMeter extends UI2dComponent implements UIModulationSource {
