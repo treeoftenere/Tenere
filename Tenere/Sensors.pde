@@ -66,23 +66,26 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
 
   /**
    * This method handles OSC message dispatch for the specific sensor listeners. 
+   *
+   * The grove channels are specific to the Raspberry Pi (TenerePi).  See more at:
+   * https://github.com/treeoftenere/Interactivity
    */
   public void oscMessage(OscMessage message) {
     if (message.matches("/grove/pulsesensor")) {
-      if (message.getFloat() > 800) {
+      if (message.getFloat(0) > 800) {
         this.heartBeat.trigger();
-        //println("Heartbeat triggered!!!!    " + message.getFloat());
+        //println("Heartbeat triggered!!!!    " + message.getFloat(0));
       }
     } else if (message.matches("/grove/analog")) {
-      //println("Analog0" + message.getFloat(0) + "Analog1" + message.getFloat(1) + "Analog2" + message.getFloat(2));
+      //println("Analog0: " + message.getFloat(0) + "  Analog1: " + message.getFloat(1) + "  Analog2: " + message.getFloat(2));
     } else if (message.matches("/grove/digital")) {
-      //println("Digital3" + message.getFloat(0));
+      //println("Digital3: " + message.getInt(0));
     } else if (message.matches("/grove/accel")) {
-      //println("Accelerometer (x,y,z)" + message.getFloat(0) + " " + message.getFloat(2) + " " + message.getFloat(2));
+      //println("Accelerometer (x,y,z): " + message.getFloat(0) + "  " + message.getFloat(1) + "  " + message.getFloat(2));
     } else if (message.matches("/voice/command")) {
 
       //XXX What is a better way to trigger a pattern?
-      //println("voice command: " + message); 
+      println("voice command: " + message); 
       if (message.getString().matches("Pattern")) {      
         this.commandPattern.trigger();
       } else if (message.getString().matches("Meditation")) {     
@@ -91,9 +94,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     } else if (message.matches("/muse/eeg")) {
       //println(message.getFloat(0) + " " + message.getFloat(1) + " " + message.getFloat(2) + " " + message.getFloat(3)  + " " + message.getFloat(4));
     } else if (message.matches("/muse/gyro")) {
-      //println(message.getFloat(0) + " " + message.getFloat(1) + " " + message.getFloat(2) + " " + message.getFloat(3)  + " " + message.getFloat(4));
+      //println(message.getFloat(0) + " " + message.getFloat(1) + " " + message.getFloat(2));
     } else if (message.matches("/muse/acc")) {
-      //println(message.getFloat(0) + " " + message.getFloat(1) + " " + message.getFloat(2) + " " + message.getFloat(3)  + " " + message.getFloat(4));
+      //println(message.getFloat(0) + " " + message.getFloat(1) + " " + message.getFloat(2));
     } else {
       println("Unrecognized sensor OSC message: " + message.getAddressPattern());
     }
