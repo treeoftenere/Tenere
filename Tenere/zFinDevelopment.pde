@@ -54,7 +54,7 @@ public class TheFourSeasons extends LXPattern {
   
   public void onActive() 
   {
-    season = SeasonsHelpers.Seasons.STARTUP;
+    season = SeasonsHelpers.Seasons.WINTER;
     dayOfTheSeason =0;
   }
   
@@ -121,7 +121,7 @@ public class TheFourSeasons extends LXPattern {
       l.wy = l.y;
       l.wz = l.z;
       l.y = l.y + model.yMax+100; //up high, ready for snowfall
-       l.colour = LX.rgb(100,100,100);
+       l.colour = LX.rgb(150,150,150);
     }
   }
   
@@ -271,13 +271,14 @@ public class TheFourSeasons extends LXPattern {
 
      void SnowFall()
      {
-
+      
        //clear all colors
        ClearColors();
 
        //itterate over all the leaves, if close illumiate
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
+         //ANIMATE FALLING LEAVES
            if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
            {
              pleaf.y -= 10;
@@ -288,13 +289,31 @@ public class TheFourSeasons extends LXPattern {
              }
              
            }
-           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING)
+           
+           //rest untill spring melt
+           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
            {
-             //rest untill spring melt
+             // zzzzzZZZzzZzzZZzZz
            }
-           else if(random(150) < 1) //randomly set leaf to falling
+           
+           //NOT YET FALLING
+           else  //randomly set leaf to falling, but dump all at 600
            {
-             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             //a few flakes
+             if(dayOfTheSeason < 200 ) 
+             {
+                if( random(1, 1000) < 2 ) pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             }
+
+             else if(dayOfTheSeason < 500 ) 
+             {
+                if( random(1, 300) < 2 ) pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             }
+             //all the flakes
+             else 
+             {
+              pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             }
            }
            
             IlluminateNearby(pleaf, pleaf.colour);
