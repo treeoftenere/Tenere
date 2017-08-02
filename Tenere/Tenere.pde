@@ -65,7 +65,7 @@ void setup() {
               channels14[i] = branch.points[i].index;
               channels58[i] = branch.points[i + pointsPerPacket].index;
             }
-            
+                        
             datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
             datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
             
@@ -165,79 +165,14 @@ private class Settings extends LXComponent {
   }
 }
 
-class CameraPosition {
-  final float radius;
-  final float theta;
-  final float phi;
-  
-  public CameraPosition(float radius, float theta, float phi) {
-    this.radius = radius;
-    this.theta = theta;
-    this.phi = phi;
-  }
-  
-  public void set(UI3dContext context) {
-    context.setRadius(this.radius).setTheta(this.theta).setPhi(this.phi);
-  }
-}
-
-final CameraPosition[] cameraPositions = {
-  new CameraPosition(120*FEET, PI/6, -PI/24),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12),
-  new CameraPosition(90*FEET, -PI/6, -PI/12)
-};
-
-float cameraInterp = 1;
-CameraPosition currentCamera = cameraPositions[0];
-CameraPosition targetCamera = cameraPositions[0];
-
 void draw() {
-  // LX handles everything for us!
-  if (cameraInterp < 1) {
-    cameraInterp += .001;
-    cameraInterp = min(1, cameraInterp);
-    lx.ui.preview
-      .setRadius(lerp(currentCamera.radius, targetCamera.radius, cameraInterp))
-      .setTheta(lerp(currentCamera.theta, targetCamera.theta, cameraInterp*cameraInterp))
-      .setPhi(lerp(currentCamera.phi, targetCamera.phi, cameraInterp));
-  } else {
-    currentCamera = targetCamera;
-  }
-   
+  // LX handles everything for us!   
 }
 
 void keyPressed(KeyEvent keyEvent) {
   if (key == 'z') {
     // Little utility to get a bit of trace info from the engine
     lx.engine.logTimers();
-  } else if (key >= '0' && key <= '9') {
-    int cameraIndex = key - '0';
-    if (cameraIndex < cameraPositions.length) {
-      if (keyEvent.isControlDown() || keyEvent.isMetaDown()) {
-        cameraPositions[cameraIndex] = new CameraPosition(
-          lx.ui.preview.radius.getValuef(),
-          lx.ui.preview.theta.getValuef(),
-          lx.ui.preview.phi.getValuef()
-        );
-        currentCamera = targetCamera = cameraPositions[cameraIndex];
-        cameraInterp = 1;
-        println("Stored camera position " + cameraIndex);
-      } else {
-        cameraInterp = 0;
-        targetCamera = cameraPositions[cameraIndex];
-        println("Moving camera to position " + cameraIndex);
-      }
-    }
-  } else if (key == 'c') {
-    cameraInterp = 1;
-    println("Manual camera control");
   }
 }
 
