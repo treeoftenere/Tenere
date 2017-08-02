@@ -574,7 +574,7 @@ public class UIOutputControls extends UICollapsibleSection {
   public UIOutputControls(final LXStudio.UI ui) {
     super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 140);
     setTitle("OUTPUT");
-    
+        
     List<OutputItem> items = new ArrayList<OutputItem>();
     for (OPCDatagram datagram : datagrams) {
       items.add(new OutputItem(datagram));
