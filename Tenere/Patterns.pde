@@ -1,6 +1,6 @@
 public class Wave extends LXPattern {
   // by Mark C. Slee
-  
+
   public final CompoundParameter size =
     new CompoundParameter("Size", 4*FEET, 28*FEET)
     .setDescription("Width of the wave");
@@ -258,6 +258,7 @@ public class Swarm extends LXPattern {
   
   public final CompoundParameter speed = new CompoundParameter("Speed", 2000, 10000, 500);
   public final CompoundParameter base = new CompoundParameter("Base", 10, 60, 1);
+  public final CompoundParameter floor = new CompoundParameter("Floor", 20, 0, 100);
   
   public final LXModulator[] pos = new LXModulator[NUM_GROUPS];
   
@@ -275,8 +276,9 @@ public class Swarm extends LXPattern {
   
   public Swarm(LX lx) {
     super(lx);
-    addParameter("speed", speed);
-    addParameter("base", base);
+    addParameter("speed", this.speed);
+    addParameter("base", this.base);
+    addParameter("floor", this.floor);
     for (int i = 0; i < pos.length; ++i) {
       final int ii = i;
       pos[i] = new SawLFO(0, LeafAssemblage.NUM_LEAVES, new FunctionalParameter() {
@@ -292,12 +294,59 @@ public class Swarm extends LXPattern {
     float base = this.base.getValuef();
     float swarmX = this.swarmX.getValuef();
     float swarmY = this.swarmY.getValuef();
+    float floor = this.floor.getValuef();
     for (LeafAssemblage assemblage : tree.assemblages) {
       float pos = this.pos[i++ % NUM_GROUPS].getValuef();
       for (Leaf leaf : assemblage.leaves) {
         float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, swarmX, swarmY));  
-        setColor(leaf, palette.getColor(leaf.point, max(20, 100 - falloff*LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length))));
+        setColor(leaf, palette.getColor(leaf.point, max(floor, 100 - falloff*LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length))));
       }
     }
   }
+}
+
+public class Sizzle extends LXPattern {
+  
+  private static final int NUM_POS = 5;
+  private static final int NUM_FALL = 7;
+  
+  public LXModulator[] pos = new LXModulator[NUM_POS];
+  public final float[] posV = new float[NUM_POS];
+  
+  public LXModulator[] fall = new LXModulator[NUM_FALL];
+  public final float[] fallV = new float[NUM_FALL];
+  
+  public final CompoundParameter falloff = new CompoundParameter("Fall", 30, 10, 100); 
+  
+  public Sizzle(LX lx) {
+    super(lx);
+    addParameter("falloff", this.falloff);
+    for (int i = 0; i < pos.length; ++i) {
+      pos[i] = startModulator(new SawLFO(0, Leaf.NUM_LEDS, 1000*i));
+    }
+    for (int i = 0; i < fall.length; ++i) {
+      fall[i] = startModulator(new SinLFO(20, 90, 2000*i));
+    }
+  }
+  
+  public void run(double deltaMs) {
+    int i = 0;
+    float falloff = this.falloff.getValuef();
+    float saturation = palette.getSaturationf();
+    for (int p = 0; p < this.pos.length; ++p) {
+      this.posV[p] = this.pos[p].getValuef();
+    }
+    for (int f = 0; f < this.fall.length; ++f) {
+      this.fallV[f] = this.fall[f].getValuef();
+    }
+    for (Leaf leaf : tree.leaves) {
+      float hue = palette.getHuef(leaf.point);
+      int pi = 0;
+      for (LXPoint p : leaf.points) {
+        colors[p.index] = LX.hsb(hue, saturation, max(0, 100 - fallV[i % NUM_FALL] * LXUtils.wrapdistf(pi, this.posV[i % NUM_POS], Leaf.NUM_LEDS)));
+        ++pi;
+      }
+      ++i;
+    }
+  } 
 }
