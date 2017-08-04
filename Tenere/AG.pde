@@ -5,8 +5,9 @@ import processing.opengl.PGraphics2D;
 
 public class SoundSplines extends LXPattern {
   // by Alexander Green 
+  public int NUM_PARTICLES = 10; 
   public final String author = "Alexander F. Green"; 
-  LXVector position = new LXVector(0,0,0); 
+  ArrayList<LXVector> positions = new ArrayList<LXVector>();
   private PImage moss = loadImage("../data/MossyTrees.jpg");
 
   
@@ -46,6 +47,9 @@ public class SoundSplines extends LXPattern {
       bass[i] = 0;
       treble[i] = 0;
     }
+    for (int j = 0; j < NUM_PARTICLES; j++) {
+      positions.add(new LXVector(0,0,0));
+    }
     startModulator(xPos);
     startModulator(zPos);
     xPos.setBasis(.25);
@@ -79,9 +83,9 @@ public class SoundSplines extends LXPattern {
      counter++; 
     //position.set(500*cos((float)counter/100), model.cy,500*sin((float)counter/100));
     //position.set(xPos.getValuef(), model.cy, zPos.getValuef());
-    position.set(xPosP.getValuef(),yPosP.getValuef(), zPosP.getValuef());
+    positions.get(0).set(xPosP.getValuef(),yPosP.getValuef(), zPosP.getValuef());
     for (Leaf leaf : tree.leaves) {
-      float dist = abs(position.dist(leaf.coords[0]));
+      float dist = abs(positions.get(0).dist(leaf.coords[0]));
 
       if (dist < radius.getValuef()) {
         setColor(leaf, moss.get(leaf.point.index%100, leaf.point.index%50));
@@ -319,6 +323,7 @@ public class Turbulence extends LXPattern {
 
 
     for (LXPoint p : model.points) {
+      
       float positionX = abs((p.x - model.xMin)/(model.xMax - model.xMin)); //to-do: make this faster by caching this 
       float positionY = abs((p.z - model.zMin)/(model.zMax - model.zMin));
       int fluidPixelX= floor(positionX*pg_fluid.width);  //gets the corresponding pixel in the fluid data array 
