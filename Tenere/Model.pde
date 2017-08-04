@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.List;
 
 // Change this line for different model modes!
-Tree.ModelMode modelMode = Tree.ModelMode.STELLAR_IMPORT;
+Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
 
 Tree buildTree() {
   return new Tree(modelMode);
@@ -12,9 +12,9 @@ Tree buildTree() {
 public static class Tree extends LXModel {
   
   public enum ModelMode {
-    UNIFORM_BRANCHES,
     MAJOR_LIMBS,
-    STELLAR_IMPORT
+    STELLAR_IMPORT,
+    UNIFORM_BRANCHES
   }
   
   public static final float TRUNK_DIAMETER = 3*FEET;
