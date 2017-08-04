@@ -9,14 +9,20 @@ final static float INCHES = 5;
 final static float IN = INCHES;
 final static float FEET = 12*INCHES;
 final static float FT = FEET;
+final static float INCHES_PER_METER = 39.3701;
+final static float METERS = INCHES_PER_METER * INCHES ;
+final static float METERS_PER_INCH = 1 / INCHES_PER_METER;
+
 final static int _width = 1200;
 final static int _height = 960;
+
+// Static reference to applet
+static PApplet applet;
 
 // Our engine and our model
 LXStudio lx;
 Tree tree;
 Sensors sensors;
-PApplet applet = Tenere.this;
 
 // Global UI objects
 UITreeStructure uiTreeStructure;
@@ -32,6 +38,7 @@ void setup() {
   size(1200, 960, P3D);
   frameRate(60.1); // Weird hack, Windows box does 30 FPS when set to 60 for unclear reasons
   final Timer t = new Timer();
+  applet = this;
   tree = buildTree();
   t.log("Built Tree Model");
   try {
