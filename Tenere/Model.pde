@@ -2,17 +2,19 @@ import heronarts.lx.model.*;
 import java.util.Collections;
 import java.util.List;
 
+// Change this line for different model modes!
+Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
 
 Tree buildTree() {
-  return new Tree(Tree.ModelMode.MAJOR_LIMBS);
-  // return new Tree(Tree.ModelMode.UNIFORM_BRANCHES);
+  return new Tree(modelMode);
 }
 
 public static class Tree extends LXModel {
   
   public enum ModelMode {
-    UNIFORM_BRANCHES,
-    MAJOR_LIMBS
+    MAJOR_LIMBS,
+    STELLAR_IMPORT,
+    UNIFORM_BRANCHES
   }
   
   public static final float TRUNK_DIAMETER = 3*FEET;
@@ -51,7 +53,32 @@ public static class Tree extends LXModel {
     private final List<Limb> limbs = new ArrayList<Limb>();
     
     Fixture(ModelMode mode) {
-      if (mode == ModelMode.UNIFORM_BRANCHES) {
+      if (mode == ModelMode.STELLAR_IMPORT) {
+        JSONObject leafAssemblage = applet.loadJSONObject("stellar_fixture_tree_branch.json");
+        JSONObject branches = applet.loadJSONObject("testExport2Tenereleafs.json");
+        JSONArray fixtures = branches.getJSONArray("Fixtures");
+        for (int fi = 0; fi < fixtures.size(); ++fi) {
+          JSONObject branch = fixtures.getJSONObject(fi);
+          JSONArray matrixArr = branch.getJSONArray("Matrix");
+          float[] m = new float[16];
+          for (int mi = 0; mi < m.length; ++mi) {
+            m[mi] = matrixArr.getFloat(mi);
+          }
+          
+          LXMatrix matrix = new LXMatrix();
+          matrix.scale(METERS_PER_INCH);
+          matrix.multiply(
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15]
+          );
+          matrix.scale(INCHES_PER_METER);
+                    
+          addBranch(new LXTransform(matrix));
+        }
+        
+      } else if (mode == ModelMode.UNIFORM_BRANCHES) {
         for (int ai = 0; ai < 14; ++ai) {
           for (int ei = 0; ei < 14; ++ ei) {
             float azimuth = (ai + (ei % 2) * .5) * TWO_PI / 13;
@@ -96,8 +123,15 @@ public static class Tree extends LXModel {
       }
     }
     
+    private void addBranch(LXTransform t) {
+      addBranch(new Branch(t));
+    }
+    
     private void addBranch(Branch.Orientation orientation) {
-      Branch branch = new Branch(orientation);
+      addBranch(new Branch(orientation));
+    }
+    
+    private void addBranch(Branch branch) {
       this.branches.add(branch);
       addPoints(branch);
     }
@@ -297,14 +331,31 @@ public static class Branch extends LXModel {
     new LeafAssemblage.Orientation(LEFT_OFFSET, 8*IN, LEFT_THETA)
   };
       
+  private static LXTransform getTransform(Orientation orientation) {
+    return new LXTransform()
+      .translate(orientation.x, orientation.y, orientation.z)
+      .rotateY(HALF_PI - orientation.azimuth)
+      .rotateX(HALF_PI - orientation.elevation)
+      .rotateY(orientation.tilt);      
+  }
+      
   public Branch(Orientation orientation) {
-    super(new Fixture(orientation));
+    this(getTransform(orientation), orientation);
+  }
+  
+  public Branch(LXTransform t) {
+    // TODO(mcslee): compute azim/elev/tilt from matrix?
+    this(t, new Orientation(t.x(), t.y(), t.z(), 0, 0, 0));
+  }
+  
+  public Branch(LXTransform t, Orientation orientation) {
+    super(new Fixture(t));
     this.orientation = orientation;
-    this.x = orientation.x;
-    this.y = orientation.y;
-    this.z = orientation.z;
-    this.azimuth = atan2(orientation.z, orientation.x);
-    this.elevation = atan2(orientation.y, dist(0, 0, orientation.x, orientation.z));
+    this.x = t.x();
+    this.y = t.y();
+    this.z = t.z();
+    this.azimuth = atan2(this.z, this.x);
+    this.elevation = atan2(this.y, dist(0, 0, this.x, this.z));
     Fixture f = (Fixture) this.fixtures.get(0);
     this.assemblages = Collections.unmodifiableList(f.assemblages);
     List<Leaf> leaves = new ArrayList<Leaf>();
@@ -320,13 +371,7 @@ public static class Branch extends LXModel {
     
     private final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     
-    Fixture(Orientation orientation) {
-      LXTransform t = new LXTransform();
-      t.translate(orientation.x, orientation.y, orientation.z);
-      t.rotateY(HALF_PI - orientation.azimuth);
-      t.rotateX(HALF_PI - orientation.elevation);
-      t.rotateY(orientation.tilt);      
-
+    Fixture(LXTransform t) {
       for (LeafAssemblage.Orientation assemblage : ASSEMBLAGES) {
         t.push();
         t.translate(assemblage.x, assemblage.y, 0);
