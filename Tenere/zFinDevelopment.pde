@@ -27,7 +27,7 @@ public class TheFourSeasons extends LXPattern {
   int summerDays = 10;
   int autumnDays = 1800;
   int winterDays = 1000;
-  int springDays = 1100;
+  int springDays = 1500;
   int blossumTime = 300;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
@@ -42,6 +42,24 @@ public class TheFourSeasons extends LXPattern {
   //COLORS OF CENTRAL PARK 
   //Shades Of Green
   
+    int[] centralParkGreen = {
+                                LX.rgb(32,89,0), 
+                                LX.rgb(74,145,43),
+                                LX.rgb(102,153,34),
+                                LX.rgb(79,125,52),
+                                LX.rgb(119,158,52),
+                                LX.rgb(54,89,33),
+                                LX.rgb(79,130,27),
+                                LX.rgb(102,153,34),
+                                LX.rgb(97,137,16),
+                                LX.rgb(86,132,8),
+                                LX.rgb(75,124,0),
+                                LX.rgb(104,128,40),
+                                LX.rgb(91,143,19),
+                                LX.rgb(9,53,0)
+                                
+                              };
+  
   //6 colors of pink
   int[] centralParkBlossums = {
                                 LX.rgb(167,13,85), 
@@ -49,10 +67,13 @@ public class TheFourSeasons extends LXPattern {
                                 LX.rgb(171,49,106),
                                 LX.rgb(198,69,125),
                                 LX.rgb(191,117,134),
-                                LX.rgb(215,161,175)
+                                LX.rgb(215,161,175),
+                                LX.rgb(192,99,109)
+                                
                               };
                               
   //10 colors of Brown 
+  // .length
   int[] centralParkInAutumn = {
                                 LX.rgb(247, 193, 35), 
                                 LX.rgb( 255, 158,3),
@@ -63,7 +84,13 @@ public class TheFourSeasons extends LXPattern {
                                 LX.rgb(110,1,0),
                                 LX.rgb(107,14,0),
                                 LX.rgb(96,13,0),
-                                LX.rgb(244,126,3)
+                                LX.rgb(244,126,3),
+                                LX.rgb(111,40,0),
+                                LX.rgb(176,113,16),
+                                //LX.rgb(191,142,47),
+                                LX.rgb(153,99,0),
+                               // LX.rgb(203,134,5),
+                                LX.rgb(213,89,29)
                               };
   
 
@@ -258,11 +285,11 @@ public class TheFourSeasons extends LXPattern {
          centreLeaf.point.y,
          centreLeaf.point.z,
          branchIdx,
-         assemblageIdx, 
-         centralParkBlossums[(int)random(0,5)], 
-         LX.rgb(20,255,20), 
-         centralParkInAutumn[(int)random(0,9)] 
-         ) //idx of the associated assemblage so we can get to it fast
+         assemblageIdx,  //idx of the associated assemblage so we can get to it fast
+         centralParkBlossums[(int)random(0,centralParkBlossums.length)],
+         centralParkGreen[(int)random(0,centralParkGreen.length)], 
+         centralParkInAutumn[(int)random(0,centralParkInAutumn.length)] 
+         )
          );
          assemblageIdx++;
        }
