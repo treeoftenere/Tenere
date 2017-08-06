@@ -279,10 +279,10 @@ public static class Donut extends LXPattern {
   * CURRENTLY ONLY:
   * Dividing leaves into spherical zones, then iterating through zones
   */
-public static class Snake extends LXPattern {
+public static class SnakeFake extends LXPattern {
   //by Eric Kent
   
-  final static int nTiers = 2;
+  final static int nTiers = 1;
   final static char maxTiers = 7; /***DO NOT CHANGE; FIXED TO tier/count DATATYPE!!!***/
   final static float innermost = 3.9*FT;
   final static float outermost = 20.7*FT;
@@ -302,10 +302,13 @@ public static class Snake extends LXPattern {
   int currRow = 0;
   int currTier = 1;
   
-  private int[] tier;
+  private int[] tier; // discrete distance from center
+  private int[] row; // layer along y-axis
+  private int[] prox; // layer along z-axis
   private int[] count;
   
   private float[] phi;
+  private float[] blarg;
   private float[] theta;
   private float[] rad;
   
@@ -315,7 +318,7 @@ public static class Snake extends LXPattern {
   
 
   
-  public Snake(LX lx) {
+  public SnakeFake(LX lx) {
     super(lx);
     addParameter(rate);
     
@@ -332,19 +335,19 @@ public static class Snake extends LXPattern {
     for (LXPoint p : model.points) {
       rad[i] = sqrt(sq(p.x-centerX)+sq(p.y-centerY)+sq(p.z-centerZ)); 
       
-      // Calculate phi, adjusting for atan limits, and rotating so "0" is on the "bottom"
-      phi[i] = atan((p.y-centerY)/(p.x-centerX));
-      //correct phi to be phi=0 @ x=1/y=0; phi=(PI||-PI) @ x=-1/y=0 (depending on side)
-      if (p.x-centerX < 0) {
-        if (p.y-centerY < 0) phi[i] = -(PI-phi[i]);
-        else phi[i] += PI;
-      }
-      //rotate phi values CW by PI/2 so that phi=0 @ x=0/y=-1
+      // Calculate phi as angle from positive x-axis
+      phi[i] = atan2(p.y-centerY, p.x-centerX);
+      // Rotate phi values CW by PI/2 so that phi=0 @ x=0/y=-1
       phi[i] += PI/2;
       if (phi[i] > PI) phi[i] -= 2*PI;
       
+      // Calculate blarg as angle from positive z-axis
+      
+            
       // Calculate theta, [0->PI], such that theta=0 @ x=0/z=1; theta=PI @ x=0/z=-1
-      theta[i] = acos((p.z-centerZ)/rad[i]);
+      float xzrad = sqrt(sq(p.x-centerX)+sq(p.z-centerZ));
+      theta[i] = acos((p.z-centerZ)/xzrad);
+      //theta[i] = acos((p.z-centerZ)/rad[i]);
       
       float stepsize = (outermost - innermost)/nTiers;
       tier[i] = floor((rad[i]-innermost)/stepsize)+1;
@@ -362,7 +365,7 @@ public static class Snake extends LXPattern {
       
       count[i] = row*(int)pow(2,tier[i]+1) + place;
       
-/*      if (i%200==0) {
+/*      if (i%200==0 && tier[i]==1) {
         println("\n"+"***i = "+i);
         println("x = "+p.x);
         println("y = "+(p.y-centerY));
@@ -380,7 +383,6 @@ public static class Snake extends LXPattern {
     }
     
   }
-  
   
   private static boolean isNeighbor(int comingN, int leavingN, int comingT, int leavingT) {
 
@@ -461,6 +463,232 @@ public static class Snake extends LXPattern {
       else if (currCount >= pow(2,2*currTier+1)) {
         currCount = 0;
         currTier++;
+      }
+    }
+  }
+}
+
+/*
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+*/
+
+
+public static class Snake extends LXPattern {
+  //by Eric Kent
+  
+  final static int nTiers = 4; // MUST BE >=1
+  final static char maxTiers = 7;
+  final float innermost;
+  final float outermost;
+  final static float centerX = 0*FEET;
+  final static float centerY = 8*FEET;
+  final static float centerZ = 0*FEET;
+  
+  final static int startBPM = 120;
+  final static int minBPM = 60;
+  final static int maxBPM = 720;
+  final static int startRate = 60000/startBPM;
+  final static int minRate = 60000/minBPM;
+  final static int maxRate = 60000/maxBPM;
+  double time = 0;
+  int wait;
+  int currCount = 0;
+  int currRow = 0;
+  int currTier = 0;
+  
+  class Block {
+    private int tier; // discrete distance from center
+    private int level; // layer along y-axis
+    private int place; // location around y-axis
+    private int count;
+    private ArrayList<LXPoint> contents;
+    
+    Block(int absCount) {
+      // Determine tier & count by iterating out through tiers
+      int tempCount = absCount;
+      tier = 0;
+      while (true) {
+        count = tempCount;
+        tempCount -= pow(2,2*tier+3);
+        tier++;
+        if (tempCount < 0) break;
+      }
+      
+      int tempPlace = count;
+      level = 0;
+      while (true) {
+        place = tempPlace;
+        tempPlace -= pow(2,tier+1);
+        if (tempPlace < 0) break;
+        level++;
+      }
+      
+      contents = new ArrayList<LXPoint>();
+    }
+  }
+  
+  private Block[] blocks;
+  
+  public final CompoundParameter rate = 
+    new CompoundParameter("Rate", startRate, minRate, maxRate)
+    .setDescription("Controls the snake refresh rate");
+  
+
+  
+  public Snake(LX lx) {
+    super(lx);
+    addParameter(rate);
+    
+    // Count the number of total number of blocks across all tiers
+    int numBlocks = 0;
+    for (int i=0; i<nTiers; i++) numBlocks += pow(2,2*i+3);
+    // Initialize all blocks
+    blocks = new Block[numBlocks];
+    for (int i=0; i<numBlocks; i++) blocks[i] = new Block(i);
+    
+    // iterator for test printlns
+    int test = 0;
+    
+    // Find actual innermost and outermost
+    float inner = 10*FT;
+    float outer = 15*FT;
+    for (LXPoint p : model.points) {
+      float rad = sqrt(sq(p.x-centerX)+sq(p.y-centerY)+sq(p.z-centerZ));
+      if (rad<inner) inner=rad;
+      if (rad>outer) outer=rad;
+    }
+    println("inner = "+inner);
+    println("outer = "+outer);
+    innermost = inner-1;
+    outermost = outer+1;
+    
+    // Assign each point to a block
+    for (LXPoint p : model.points) {
+      float rad = sqrt(sq(p.x-centerX)+sq(p.y-centerY)+sq(p.z-centerZ));
+      
+      float stepsize = (outermost - innermost)/nTiers;
+      int tier = floor((rad-innermost)/stepsize);
+      
+      int level = floor(((p.y + (tier+1)*stepsize)-centerY)/stepsize);
+      
+      float phi = atan2(p.z-centerZ, p.x-centerX);
+      phi += PI/2;
+      if (phi > PI) phi -= 2*PI;
+      phi += PI;
+      
+      int place = (int)floor(phi / (2*PI / (int)pow(2,tier+2)));
+      
+      // count within the tier
+      int count = level*(int)pow(2,tier+2) + place;
+      // increment by how many have been in earlier tiers
+      int abscount = count;
+      for (int i=0; i<tier; i++) abscount += pow(2,2*i+3);
+      // append point to the corresponding block's contents
+      if (abscount >= numBlocks) println("Throwing an error at "+test+" because abscount="+abscount+", tier="+tier+", count="+count+", place="+place+", level="+level+", x="+p.x+",y="+p.y+",z="+p.z);
+      blocks[abscount].contents.add(p);
+      
+      /*
+      if (test%200==0) {
+        println(test+" added to "+abscount);
+        println(abscount+" has "+blocks[abscount].contents.size()+" LXPoints");
+      }*/
+      
+      
+      // Test code for checking locations, only shows every Xth to get a good variety displayed
+      /*
+      int X = 200;
+      if (test % X == 0) {
+        println("\n"+"***i = "+test);
+        println("x = "+p.x);
+        println("y = "+(p.y-centerY));
+        println("z = "+p.z);
+        println("rad = "+rad);
+        println("phi = " + phi);
+        println("tier = " + tier);
+        println("level = " + level);
+        println("place = " + place);
+        println("count = " + count);
+      }*/
+      test++;
+      
+      
+    }
+    
+
+  }
+  
+  /*
+  private boolean isNeighbor(Block next, Block prev) {
+    // IF STAYING ON SAME TIER
+    if (next.tier == prev.tier) {
+      
+      // AND IF ON THE SAME LEVEL
+      if (next.level == prev.level) {
+        
+        // AND IF ON A WRAP POINT
+        if ((next.place == 0 || prev.place == 0) &&
+            (next.place+prev.place == (int)pow(2,next.tier+1)))
+          return true;
+        
+        // ELSE IF INCREMENTAL
+        else if (abs(next.place-prev.place)==1)
+          return true;
+      }
+      
+      // ELSE IF ADJACENT IN THE NEXT LEVEL
+      else if (abs(next.level-prev.level)==1 && next.place==prev.place)
+        return true;
+      
+    }
+    
+    // ELSE IF GOING INWARD
+    else if (next.tier == prev.tier-1) return true;
+    
+    // ELSE IF GOING OUTWARD
+    else if (next.tier == prev.tier+1) return true;
+    
+    // if not on same or next tier, not a neighbor
+    else return false;
+  }*/
+  
+  
+  
+  public void run (double deltaMs) {
+    // As a test, iterate over each zone in each layer
+    
+    // Parameter of rate modifies delay between each step
+    time += deltaMs;
+    wait = round((float)rate.getValue());
+    if (time >= wait) {
+      println("currCount = "+currCount);
+      
+      for (LXPoint p : blocks[currCount].contents) {
+        colors[p.index] = palette.getColor(p,100);
+      }
+      
+      /*
+      int i = 0;
+      for (LXPoint p : model.points) {
+        //if spot is in current step#
+        if ((tier[i] == currTier) && (count[i] == currCount)) {
+          colors[p.index] = palette.getColor(p,100);
+        } else colors[p.index] = #000000;
+        i++;
+      }*/
+      
+      time = 0;
+      currCount++;
+
+      if (currCount >= blocks.length) {
+        currCount = 0;
+        
+        for (LXPoint p : model.points) {
+          colors[p.index] = #000000;
+        }
       }
     }
   }
