@@ -94,9 +94,298 @@ public class SoundSplines extends LXPattern {
     }
   }
 }
+   
+
+public class SoundParticles extends LXPattern {
+    private final int LIMINAL_KEY = 46; 
+    private final int MAX_VELOCITY = 100; 
+    private boolean debug = false; 
+    private boolean doUpdate= false;   
+    public  LXProjection spinProjection; 
+    public  LXProjection scaleProjection; 
+   // public  LXProjection 
+    //private LeapMotion leap; 
+    public  GraphicMeter eq = null;
+    public  BoundedParameter spark = new BoundedParameter("Spark", 0); 
+    public  BoundedParameter magnitude = new BoundedParameter("Mag", 0.1, 1);
+    public  BoundedParameter scale = new BoundedParameter("scale", 1, .8, 1.2); 
+    public  BoundedParameter spin  = new BoundedParameter("Spin", .5 , 0, 1); 
+    public  BoundedParameter sizeV = new BoundedParameter("Size", 3.5, 0, 10); 
+    public  BoundedParameter speed = new BoundedParameter("Speed", 16, 0, 500); 
+    public  BoundedParameter colorWheel = new BoundedParameter("Color", 0, 0, 360); 
+    public  BoundedParameter wobble = new BoundedParameter("wobble", 1, 0, 10); 
+    public  BoundedParameter radius = new BoundedParameter("radius", 2000, 500, 2500); 
+    private ArrayList<Particle> particles = new ArrayList<Particle>(); 
+    public  ArrayList<SinLFO> xPos = new ArrayList<SinLFO>();
+    public  ArrayList<SinLFO> yPos = new ArrayList<SinLFO>();
+    public  ArrayList<SinLFO> zPos = new ArrayList<SinLFO>();
+    public  ArrayList<SinLFO> wobbleX = new ArrayList<SinLFO>();
+    public  ArrayList<SinLFO> wobbleY = new ArrayList<SinLFO>();
+    public  ArrayList<SinLFO> wobbleZ = new ArrayList<SinLFO>();
+    public  PVector startVelocity = new PVector(); 
+    private PVector modelCenter = new PVector(); 
+    public  SawLFO angle = new SawLFO(0, TWO_PI, 1000); 
+    private float[] randomFloat = new float[model.points.length];
+    private float[] freqBuckets; 
+    private float lastParticleBirth = millis(); 
+    private float lastTime = millis(); 
+    private float lastTransmitEQ = millis();
+    private int prints = 0; 
+    private float sparkX = 0.; 
+    private float sparkY = 0.; 
+    private float sparkZ = 0.; 
+    private float randCtr (float a) { 
+      return random(a) - a*.5; 
+    }
+    private float midiToHz(int key ) {
+          return (float) (440 * pow(2, (key - 69) / 12)); 
+          }
+    private float midiToAngle(int key ) {
+           return (2 * PI / 24) * key;  
+          }
+    
+    
+    ArrayList<MidiNoteStamp> lfoNotes = new ArrayList<MidiNoteStamp>(); 
+    MidiNote[] particleNotes = new MidiNote[128]; 
+
+      class MidiNoteStamp {
+        MidiNote note; 
+        float timestamp; 
+          MidiNoteStamp(MidiNote _note) {
+          note =_note; 
+          timestamp = millis()* .001; 
+          }
+        } 
+       class Particle  { 
+        PVector position= new PVector(); 
+        PVector velocity= new PVector(); 
+        PVector distance = new PVector();
+        PVector modDist = new PVector();  
+        float hue; 
+        float life; 
+        float intensity; 
+        float falloff; 
+        int i = 0; 
+          Particle(PVector pos, PVector vel) {
+            position.set(pos);     
+            velocity.set(vel); 
+            life=1; 
+            intensity=1; 
+            falloff=1; 
+            hue =220.; 
+            i = particles.size(); 
+            float rand = randomGaussian(); 
+            float rand2 = randomGaussian();
+            SinLFO x = new SinLFO(-rand*20, rand2*20,1500+ 500*rand2);
+            startModulator(x);
+            xPos.add(x);
+            SinLFO y = new SinLFO(-rand2*20, rand*20, 1500 + 500*rand2);
+            startModulator(y);
+            yPos.add(y);
+            wobbleX.add(new SinLFO(6000, 1000, 2000)); 
+          }
+          Particle(PVector pos, PVector vel, MidiNote note) {
+            position.set(pos);     
+            velocity.set(vel); 
+            life=1; 
+            intensity=1; 
+            falloff=1;
+            this.hue=220.; 
+          }
+          public  boolean isActive() {
+             if (abs(this.position.dist(modelCenter)) >= radius.getValuef()) {
+              if( millis() %100 < 5 ) {
+             // println("particle distance to center:  " +   abs(this.position.dist(modelCenter)));
+             // println("particle distance:  " +  distance); 
+              };
+              //  println("position" + this.position + "modelCenter:  " +   modelCenter); 
+              //  println("particle inactive"); 
+                return false; 
+                }
+              else 
+                //println("position" + this.position + "modelCenter:  " +   modelCenter); 
+                //println("particle active"); 
+                return true; 
+              }
+
+          public void respawn() {
+            //this.position.set(modelCenter.mult(random(.5,1.2))); 
+            PVector randomG = 
+            new PVector(model.cx + randomGaussian()*model.xMax/4, model.cy + randomGaussian()*model.yMax/4, model.cz + randomGaussian()*model.yMax/4);
+            this.position.set(randomG);
+            PVector toCenter = modelCenter.sub(randomG).normalize();
+
+            this.velocity.set(toCenter).setMag(1);
+            this.hue=120 + randomGaussian()*30; 
+          } 
+
+          public  color CalculateColor(LXPoint p ) { 
+
+              return lx.hsb(0,0,0); 
+          }
+          public  void run(double deltaMs) {
+            if (!this.isActive()){
+            respawn(); 
+            } 
+
+            float spinNow = spin.getValuef(); 
+            float sparkf = spark.getValuef(); 
+            float clock = 0.001 * millis();
+
+            if (spinNow != 0){
+                if (spinNow > 0) {angle.setRange((double)0.0, (double)TWO_PI, 1000-spinNow);}
+                else if (spinNow < 0) {angle.setRange(angle.getValuef(), angle.getValuef() - TWO_PI, (double) 1000 - spinNow);}
+             
+             spinProjection
+             .center()
+             .rotate((spinNow - .5) / 100 , 0,0,1)
+             .translate(model.cx, model.cy, model.cz);  
+            //  .scale(scale.getValuef(),scale.getValuef(),scale.getValuef()); 
+             }
+          
+            float move = ((float)deltaMs/ 1000)*10*speed.getValuef(); 
+            PVector distance = PVector.mult(velocity, move); 
+            position.add(distance); 
+            //modDist.set(PVector.random3D().setMag(10)); 
+             modDist.set(xPos.get(i).getValuef()/2, yPos.get(i).getValuef()/2); 
+          
+            //modDist.set(sin((float)deltaMs/1000)*2,sin((float)deltaMs/1000 + PI/4)*2); 
+            position.add(modDist);
+            float size = sizeV.getValuef(); 
+            float avgBass = eq.getAveragef(0,4); 
+            float avgMid = eq.getAveragef(6,6); 
+            float avgTreble= eq.getAveragef(12,6); 
+            float hueShift = 10; 
+            hueShift = hueShift * avgTreble*10;  
+            int i = 0; 
+              
+            //  for (LXVector p : spinProjection) {
+             for (Leaf leaf : tree.leaves) {
+
+                float randomX = randomFloat[i];  
+                 //float randomY = randctr(20); 
+                 //float randomZ = randctr(20); 
+                float sparkle = randomX*sparkf; 
+              // asin(p.y-position.y/ dist(p.x, p.y,position.x, position.y));                
+               // float b =0; 
+               // float thetaP = atan2((p.y - position.y), (p.x - position.x));  //too slow 
+               // float b = 100 - (pow(p.x-(position.x),2) + pow(p.y - (position.y), 2) + pow(p.z - (position.z), 2))/((10+6*avgBass)*size); 
+                float b = 100 - (pow(leaf.x-(position.x + sparkle),2) + pow(leaf.y - (position.y + sparkle), 2) + pow(leaf.z - (position.z+ randomX*sparkle), 2))/((10+6*avgBass)*10*size); 
+
+                if (b >0){
+                  addColor(leaf, lx.hsb(this.hue+hueShift, map(1-avgTreble, 0,1, 0, 100), b));
+
+                 // blendColor(p.index, lx.hsb(this.hue+hueShift, map(1-avgTreble, 0,1, 0, 100), b), LXColor.Blend.ADD);
+                }
+               i++; 
+            }
+           position.sub(modDist);
+          }
+        } 
+    public  SoundParticles(LX lx) {
+      super(lx);
+      for (int i = 0 ; i < model.points.length; i++) {
+        randomFloat[i]=randomGaussian()*10; 
+      }
+   
+      spinProjection = new LXProjection(model); 
+      scaleProjection = new LXProjection(model); 
+      addParameter(spark);
+      addParameter(magnitude); 
+      addParameter(sizeV); 
+      addParameter(speed); 
+      addParameter(spin); 
+      addParameter(colorWheel); 
+      addParameter(wobble); 
+      addParameter(radius);
+      startModulator(angle);
+      //addModulator(xPos).trigger();
+      //addModulator(yPos).trigger();
+      //addModulator(zPos).trigger();
+      modelCenter.set(model.cx, model.cy, model.cz); 
+      //modelCenter.set(0.0f, 0.0f,0.0f);
+      // println("modelCenter = " + modelCenter); 
+      // println("model.cx:  " + model.cx + "model.cy:  " + model.cy + "model.cz:  " + model.cz); 
+
+      }
+
+    public boolean noteOn(MidiNote note)  { 
+
+        if (note.getPitch() < LIMINAL_KEY ){ 
+            lfoNotes.add(new MidiNoteStamp(note)); 
+            return false; 
+          }
+
+        float angle = map(note.getPitch(), 30, 50,  0, TWO_PI); 
+        float velocity = map(note.getVelocity(), 0, 127, 0, 1);                                           ;
+        particles.add( new Particle(modelCenter.add(new PVector(random(-model.xMax/4,model.xMax/4), random(-model.yMax/4, model.yMax/4), 0)), new PVector( cos(angle)*velocity, sin(angle)*velocity, 0))); 
+     
+
+        return false;
+    }
+
+    private void debugFloat(String name, float num, float interval) {
+      if (prints > 500) return; 
+      if (prints < 500) {
+      println(name + num); 
+      }
+      prints++; 
+      
+    }
+
+      
+    public void onParameterChanged(LXParameter p ) {
+      if (p == wobble){
+        for (SinLFO x : xPos){
+          x.setRangeFromHereTo(p.getValuef()*100 + randomGaussian()*10);
+        }
+        for (SinLFO y : yPos){
+          y.setRangeFromHereTo(p.getValuef()*100 + randomGaussian()*10);
+        }
+        return;
+       }
+      if (p == colorWheel) {
+        float val = p.getValuef();
+     }
+        return; 
+      }
+
+
+    PVector randomVector() { return new PVector(random(-model.xMax/4, model.xMax/4), random(-model.yMax/4, model.yMax/4), 0);}
+   
+    
+    
+    public void onActive()  {
+      if (eq == null ) {
+        eq = new GraphicMeter(lx.engine.audio.input);
+        eq.slope.setValue(6);
+        eq.range.setValue(36);
+        eq.attack.setValue(10);
+        eq.release.setValue(640);
+        eq.gain.setValue(.3); 
+        addModulator(eq).start();
+        freqBuckets = new float[eq.numBands]; 
+      }
  
+      for (int i=0; i<10; i++){
+     // particles.add(new Particle(PVector.random3D().setMag(model.xMax/2).add(modelCenter), PVector.random3D().setMag(.1))); 
+      particles.add(new Particle(modelCenter.add(randomVector().setMag(50.)), PVector.random3D())); 
 
+      }
+    }
 
+    public void run(double deltaMs) {
+     setColors(0); 
+     sparkX = randCtr(20); 
+     sparkY = randCtr(20);
+     sparkZ = randCtr(20); 
+     for (Particle p : particles)
+      {
+      p.run(deltaMs); 
+      }
+    }
+ }
+ 
 public class Turbulence extends LXPattern {
   //by Alexander Green 
    public final String author = "Alexander F. Green"; 
@@ -347,5 +636,160 @@ public class Turbulence extends LXPattern {
       
       }
     
+  }
+}
+
+public class Pong extends APat {
+  SinLFO x,y,z,dx,dy,dz;
+  float cRad; BoundedParameter pSize;
+  DiscreteParameter   pChoose;
+  PVector v = new PVector(), vMir =  new PVector();
+
+  Pong(LX lx) {
+    super(lx);
+    cRad = mMax.x/10;
+    startModulator(dx = new SinLFO(6000,  500, 30000  ));
+    startModulator(dy = new SinLFO(3000,  500, 22472  ));
+    startModulator(dz = new SinLFO(1000,  500, 18420  ));
+    startModulator(x  = new SinLFO(cRad, mMax.x - cRad, 0));  x.setPeriod(dx);
+    startModulator(y  = new SinLFO(cRad, mMax.y - cRad, 0));  y.setPeriod(dy);
+    startModulator(z  = new SinLFO(cRad, mMax.z - cRad, 0));  z.setPeriod(dz);
+      pSize = addParam  ("Size"     , 0.4 );
+      pChoose = new DiscreteParameter("Anim", new String[] {"Pong", "Ball", "Cone"} );
+      pChoose.setValue(2);
+      addParameter(pChoose);
+  }
+
+  void    StartRun(double deltaMs)  { cRad = mMax.x*val(pSize)/6; }
+  color CalculateColor(PVector p)      {
+    v.set(x.getValuef(), y.getValuef(), z.getValuef());
+    v.z=0;p.z=0;// ignore z dimension
+    switch(pChoose.getValuei()) {
+    case 0: vMir.set(mMax); vMir.sub(p);
+        return lx.hsb(lxh(),100,c1c(1 - min(v.dist(p), v.dist(vMir))*.5/cRad));   // balls
+    case 1: return lx.hsb(lxh(),100,c1c(1 - v.dist(p)*.5/cRad));              // ball
+    case 2: vMir.set(mMax.x/2,0,mMax.z/2);
+        return lx.hsb(lxh(),100,c1c(1 - calcCone(p,v,vMir) * max(.02,.45-val(pSize))));   // spot
+    }
+    return lx.hsb(0,0,0);
+  }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+public class NDat {
+  float   xz, yz, zz, hue, speed, angle, den;
+  float xoff,yoff,zoff;
+  float sinAngle, cosAngle;
+  boolean isActive;
+  NDat      () { isActive=false; }
+  boolean Active() { return isActive; }
+  void  set   (float _hue, float _xz, float _yz, float _zz, float _den, float _speed, float _angle) {
+    isActive = true;
+    hue=_hue; xz=_xz; yz=_yz; zz =_zz; den=_den; speed=_speed; angle=_angle;
+    xoff = random(100e3); yoff = random(100e3); zoff = random(100e3);
+     
+  }
+}
+
+public class Fall extends APat
+{
+  int       CurAnim, iSymm;
+  int       XSym=1,YSym=2,RadSym=3;
+  float       zTime , zTheta=0, zSin, zCos, rtime, ttime;
+  BoundedParameter  pSpeed , pDensity, pSharp, cutoff; 
+  DiscreteParameter     pChoose, pSymm;
+  int       _ND = 4;
+  NDat      N[] = new NDat[_ND];
+
+  public Fall(LX lx) {
+    super(lx);
+    pSpeed = new BoundedParameter("Fast", .55, -2, 2); 
+    addParameter(pSpeed);
+    pDensity  = addParam("Dens"    , .3);
+    cutoff = addParam("Cut", .5);
+    pSharp    = addParam("Shrp"    ,  0);
+    pSymm     = new DiscreteParameter("Symm" , new String[] {"None", "X", "Y", "Rad"} );
+    pChoose   = new DiscreteParameter("Anim", new String[] {"Drip", "Cloud", "Rain", "Fire", "Mach", "Spark","VWav", "Wave"}  );
+    pChoose.setValue(5);
+    addParameter(pSymm);
+    addParameter(pChoose);
+    for (int i=0; i<_ND; i++) N[i] = new NDat();
+  }
+
+  void onActive() { zTime = random(500); zTheta=0; rtime = 0; ttime = 0; }
+
+  void StartRun(double deltaMs) {
+    zTime   += deltaMs*(1*val(pSpeed)-.50) * .005;
+    zTheta  += deltaMs*(spin()-.5)*.01  ;
+    rtime += deltaMs;
+    iSymm  = pSymm.getValuei();
+    zSin  = sin(zTheta);
+    zCos  = cos(zTheta);
+
+    if (pChoose.getValuei() != CurAnim) {
+      CurAnim = pChoose.getValuei(); ttime = rtime;
+      pSpin   .reset(); zTheta    = 0;
+      pDensity  .reset(); pSpeed    .reset();
+      for (int i=0; i<_ND; i++) { N[i].isActive = false; }
+      
+      switch(CurAnim) {
+      //               hue xz  yz  zz den mph angle
+      case 0: N[0].set(0  ,75 ,75 ,150,45 ,3  ,0  ); 
+              N[1].set(20, 25, 50, 50, 25, 1, 0 ); 
+                    N[2].set(80, 25, 50, 50, 15, 2, 0 );  
+                    pSharp.setValue(1 );   break;  // drip
+      case 1: N[0].set(0  ,100,100,200,45 ,3  ,180); pSharp.setValue(0 ); break;  // clouds
+      case 2: N[0].set(0  ,2  ,400,2  ,20 ,3  ,0  ); pSharp.setValue(.5); break;  // rain
+      case 3: N[0].set(40 ,100,100,200,10 ,1  ,180); 
+          N[1].set(0  ,100,100,200,10 ,5  ,180); pSharp.setValue(0 ); break;  // fire 1
+      case 4: N[0].set(0  ,40 ,40 ,40 ,15 ,2.5,180);
+          N[1].set(20 ,40 ,40 ,40 ,15 ,4  ,0  );
+          N[2].set(40 ,40 ,40 ,40 ,15 ,2  ,90 );
+                    N[3].set(60 ,40 ,40 ,40 ,15 ,3  ,-90); pSharp.setValue(.5); break; // machine       
+      case 5: N[0].set(0  ,400,100,2  ,15 ,3  ,90 );
+          N[1].set(20 ,400,100,2  ,15 ,2.5,0  );
+          N[2].set(40 ,100,100,2  ,15 ,2  ,180);
+          N[3].set(60 ,100,100,2  ,15 ,1.5,270); pSharp.setValue(.5); break; // spark
+      }
+    }
+    
+    for (int i=0; i<_ND; i++) if (N[i].Active()) {
+      N[i].sinAngle = sin(radians(N[i].angle));
+      N[i].cosAngle = cos(radians(N[i].angle));
+    }
+  }
+
+  color CalculateColor(PVector p) {
+    color c = 0;
+    rotateZ(p, mCtr, zSin, zCos);
+        //rotateY(p, mCtr, ySin, yCos);
+        //rotateX(p, mCtr, xSin, xCos); 
+    if (CurAnim == 6 || CurAnim == 7) {
+      setNorm(p);
+      return lx.hsb(lxh(),100, 100 * (
+              constrain(1-50*(1-val(pDensity))*abs(p.y-sin(zTime*10  + p.x*(300))*.5 - .5),0,1) + 
+      (CurAnim == 7 ? constrain(1-50*(1-val(pDensity))*abs(p.x-sin(zTime*10  + p.y*(300))*.5 - .5),0,1) : 0))
+      );
+    }     
+
+    if (iSymm == XSym && p.x > mMax.x/2) p.x = mMax.x-p.x;
+    if (iSymm == YSym && p.y > mMax.y/2) p.y = mMax.y-p.y;
+
+    for (int i=0;i<_ND; i++) if (N[i].Active()) {
+      NDat  n     = N[i];
+      float zx    = zTime * n.speed * n.sinAngle,
+          zy    = zTime * n.speed * n.cosAngle;
+
+      float b     = (iSymm==RadSym ? (zTime*n.speed+n.xoff-p.dist(mCtr)/n.xz)
+                     : noise(p.x/n.xz+zx+n.xoff,p.y/n.yz+zy+n.yoff,p.z/n.zz+n.zoff))
+              *1.8;
+
+      b +=  n.den/100 -.4 + val(pDensity) -1;
+
+    c =   PImage.blendColor(c,lx.hsb(palette.getHuef()+n.hue,100,c1c(b)),ADD);
+    }
+    if (brightness(c) < cutoff.getValuef()) return LXColor.BLACK;
+    else return c; 
+    //brightness(c) > .4 ? return c : return LXColor.BLACK;
+    // return c;
   }
 }
