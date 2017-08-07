@@ -555,7 +555,7 @@ public static class Leaf extends LXModel {
     this.x = t.x();
     this.y = t.y();
     this.z = t.z();
-    this.point = this.points[4];
+    this.point = this.points[0];
     
     // Precompute boundary coordinates for faster rendering, these
     // can be dumped into a VBO for a shader.

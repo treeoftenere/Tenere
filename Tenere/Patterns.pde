@@ -1,46 +1,252 @@
-public class Wave extends LXPattern {
-  // by Mark C. Slee
+public abstract class TenerePattern extends LXPattern {
+  
+  protected final Tree model;
+  
+  public TenerePattern(LX lx) {
+    super(lx);
+    this.model = (Tree) lx.model;
+  }
+  
+  public void onActive() {
+    // TODO: report via OSC to blockchain
+  }
+  
+  public void onInactive() {
+    // TODO: report via OSC to blockchain
+  }
+  
+  public abstract String getAuthor();
+}
+
+public class Scanner extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", .5, -1, 1)
+    .setDescription("Speed that the plane moves at");
+    
+  public final CompoundParameter sharp = (CompoundParameter)
+    new CompoundParameter("Sharp", 0, -50, 150)
+    .setDescription("Sharpness of the falling plane")
+    .setExponent(2);
+    
+  public final CompoundParameter xSlope = (CompoundParameter)
+    new CompoundParameter("XSlope", 0, -1, 1)
+    .setDescription("Slope on the X-axis");
+    
+  public final CompoundParameter zSlope = (CompoundParameter)
+    new CompoundParameter("ZSlope", 0, -1, 1)
+    .setDescription("Slope on the Z-axis");
+  
+  private float basis = 0;
+  
+  public Scanner(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("sharp", this.sharp);
+    addParameter("xSlope", this.xSlope);
+    addParameter("zSlope", this.zSlope);
+  }
+  
+  public void run(double deltaMs) {
+    float speed = this.speed.getValuef();
+    speed = speed * speed * ((speed < 0) ? -1 : 1);
+    float sharp = this.sharp.getValuef();
+    float xSlope = this.xSlope.getValuef();
+    float zSlope = this.zSlope.getValuef();
+    this.basis = (float) (this.basis - .001 * speed * deltaMs) % 1.;
+    for (Leaf leaf : model.leaves) {
+      setColor(leaf, LXColor.gray(max(0, 50 - sharp + (50 + sharp) * LXUtils.trif(leaf.point.yn + this.basis + (leaf.point.xn-.5) * xSlope + (leaf.point.zn-.5) * zSlope))))  ;
+    }
+  }
+}
+
+public class Starlight extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  final static int MAX_STARS = 5000;
+  final static int LEAVES_PER_STAR = 3;
+  
+  final LXUtils.LookupTable flicker = new LXUtils.LookupTable(360, new LXUtils.LookupTable.Function() {
+    public float compute(int i, int tableSize) {
+      return .5 - .5 * cos(i * TWO_PI / tableSize);
+    }
+  });
+  
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", 3000, 9000, 500)
+    .setDescription("Speed of the twinkling");
+    
+  public final CompoundParameter variance =
+    new CompoundParameter("Variance", .5, 0, .9)
+    .setDescription("Variance of the twinkling");    
+  
+  public final CompoundParameter numStars =
+    new CompoundParameter("Num", 5000, 1000, MAX_STARS)
+    .setDescription("Number of stars");
+  
+  private final Star[] stars = new Star[MAX_STARS];
+    
+  private final ArrayList<Leaf> shuffledLeaves;
+    
+  public Starlight(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("variance", this.variance);
+    addParameter("numStars", this.numStars);
+    this.shuffledLeaves = new ArrayList<Leaf>(model.leaves); 
+    Collections.shuffle(this.shuffledLeaves);
+    for (int i = 0; i < MAX_STARS; ++i) {
+      this.stars[i] = new Star(i);
+    }
+  }
+  
+  public void run(double deltaMs) {
+    setColors(#000000);
+    float numStars = this.numStars.getValuef();
+    float speed = this.speed.getValuef();
+    float variance = this.variance.getValuef();
+    for (Star star : this.stars) {
+      if (star.active) {
+        star.run(deltaMs);
+      } else if (star.num < numStars) {
+        star.activate(speed, variance);
+      }
+    }
+  }
+  
+  class Star {
+    
+    final int num;
+    
+    double period;
+    float amplitude = 50;
+    double accum = 0;
+    boolean active = false;
+    
+    Star(int num) {
+      this.num = num;
+    }
+    
+    void activate(float speed, float variance) {
+      this.period = max(400, speed * (1 + random(-variance, variance)));
+      this.accum = 0;
+      this.amplitude = random(20, 100);
+      this.active = true;
+    }
+    
+    void run(double deltaMs) {
+      int c = LXColor.gray(this.amplitude * flicker.get(this.accum / this.period));
+      for (int i = 0; i < LEAVES_PER_STAR; ++i) {
+        setColor(shuffledLeaves.get(num * LEAVES_PER_STAR + i), c);
+      }
+      this.accum += deltaMs;
+      if (this.accum > this.period) {
+        this.active = false;
+      }
+    }
+  }
+
+}
+
+public class Waves extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+
+  final int NUM_LAYERS = 3;
+
+  public final CompoundParameter rate = (CompoundParameter)
+    new CompoundParameter("Rate", 6000, 48000, 2000)
+    .setDescription("Rate of the of the wave motion")
+    .setExponent(.3);
 
   public final CompoundParameter size =
     new CompoundParameter("Size", 4*FEET, 28*FEET)
     .setDescription("Width of the wave");
-
-  public final CompoundParameter rate =
-    new CompoundParameter("Rate", 6000, 18000)
-    .setDescription("Rate of the of the wave motion");
-
-  private final SawLFO phase = new SawLFO(0, TWO_PI, rate);
+    
+  public final CompoundParameter amp1 =
+    new CompoundParameter("Amp1", .5, 2, .2)
+    .setDescription("First modulation size");
+    
+  public final CompoundParameter amp2 =
+    new CompoundParameter("Amp2", 1.4, 2, .2)
+    .setDescription("Second modulation size");
+    
+  public final CompoundParameter amp3 =
+    new CompoundParameter("Amp3", .5, 2, .2)
+    .setDescription("Third modulation size");
+    
+  public final CompoundParameter len1 =
+    new CompoundParameter("Len1", 1, 2, .2)
+    .setDescription("First wavelength size");
+    
+  public final CompoundParameter len2 =
+    new CompoundParameter("Len2", .8, 2, .2)
+    .setDescription("Second wavelength size");
+    
+  public final CompoundParameter len3 =
+    new CompoundParameter("Len3", 1.5, 2, .2)
+    .setDescription("Third wavelength size");
+    
+  private final LXModulator phase =
+    startModulator(new SawLFO(0, TWO_PI, rate));
 
   private final double[] bins = new double[512];
 
-  public Wave(LX lx) {
+  public Waves(LX lx) {
     super(lx);
-    startModulator(phase);
-    addParameter(size);
-    addParameter(rate);
+    addParameter("rate", this.rate);
+    addParameter("size", this.size);
+    addParameter("amp1", this.amp1);
+    addParameter("amp2", this.amp2);
+    addParameter("amp3", this.amp3);
+    addParameter("len1", this.len1);
+    addParameter("len2", this.len2);
+    addParameter("len3", this.len3);
   }
 
   public void run(double deltaMs) {
     double phaseValue = phase.getValue();
+    float amp1 = this.amp1.getValuef();
+    float amp2 = this.amp2.getValuef();
+    float amp3 = this.amp3.getValuef();
+    float len1 = this.len1.getValuef();
+    float len2 = this.len2.getValuef();
+    float len3 = this.len3.getValuef();
+    
     float falloff = 100 / size.getValuef();
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
     }
     for (Leaf leaf : tree.leaves) {
-      int idx = Math.round((bins.length-1) * (leaf.x - model.xMin) / model.xRange);
+      int idx = Math.round((bins.length-1) * (len1 * leaf.point.xn)) % bins.length;
+      int idx2 = Math.round((bins.length-1) * (len2 * (.2 + leaf.point.xn))) % bins.length;
+      int idx3 = Math.round((bins.length-1) * (len2 * (1.7 - leaf.point.xn))) % bins.length; 
+      
       float y1 = (float) bins[idx];
-      float y2 = (float) bins[(idx*4 / 3 + bins.length/2) % bins.length];
-      float b1 = max(0, 100 - falloff * abs(leaf.y - y1));
-      float b2 = max(0, 100 - falloff * abs(leaf.y - y2));
-      float b = max(b1, b2);
-      setColor(leaf, b > 0 ? palette.getColor(leaf.point, b) : #000000);
+      float y2 = (float) bins[idx2];
+      float y3 = (float) bins[idx3];
+      
+      float d1 = abs(leaf.y*amp1 - y1);
+      float d2 = abs(leaf.y*amp2 - y2);
+      float d3 = abs(leaf.y*amp3 - y3);
+      
+      float b = max(0, 100 - falloff * min(min(d1, d2), d3));      
+      setColor(leaf, b > 0 ? LXColor.gray(b) : #000000);
     }
   }
 }
 
-public class Swirl extends LXPattern {
-  // by Mark C. Slee
-
+public class Vortex extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
   private final SinLFO xPos = new SinLFO(model.xMin, model.xMax, startModulator(
     new SinLFO(29000, 59000, 51000).randomBasis()
     ));
@@ -49,15 +255,15 @@ public class Swirl extends LXPattern {
     new SinLFO(35000, 44000, 57000).randomBasis()
     ));
 
-  public final CompoundParameter swirlBase = new CompoundParameter("Base", 
+  public final CompoundParameter vortexBase = new CompoundParameter("Base", 
     12*INCHES, 
     1*INCHES, 
     140*INCHES
     );
 
-  public final CompoundParameter swirlMod = new CompoundParameter("Mod", 0, 120*INCHES);
+  public final CompoundParameter vortexMod = new CompoundParameter("Mod", 0, 120*INCHES);
 
-  private final SinLFO swirlSize = new SinLFO(0, swirlMod, 19000);
+  private final SinLFO vortexSize = new SinLFO(0, vortexMod, 19000);
 
   private final SawLFO pos = new SawLFO(0, 1, startModulator(
     new SinLFO(1000, 9000, 17000)
@@ -75,14 +281,14 @@ public class Swirl extends LXPattern {
     new SinLFO(47000, 91000, 53000).randomBasis()
     ));
 
-  public Swirl(LX lx) {
+  public Vortex(LX lx) {
     super(lx);
-    addParameter(swirlBase);
-    addParameter(swirlMod);
+    addParameter(vortexBase);
+    addParameter(vortexMod);
     startModulator(xPos.randomBasis());
     startModulator(yPos.randomBasis());
     startModulator(pos);
-    startModulator(swirlSize);
+    startModulator(vortexSize);
     startModulator(xSlope);
     startModulator(ySlope);
     startModulator(zSlope);
@@ -92,24 +298,25 @@ public class Swirl extends LXPattern {
     final float xPos = this.xPos.getValuef();
     final float yPos = this.yPos.getValuef();
     final float pos = this.pos.getValuef();
-    final float swirlSize = this.swirlBase.getValuef() + this.swirlSize.getValuef();
+    final float vortexSize = this.vortexBase.getValuef() + this.vortexSize.getValuef();
     final float xSlope = this.xSlope.getValuef();
     final float ySlope = this.ySlope.getValuef();
     final float zSlope = this.zSlope.getValuef();
 
     for (Leaf leaf : tree.leaves) {
-      float radix = (20*swirlSize + xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swirlSize;
+      float radix = abs((xSlope*abs(leaf.x-model.cx) + ySlope*abs(leaf.y-model.cy) + zSlope*abs(leaf.z-model.cz)) % vortexSize);
       float dist = dist(leaf.x, leaf.y, xPos, yPos); 
-      float size = max(20*INCHES, 2*swirlSize - .5*dist);
-      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swirlSize, swirlSize);
+      float size = max(20*INCHES, 2*vortexSize - .5*dist);
+      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * vortexSize, vortexSize);
       setColor(leaf, (b > 0) ? LXColor.gray(b) : #000000);
-      // setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
     }
   }
 }
 
-public class Rotors extends LXPattern {
-  // by Mark C. Slee
+public class Rotors extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
 
   private final SawLFO aziumuth = new SawLFO(0, PI, startModulator(
     new SinLFO(11000, 29000, 33000)
@@ -155,8 +362,10 @@ public class Rotors extends LXPattern {
   }
 }
 
-public class DiamondRain extends LXPattern {
-  // by Mark C. Slee
+public class DiamondRain extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
 
   private final static int NUM_DROPS = 24; 
 
@@ -210,8 +419,11 @@ public class DiamondRain extends LXPattern {
   }
 }
 
-public class Azimuth extends LXPattern {
-
+public class Azimuth extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
   public final CompoundParameter azim = new CompoundParameter("Azimuth", 0, TWO_PI);  
 
   public Azimuth(LX lx) {
@@ -228,7 +440,7 @@ public class Azimuth extends LXPattern {
 }
 
 public class AxisTest extends LXPattern {
-
+ 
   public final CompoundParameter xPos = new CompoundParameter("X", 0);
   public final CompoundParameter yPos = new CompoundParameter("Y", 0);
   public final CompoundParameter zPos = new CompoundParameter("Z", 0);
@@ -253,13 +465,25 @@ public class AxisTest extends LXPattern {
   }
 }
 
-public class Swarm extends LXPattern {
-
+public class Swarm extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
   private static final int NUM_GROUPS = 5;
 
-  public final CompoundParameter speed = new CompoundParameter("Speed", 2000, 10000, 500);
-  public final CompoundParameter base = new CompoundParameter("Base", 10, 60, 1);
-  public final CompoundParameter floor = new CompoundParameter("Floor", 20, 0, 100);
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 2000, 10000, 500)
+    .setDescription("Speed of swarm motion")
+    .setExponent(.25);
+    
+  public final CompoundParameter base =
+    new CompoundParameter("Base", 10, 60, 1)
+    .setDescription("Base size of swarm");
+    
+  public final CompoundParameter floor =
+    new CompoundParameter("Floor", 20, 0, 100)
+    .setDescription("Base level of swarm brightness");
 
   public final LXModulator[] pos = new LXModulator[NUM_GROUPS];
 
@@ -288,12 +512,12 @@ public class Swarm extends LXPattern {
     addParameter("floor", this.floor);
     for (int i = 0; i < pos.length; ++i) {
       final int ii = i;
-      pos[i] = new SawLFO(0, LeafAssemblage.NUM_LEAVES, new FunctionalParameter() {
+      float start = (i % 2 == 0) ? 0 : LeafAssemblage.NUM_LEAVES;
+      pos[i] = new SawLFO(start, LeafAssemblage.NUM_LEAVES - start, new FunctionalParameter() {
         public double getValue() {
           return speed.getValue() + ii*500;
         }
-      }
-      ).randomBasis();
+      }).randomBasis();
       startModulator(pos[i]);
     }
   }
@@ -311,56 +535,65 @@ public class Swarm extends LXPattern {
       for (Leaf leaf : assemblage.leaves) {
         float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, leaf.point.zn, swarmX, swarmY, swarmZ));
         float b = max(floor, 100 - falloff * LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length));
-       // setColor(leaf, LXColor.gray(b));
-         setColor(leaf, palette.getColor(leaf.point, b));
+        setColor(leaf, LXColor.gray(b));
       }
     }
   }
 }
 
-public class Sizzle extends LXPattern {
+public class Sizzle extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private static final int NUM_WAVES = 13;
+  private static final int NUM_SIZES = 19;
 
-  private static final int NUM_POS = 5;
-  private static final int NUM_FALL = 7;
+  public LXModulator[] wave = new LXModulator[NUM_WAVES];
+  public LXModulator[] size = new LXModulator[NUM_SIZES];
 
-  public LXModulator[] pos = new LXModulator[NUM_POS];
-  public final float[] posV = new float[NUM_POS];
+  public int[][][] precompute = new int[NUM_WAVES][NUM_SIZES][Leaf.NUM_LEDS];
 
-  public LXModulator[] fall = new LXModulator[NUM_FALL];
-  public final float[] fallV = new float[NUM_FALL];
-
-  public final CompoundParameter falloff = new CompoundParameter("Fall", 30, 10, 100); 
+  public final CompoundParameter base =
+    new CompoundParameter("Base", 3, 1, Leaf.NUM_LEDS)
+    .setDescription("Base size of the leaf sizzle");
+    
+  public final CompoundParameter max =
+    new CompoundParameter("Max", Leaf.NUM_LEDS, 1, Leaf.NUM_LEDS)
+    .setDescription("Max size of the leaf sizzle");    
 
   public Sizzle(LX lx) {
     super(lx);
-    addParameter("falloff", this.falloff);
-    for (int i = 0; i < pos.length; ++i) {
-      pos[i] = startModulator(new SawLFO(0, Leaf.NUM_LEDS, 1000*i).randomBasis());
+    addParameter("base", this.base);
+    addParameter("max", this.max);
+    for (int i = 0; i < wave.length; ++i) {
+      int start = (i % 2 == 0) ? 0 : Leaf.NUM_LEDS;
+      this.wave[i] = startModulator(new SawLFO(start, Leaf.NUM_LEDS-start, 1000*i).randomBasis());
     }
-    for (int i = 0; i < fall.length; ++i) {
-      fall[i] = startModulator(new SinLFO(20, 90, 2000*i).randomBasis());
+    for (int i = 0; i < size.length; ++i) {
+      this.size[i] = startModulator(new SinLFO(this.base, max, 7000 + 1000*i).randomBasis());
     }
   }
 
   public void run(double deltaMs) {
-    int i = 0;
-    float falloff = this.falloff.getValuef();
-    float saturation = palette.getSaturationf();
-    for (int p = 0; p < this.pos.length; ++p) {
-      this.posV[p] = this.pos[p].getValuef();
-    }
-    for (int f = 0; f < this.fall.length; ++f) {
-      this.fallV[f] = this.fall[f].getValuef();
-    }
-    for (Leaf leaf : tree.leaves) {
-      float hue = palette.getHuef(leaf.point);
-      int pi = 0;
-      for (LXPoint p : leaf.points) {
-        float b = max(0, 100 - fallV[i % NUM_FALL] * LXUtils.wrapdistf(pi, this.posV[i % NUM_POS], Leaf.NUM_LEDS));
-        colors[p.index] = LXColor.gray(b);
-        ++pi;
+    for (int w = 0; w < NUM_WAVES; ++w) {
+      float wave = this.wave[w].getValuef();
+      for (int s = 0; s < NUM_SIZES; ++s) {
+        float falloff = 100 / this.size[s].getValuef();
+        for (int p = 0; p < Leaf.NUM_LEDS; ++p) {
+          this.precompute[w][s][p] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(p, wave, Leaf.NUM_LEDS)));
+        }
       }
-      ++i;
+    }
+    
+    int li = 0;
+    for (Leaf leaf : tree.leaves) {
+      int wi = li % NUM_WAVES;
+      int si = li % NUM_SIZES;
+      for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
+        colors[leaf.point.index + i] = this.precompute[wi][si][i];
+      }
+      ++li;
     }
   }
 }
@@ -408,6 +641,7 @@ public class sphericalWave extends LXPattern {
    public final DiscreteParameter clamp =
     new DiscreteParameter("clamp", 0, 2 )
     .setDescription("clamp the input signal to be positive ");
+  
   public sphericalWave(LX lx) {
      super(lx);
      addParameter(input);
@@ -459,6 +693,6 @@ public class sphericalWave extends LXPattern {
        }
        setColor(leaf, leafColor);
     
-  }  
-}
+    }  
+  }
 }
