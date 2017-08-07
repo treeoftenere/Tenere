@@ -4,6 +4,10 @@
  * There is code for an example pattern there, which gives some guidance.
  */
 
+// Change this line to specify the model mode!
+Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
+final static String STELLAR_FILE = "stellartenereexporttest2.json";
+
 // Helpful global constants
 final static float INCHES = 5;
 final static float IN = INCHES;
@@ -12,9 +16,6 @@ final static float FT = FEET;
 final static float INCHES_PER_METER = 39.3701;
 final static float METERS = INCHES_PER_METER * INCHES ;
 final static float METERS_PER_INCH = 1 / INCHES_PER_METER;
-
-final static int _width = 1200;
-final static int _height = 960;
 
 // Static reference to applet
 static PApplet applet;
