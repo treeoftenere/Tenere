@@ -46,7 +46,7 @@ void setup() {
       public void initialize(LXStudio lx, LXStudio.UI ui) {
         // Register a couple top-level effects
         lx.registerEffect(BlurEffect.class);
-        lx.registerEffect(DesaturationEffect.class);        
+        //lx.registerEffect(DesaturationEffect.class);        
 
         // Register the settings component
         lx.engine.registerComponent("tenereSettings", new Settings(lx, ui));
@@ -61,7 +61,11 @@ void setup() {
         try {          
 
           // Update appropriately for testing!
-          final String OPC_ADDRESS = "192.168.1.80"; 
+          final String OPC_ADDRESS = "192.168.1.2"; 
+          final String OPC_ADDRESS_2 = "192.168.1.3"; 
+          final String OPC_ADDRESS_3 = "192.168.1.4";
+          final String OPC_ADDRESS_4= "192.168.1.5"; 
+          final String OPC_ADDRESS_5 = "192.168.1.6"; 
           final int OPC_PORT = 1337;
 
           for (Branch branch : tree.branches) {
@@ -75,7 +79,14 @@ void setup() {
 
             datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
             datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
-
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x04).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x04).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
             // Only one branch for now... skip the rest!
             break;
           }
@@ -124,7 +135,7 @@ void setup() {
   }
 
   // Use multi-threading for network output
-  lx.engine.setNetworkMultithreaded(true);
+  //lx.engine.setNetworkMultithreaded(true);
 }
 
 private class Settings extends LXComponent {
