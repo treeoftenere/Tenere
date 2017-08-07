@@ -92,16 +92,16 @@ public class Swirl extends LXPattern {
     final float xPos = this.xPos.getValuef();
     final float yPos = this.yPos.getValuef();
     final float pos = this.pos.getValuef();
-    final float swarmSize = this.swirlBase.getValuef() + this.swirlSize.getValuef();
+    final float swirlSize = this.swirlBase.getValuef() + this.swirlSize.getValuef();
     final float xSlope = this.xSlope.getValuef();
     final float ySlope = this.ySlope.getValuef();
     final float zSlope = this.zSlope.getValuef();
 
     for (Leaf leaf : tree.leaves) {
-      float radix = (xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swarmSize;
+      float radix = (8*swirlSize + xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swirlSize;
       float dist = dist(leaf.x, leaf.y, xPos, yPos); 
-      float size = max(20*INCHES, 2*swarmSize - .5*dist);
-      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swarmSize, swarmSize);
+      float size = max(20*INCHES, 2*swirlSize - .5*dist);
+      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swirlSize, swirlSize);
       setColor(leaf, (b > 0) ? LXColor.gray(b) : #000000);
       // setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
     }
