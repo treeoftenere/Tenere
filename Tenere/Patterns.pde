@@ -98,7 +98,7 @@ public class Swirl extends LXPattern {
     final float zSlope = this.zSlope.getValuef();
 
     for (Leaf leaf : tree.leaves) {
-      float radix = (8*swirlSize + xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swirlSize;
+      float radix = (20*swirlSize + xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swirlSize;
       float dist = dist(leaf.x, leaf.y, xPos, yPos); 
       float size = max(20*INCHES, 2*swirlSize - .5*dist);
       float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swirlSize, swirlSize);
