@@ -311,8 +311,8 @@ public class Swarm extends LXPattern {
       for (Leaf leaf : assemblage.leaves) {
         float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, leaf.point.zn, swarmX, swarmY, swarmZ));
         float b = max(floor, 100 - falloff * LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length));
-        setColor(leaf, LXColor.gray(b));
-        // setColor(leaf, palette.getColor(leaf.point, b)));
+       // setColor(leaf, LXColor.gray(b));
+         setColor(leaf, palette.getColor(leaf.point, b));
       }
     }
   }

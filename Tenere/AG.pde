@@ -2,7 +2,74 @@ import com.thomasdiewald.pixelflow.java.DwPixelFlow;
 import com.thomasdiewald.pixelflow.java.fluid.DwFluid2D;
 import processing.opengl.PGraphics2D;
 
+public class FrameRateTest extends LXPattern {
 
+  private static final int NUM_GROUPS = 5;
+  
+
+  public final CompoundParameter speed = new CompoundParameter("Speed", 2000, 10000, 500);
+  public final CompoundParameter base = new CompoundParameter("Base", 10, 60, 1);
+  public final CompoundParameter floor = new CompoundParameter("Floor", 20, 0, 100);
+
+  public final LXModulator[] pos = new LXModulator[NUM_GROUPS];
+
+  public final LXModulator swarmX = startModulator(new SinLFO(
+    startModulator(new SinLFO(0, .2, startModulator(new SinLFO(3000, 9000, 17000).randomBasis()))), 
+    startModulator(new SinLFO(.8, 1, startModulator(new SinLFO(4000, 7000, 15000).randomBasis()))), 
+    startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
+    ).randomBasis());
+
+  public final LXModulator swarmY = startModulator(new SinLFO(
+    startModulator(new SinLFO(0, .2, startModulator(new SinLFO(3000, 9000, 19000).randomBasis()))), 
+    startModulator(new SinLFO(.8, 1, startModulator(new SinLFO(4000, 7000, 13000).randomBasis()))), 
+    startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
+    ).randomBasis());
+
+  public final LXModulator swarmZ = startModulator(new SinLFO(
+    startModulator(new SinLFO(0, .2, startModulator(new SinLFO(3000, 9000, 19000).randomBasis()))), 
+    startModulator(new SinLFO(.8, 1, startModulator(new SinLFO(4000, 7000, 13000).randomBasis()))), 
+    startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
+    ).randomBasis());
+
+  public FrameRateTest(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("base", this.base);
+    addParameter("floor", this.floor);
+    for (int i = 0; i < pos.length; ++i) {
+      final int ii = i;
+      pos[i] = new SawLFO(0, LeafAssemblage.NUM_LEAVES, new FunctionalParameter() {
+        public double getValue() {
+          return speed.getValue() + ii*500;
+        }
+      }
+      ).randomBasis();
+      startModulator(pos[i]);
+    }
+  }
+  int frameCount = 0; 
+  public void run(double deltaMs) {
+    frameCount++;
+    float base = this.base.getValuef();
+    float swarmX = this.swarmX.getValuef();
+    float swarmY = this.swarmY.getValuef();
+    float swarmZ = this.swarmZ.getValuef();
+    float floor = this.floor.getValuef();
+    frameCount = frameCount % 50; 
+    int c = lx.hsb(frameCount * 50 % 360, 100, map(frameCount * 10, 0, 500,  60, 100));
+    int i = 0;
+    for (LeafAssemblage assemblage : tree.assemblages) {
+      float pos = this.pos[i++ % NUM_GROUPS].getValuef();
+      for (Leaf leaf : assemblage.leaves) {
+        float falloff = min(100, base + 40 * dist(leaf.point.xn, leaf.point.yn, leaf.point.zn, swarmX, swarmY, swarmZ));
+        float b = max(floor, 100 - falloff * LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length));
+        setColor(leaf, lx.hsb(hue(c), saturation(c),b));
+
+        // setColor(leaf, palette.getColor(leaf.point, b)));
+      }
+    }
+  }
+}
 public class SoundSplines extends LXPattern {
   // by Alexander Green 
   public int NUM_PARTICLES = 10; 
