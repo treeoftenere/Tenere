@@ -4,6 +4,10 @@
  * There is code for an example pattern there, which gives some guidance.
  */
 
+// Change this line to specify the model mode!
+Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
+final static String STELLAR_FILE = "stellartenereexporttest2.json";
+
 // Helpful global constants
 final static float INCHES = 5;
 final static float IN = INCHES;
@@ -12,9 +16,6 @@ final static float FT = FEET;
 final static float INCHES_PER_METER = 39.3701;
 final static float METERS = INCHES_PER_METER * INCHES ;
 final static float METERS_PER_INCH = 1 / INCHES_PER_METER;
-
-final static int _width = 1200;
-final static int _height = 960;
 
 // Static reference to applet
 static PApplet applet;
@@ -28,8 +29,17 @@ Sensors sensors;
 UITreeStructure uiTreeStructure;
 UILeaves uiLeaves;
 UISensors uiSensors;
+
 UITreeControls uiTreeControls;
 UIOutputControls uiOutputControls;
+
+
+//Muliple Muses
+//each muse sends to a differnt port numbered sequentially starting with musePortOffset
+Muse[] muse;
+UIMuse[] uiMuse;
+int num_muses = 3;
+int musePortOffset=7810;
 
 List<OPCDatagram> datagrams = new ArrayList<OPCDatagram>();
 
@@ -56,6 +66,14 @@ void setup() {
         lx.engine.registerComponent("sensors", sensors);
         lx.engine.addLoopTask(sensors);
 
+        // Register a bunch of Muses
+        muse = new Muse[num_muses];
+        for (int k=0; k<num_muses;k=k+1){  
+          muse[k] = new Muse(lx,musePortOffset+k);
+          lx.engine.registerComponent("Muse"+k, muse[k]);
+          lx.engine.addLoopTask(muse[k]);
+        }
+       
         // End-to-end test, sending one branch worth of data
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
         try {          
@@ -120,7 +138,12 @@ void setup() {
 
         // Sensor integrations
         uiSensors = (UISensors) new UISensors(ui, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
-
+        
+        //Add a UI for each Muse.
+        uiMuse = new UIMuse[num_muses];
+        for (int k=0; k<num_muses;k=k+1){  
+           uiMuse[k] = (UIMuse) new UIMuse(ui, ui.leftPane.global.getContentWidth(),muse[k]).addToContainer(ui.leftPane.global);
+        }
         // Custom tree rendering controls
         uiTreeControls = (UITreeControls) new UITreeControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
         uiOutputControls = (UIOutputControls) new UIOutputControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
@@ -152,6 +175,7 @@ private class Settings extends LXComponent {
   private static final String KEY_STRUCTURE_VISIBLE = "structureVisible";
   private static final String KEY_CONTROLS_EXPANDED = "controlsExpanded";
   private static final String KEY_SENSORS_EXPANDED = "sensorsExpanded";
+  private static final String KEY_MUSE_EXPANDED = "museExpanded";
   private static final String KEY_OUTPUT_EXPANDED = "outputExpanded";
 
   @Override
@@ -162,6 +186,9 @@ private class Settings extends LXComponent {
     obj.addProperty(KEY_CONTROLS_EXPANDED, uiTreeControls.isExpanded());
     obj.addProperty(KEY_SENSORS_EXPANDED, uiSensors.isExpanded());
     obj.addProperty(KEY_OUTPUT_EXPANDED, uiOutputControls.isExpanded());
+    for (int k=0; k<num_muses;k=k+1){  
+      obj.addProperty(KEY_MUSE_EXPANDED+k, uiMuse[k].isExpanded());
+    }
   }
 
   @Override
@@ -183,6 +210,11 @@ private class Settings extends LXComponent {
     }
     if (obj.has(KEY_OUTPUT_EXPANDED)) {
       uiOutputControls.setExpanded(obj.get(KEY_OUTPUT_EXPANDED).getAsBoolean());
+    }
+    for (int k=0; k<num_muses;k=k+1){
+      if (obj.has(KEY_MUSE_EXPANDED+k)) {
+        uiMuse[k].setExpanded(obj.get(KEY_MUSE_EXPANDED+k).getAsBoolean());
+      }
     }
   }
 }

@@ -92,16 +92,16 @@ public class Swirl extends LXPattern {
     final float xPos = this.xPos.getValuef();
     final float yPos = this.yPos.getValuef();
     final float pos = this.pos.getValuef();
-    final float swarmSize = this.swirlBase.getValuef() + this.swirlSize.getValuef();
+    final float swirlSize = this.swirlBase.getValuef() + this.swirlSize.getValuef();
     final float xSlope = this.xSlope.getValuef();
     final float ySlope = this.ySlope.getValuef();
     final float zSlope = this.zSlope.getValuef();
 
     for (Leaf leaf : tree.leaves) {
-      float radix = (xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swarmSize;
+      float radix = (20*swirlSize + xSlope*(leaf.x-model.cx) + ySlope*(leaf.y-model.cy) + zSlope*(leaf.z-model.cz)) % swirlSize;
       float dist = dist(leaf.x, leaf.y, xPos, yPos); 
-      float size = max(20*INCHES, 2*swarmSize - .5*dist);
-      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swarmSize, swarmSize);
+      float size = max(20*INCHES, 2*swirlSize - .5*dist);
+      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * swirlSize, swirlSize);
       setColor(leaf, (b > 0) ? LXColor.gray(b) : #000000);
       // setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
     }
@@ -363,4 +363,102 @@ public class Sizzle extends LXPattern {
       ++i;
     }
   }
+}
+
+public class sphericalWave extends LXPattern {
+  // by  Aimone
+  hist inputHist;
+
+  public final CompoundParameter input =
+    new CompoundParameter("input", 0, 1)
+    .setDescription("Input (0-1)");
+    
+  public final CompoundParameter yPos =
+    new CompoundParameter("yPos", model.cy, model.yMin, model.yMax)
+    .setDescription("Controls Y");
+
+  public final CompoundParameter xPos =
+    new CompoundParameter("xPos", model.cx, model.xMin, model.xMax)
+    .setDescription("Controls X");
+
+  public final CompoundParameter zPos =
+    new CompoundParameter("zPos", model.cz, model.zMin, model.zMax)
+    .setDescription("Controls Z");
+
+  public final CompoundParameter waveSpeed =
+    new CompoundParameter("speed", 0.001, 0.5)
+    .setDescription("Controls the speed");
+
+  public final CompoundParameter falloff =
+    new CompoundParameter("falloff", 0, 40*FEET)
+    .setDescription("Controls the falloff over distance");
+    
+   public final CompoundParameter scale =
+    new CompoundParameter("scale", 0.1, 20)
+    .setDescription("Scale the input (after offset)");
+   
+   public final CompoundParameter offset =
+    new CompoundParameter("offset", 0, 2)
+    .setDescription("Offset the input (-1, 1)");
+    
+   public final CompoundParameter sourceColor =
+    new CompoundParameter("Color", 0, 360)
+    .setDescription("Controls the falloff");
+   
+   public final DiscreteParameter clamp =
+    new DiscreteParameter("clamp", 0, 2 )
+    .setDescription("clamp the input signal to be positive ");
+  public sphericalWave(LX lx) {
+     super(lx);
+     addParameter(input);
+     addParameter(yPos);
+     addParameter(xPos);
+     addParameter(zPos);
+     addParameter(waveSpeed);
+     addParameter(falloff);
+     addParameter(offset);
+     addParameter(scale);
+     addParameter(sourceColor);
+     addParameter(clamp);
+     inputHist = new hist(1000);
+  }
+  
+  public void run(double deltaMs) {
+    float inputVal = (float)input.getValue();
+    inputHist.addValue(inputVal);
+    
+    float speed = (float)waveSpeed.getValue();
+    color leafColor = LX.rgb(0, 0,0);    
+    
+//    println("input val is "+inputVal);
+    float offsetVal = (float)offset.getValue();
+    offsetVal = offsetVal-1;
+    
+    float scaleVal = (float)scale.getValue();
+    float dist=0;
+    float sourceAdd = 0;
+    int histIdx=0;
+    float histVal=0;
+    float sourceBaseColor = (float)sourceColor.getValue();
+    float clampInput = (int)clamp.getValue();
+    
+    for (Leaf leaf : tree.leaves) {
+       dist = sqrt(sq((float)leaf.x - (float)xPos.getValue()) 
+        + sq((float)leaf.y - (float)yPos.getValue())
+        + sq((float)leaf.z - (float)zPos.getValue()));
+       sourceAdd = 0;
+       histIdx = inputHist.lookupInd((int)(dist*speed));
+       
+       if (histIdx != -1){
+          if (clampInput == 0){
+            histVal= min(1,inputHist.getValue(histIdx)+offsetVal)*scaleVal*max(0, 100-min(1, dist/(float)falloff.getValue())*100 );
+          }else{
+            histVal= min(1,max(0,inputHist.getValue(histIdx)+offsetVal)*scaleVal)*max(0, 100-min(1, dist/(float)falloff.getValue())*100 );
+          }
+          leafColor = LX.hsb(sourceBaseColor, 100, histVal);
+       }
+       setColor(leaf, leafColor);
+    
+  }  
+}
 }

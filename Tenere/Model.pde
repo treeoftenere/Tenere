@@ -2,9 +2,6 @@ import heronarts.lx.model.*;
 import java.util.Collections;
 import java.util.List;
 
-// Change this line for different model modes!
-Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
-
 Tree buildTree() {
   return new Tree(modelMode);
 }
@@ -31,16 +28,18 @@ public static class Tree extends LXModel {
     Fixture f = (Fixture) this.fixtures.get(0);
     this.branches = Collections.unmodifiableList(f.branches);
     this.limbs = Collections.unmodifiableList(f.limbs);
-    
+        
     // Collect up all the leaves for top-level reference
     final List<Leaf> leaves = new ArrayList<Leaf>();
-    final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
+    final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>(f.assemblages);
     for (Branch branch : this.branches) {
       for (LeafAssemblage assemblage : branch.assemblages) {
         assemblages.add(assemblage);
-        for (Leaf leaf : assemblage.leaves) {
-          leaves.add(leaf);
-        }
+      }
+    }
+    for (LeafAssemblage assemblage : assemblages) {
+      for (Leaf leaf : assemblage.leaves) {
+        leaves.add(leaf);
       }
     }
     this.assemblages = Collections.unmodifiableList(assemblages);
@@ -50,13 +49,14 @@ public static class Tree extends LXModel {
   private static class Fixture extends LXAbstractFixture {
     
     private final List<Branch> branches = new ArrayList<Branch>();
+    private final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     private final List<Limb> limbs = new ArrayList<Limb>();
     
     Fixture(ModelMode mode) {
       if (mode == ModelMode.STELLAR_IMPORT) {
-        JSONObject leafAssemblage = applet.loadJSONObject("stellar_fixture_tree_branch.json");
-        JSONObject branches = applet.loadJSONObject("testExport2Tenereleafs.json");
-        JSONArray fixtures = branches.getJSONArray("Fixtures");
+        // JSONObject leafAssemblage = applet.loadJSONObject("stellar_fixture_tree_branch.json");
+        JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);
+        JSONArray fixtures = assemblages.getJSONArray("Fixtures");
         for (int fi = 0; fi < fixtures.size(); ++fi) {
           JSONObject branch = fixtures.getJSONObject(fi);
           JSONArray matrixArr = branch.getJSONArray("Matrix");
@@ -75,7 +75,7 @@ public static class Tree extends LXModel {
           );
           matrix.scale(INCHES_PER_METER);
                     
-          addBranch(new LXTransform(matrix));
+          addAssemblage(new LXTransform(matrix));
         }
         
       } else if (mode == ModelMode.UNIFORM_BRANCHES) {
@@ -123,8 +123,13 @@ public static class Tree extends LXModel {
       }
     }
     
-    private void addBranch(LXTransform t) {
-      addBranch(new Branch(t));
+    private void addAssemblage(LXTransform t) {
+      addAssemblage(new LeafAssemblage(t));
+    }
+    
+    private void addAssemblage(LeafAssemblage assemblage) {
+      this.assemblages.add(assemblage);
+      addPoints(assemblage);
     }
     
     private void addBranch(Branch.Orientation orientation) {
@@ -460,6 +465,10 @@ public static class LeafAssemblage extends LXModel {
   
   public final Orientation orientation;
   public final List<Leaf> leaves;
+  
+  public LeafAssemblage(LXTransform t) {
+    this(t, new Orientation(0, 0, 0));
+  }
   
   public LeafAssemblage(LXTransform t, Orientation orientation) {
     super(new Fixture(t));
