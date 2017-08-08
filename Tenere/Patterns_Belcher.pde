@@ -41,8 +41,10 @@ public class AtomPattern extends LXPattern {
       addLayer(electronLayer);
       
       //Initialize electron parameters
-      electronLayer.pathRadius.setValue(Math.max(1.0 - (0.25 * i), 0.2));  //Stagger the path radius
       electronLayer.enableElectron.setValue((i == 1) ? true : false);    //Only one electron visible to start
+      electronLayer.pathRadius.setValue(Math.max(1.0 - (0.25 * i), 0.2));  //Stagger the path radius
+      electronLayer.hueShift.setValue(((i-1)*115)%360);      //Offset the color of each electron
+      electronLayer.velocity.setValue(i*110);          //inner electrons run faster
       electronLayer.tilt.setValue(((i-1)*60)%180);              //Offset the tilt of each electron
       electronLayer.orient.setValue(((i-1)*60)%360);            //Offset the orientation of each electron
       
@@ -50,6 +52,7 @@ public class AtomPattern extends LXPattern {
       addParameter(electronLayer.enableElectron.getLabel() + i, electronLayer.enableElectron);
       addParameter(electronLayer.pathRadius.getLabel() + i, electronLayer.pathRadius);
       addParameter(electronLayer.electronSize.getLabel() + i, electronLayer.electronSize);
+      addParameter(electronLayer.hueShift.getLabel() + i, electronLayer.hueShift);
       addParameter(electronLayer.tailLength.getLabel() + i, electronLayer.tailLength);
       addParameter(electronLayer.tailHueOffset.getLabel() + i, electronLayer.tailHueOffset);
       addParameter(electronLayer.velocity.getLabel() + i, electronLayer.velocity);
@@ -62,11 +65,8 @@ public class AtomPattern extends LXPattern {
     }
   }
 
-  //protected double elapsedMs = 0;
-  
   @Override
   protected void run(double deltaMs) {
-    //this.elapsedMs += deltaMs;
         
     setColors(LXColor.BLACK);
     
@@ -112,11 +112,14 @@ public class AtomPattern extends LXPattern {
     public final CompoundParameter electronSize =
       new CompoundParameter("SizeElectron", 0.2, 0, 1)
       .setDescription("Size of electron, relative to structure");
+    public final CompoundParameter hueShift = 
+      new CompoundParameter("HueShift", 0, 0, 360)
+      .setDescription("Offset the electron's color from the global palette to distinguish it from the others");    
     public final CompoundParameter tailLength =
-      new CompoundParameter("TailLength", 0.95, 0, 1.2)
+      new CompoundParameter("TailLength", 0.95, 0, 1.3)
       .setDescription("Duration of comet-like tail, in seconds");
     public final CompoundParameter tailHueOffset = 
-      new CompoundParameter("TailHueOffset", 60, 0, 360)
+      new CompoundParameter("TailHueShift", 60, 0, 360)
       .setDescription("Tail hue offset amount, relative to electron.");
     //Simple behavior
     public final CompoundParameter velocity =
@@ -171,6 +174,7 @@ public class AtomPattern extends LXPattern {
       float orient = this.orient.getValuef();
       float pRadius = this.parent.structureRadius * this.pathRadius.getValuef();
       float eSize = this.parent.structureRadius * this.electronSize.getValuef();
+      float hueShift = this.hueShift.getValuef();
       float velocity = this.velocity.getValuef();
       //WobbleWidth: Theoretical parameter range is 0-180 but we divide that by two because for every degree we tilt the effect is doubled.
       //  In practice the max value is limited on input because the electron behavior gets weird (turns into a sine wave) at high values.
@@ -243,7 +247,7 @@ public class AtomPattern extends LXPattern {
           //Fade the outer 10% to make a soft edge.
           float pointPercentile = (eSize - distToElectron) / eSize;
           float brightness = (pointPercentile > 0.1f) ? 100f : pointPercentile / 0.1f * 100f;
-          int pointColor = palette.getColor(p, brightness); 
+          int pointColor = OffsetColor(palette.getColor(p, brightness), hueShift); 
           colors[p.index] = pointColor;
           
           //Add point to list of TailPoints so it can be faded out gradually
@@ -263,12 +267,12 @@ public class AtomPattern extends LXPattern {
               }
             } else {
               //Tailpoint is from a previous pass.  Make a new one.
-              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
+              TailPoint newTailPoint = new TailPoint(OffsetColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
               this.tailPoints.put(p, newTailPoint);            
             }
           } else {
             //No tailpoint existed for this point.
-              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
+              TailPoint newTailPoint = new TailPoint(OffsetColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
               this.tailPoints.put(p, newTailPoint);
           }          
           
@@ -287,8 +291,8 @@ public class AtomPattern extends LXPattern {
       this.previousFrame = this.parent.runMs;
     }
     
-    protected int GetTailColor(int pointColor, float tailHueOffset) {
-      return LXColor.hsb((LXColor.h(pointColor) + tailHueOffset) % 360, LXColor.s(pointColor), LXColor.b(pointColor));  
+    protected int OffsetColor(int pointColor, float hueOffset) {
+      return LXColor.hsb((LXColor.h(pointColor) + hueOffset) % 360, LXColor.s(pointColor), LXColor.b(pointColor));  
     }
     
     protected double CalcTailLifetime(float eSize, float tailLength, float distToElectron) {
