@@ -95,16 +95,16 @@ void setup() {
               channels58[i] = branch.points[i + pointsPerPacket].index;
             }
 
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels58, (byte) 0x04).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x04).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x00).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new OPCDatagram(channels14, (byte) 0x04).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x04).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x04).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
             // Only one branch for now... skip the rest!
             break;
           }
@@ -116,8 +116,9 @@ void setup() {
 
           // Add to the output
           lx.engine.output.addChild(datagramOutput);
-        } 
-        catch (Exception x) {
+          lx.engine.output.mode.setValue(LXOutput.Mode.RAW);
+          
+        } catch (Exception x) {
           println("Failed to construct UDP output: " + x);
           x.printStackTrace();
         }
