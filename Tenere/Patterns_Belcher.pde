@@ -6,13 +6,13 @@ import java.util.Iterator;
 //Questions:
 //-How to do a calculation on the value of one parameter and pass the result of the calculation to the period of a TriangleLFO?
 //-Is it possible to group ui controls? (look for example first)
+//-How to add more palettes (for nucleus, and for other electron layers)
 //
 //TO-DO:
-//Change Spin to Orient and change Wander to Spin
 //Change elapsedMs to this.runMS
-//Fix RPM to be accurate
-//Make nucleus breathe
-//Add soft edges to nucleus
+//Add color palettes for:
+//-nucleus
+//-other electron layers
 
 public class AtomPattern extends LXPattern {
   // by Justin Belcher
@@ -29,7 +29,7 @@ public class AtomPattern extends LXPattern {
   public final CompoundParameter nucleusHue = 
     new CompoundParameter("HueNucleus", LXColor.h(LXColor.RED), 0, 360)
     .setDescription("Color hue of nucleus");
-  
+
   //ElectronParameters
   //Basic Properties
   public final BooleanParameter enableElectron =
@@ -115,7 +115,7 @@ public class AtomPattern extends LXPattern {
   
   @Override
   protected void run(double deltaMs) {
-  this.elapsedMs += deltaMs;
+    this.elapsedMs += deltaMs;
     
     setColors(LXColor.BLACK);
     
@@ -128,6 +128,8 @@ public class AtomPattern extends LXPattern {
     //Nucleus calculations
     float nucleusRadius = structureRadius * this.nucleusSize.getValuef();
     LXVector nucleusPos = this.transform1.vector();
+    //TO-DO: pull nucleusColor from a palette instead of a parameter
+    int nucleusColor = LXColor.hsb(this.nucleusHue.getValuef(), 100, 100);
 
     //Electron calculations
     float tilt = this.tilt.getValuef();
@@ -197,7 +199,7 @@ public class AtomPattern extends LXPattern {
         colors[entry.getKey().index] = LXColor.scaleBrightness(entry.getValue().c, (float)remainingPercent * MAX_TAIL_BRIGHTNESS);
       }
     }
-
+    
     for (LXPoint p : model.points) {
 
       //Calculate distances from point to objects
@@ -207,15 +209,16 @@ public class AtomPattern extends LXPattern {
       //Draw nucleus first, so it can be overwritten
       if (distToNucleus<nucleusRadius) {
         //Point is within nucleus
-        colors[p.index] = getNucleusColor(p);
+        colors[p.index] = nucleusColor;
       }
             
       //Draw electron last, on top of nucleus and tail
       if (distToElectron<eSize) {
         
         //Point is within the electron
+        //Fade the outer 10% to make a soft edge.
         float pointPercentile = (eSize - distToElectron) / eSize;
-        double brightness = (pointPercentile > 0.1) ? 100 : pointPercentile / 0.1 * 100;
+        float brightness = (pointPercentile > 0.1) ? 100 : pointPercentile / 0.1 * 100;
         int pointColor = palette.getColor(p, brightness); 
         colors[p.index] = pointColor;
         
@@ -272,13 +275,6 @@ public class AtomPattern extends LXPattern {
     //Points closer to the center of the electron will have a longer lifetime.
     //This creates a tapered tail.
     return tailLength * 1000 * (eSize-distToElectron)/eSize;    
-  }
-  
-  protected int getNucleusColor(LXPoint p)
-  {
-    //Only called if the point is already in the nucleus
-  //TO-DO: pull color from a palette instead of a parameter
-    return LXColor.hsb(this.nucleusHue.getValuef(), 100, 100);
   }
   
   protected float dist(LXVector vector, LXPoint point) {
