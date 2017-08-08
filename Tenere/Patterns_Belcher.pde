@@ -2,9 +2,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
-//TO-DO:
-//Change elapsedMs to this.runMS
-
 public class AtomPattern extends LXPattern {
   // by Justin Belcher
   //
@@ -15,7 +12,7 @@ public class AtomPattern extends LXPattern {
 
   //Overall parameters
   public final CompoundParameter nucleusSize =
-    new CompoundParameter("SizeNucleus", 0.5, 0, 1)
+    new CompoundParameter("SizeNucleus", 0.45, 0, 1)
     .setDescription("Size of the nucleus, relative to structure");
   public final CompoundParameter nucleusHue = 
     new CompoundParameter("HueNucleus", LXColor.h(LXColor.RED), 0, 360)
@@ -44,7 +41,7 @@ public class AtomPattern extends LXPattern {
       addLayer(electronLayer);
       
       //Initialize electron parameters
-      electronLayer.pathRadius.setValue(Math.max(1.0 - (0.2 * i), 0.2));  //Stagger the path radius
+      electronLayer.pathRadius.setValue(Math.max(1.0 - (0.25 * i), 0.2));  //Stagger the path radius
       electronLayer.enableElectron.setValue((i == 1) ? true : false);    //Only one electron visible to start
       electronLayer.tilt.setValue(((i-1)*60)%180);              //Offset the tilt of each electron
       electronLayer.orient.setValue(((i-1)*60)%360);            //Offset the orientation of each electron
@@ -65,11 +62,11 @@ public class AtomPattern extends LXPattern {
     }
   }
 
-  protected double elapsedMs = 0;
+  //protected double elapsedMs = 0;
   
   @Override
   protected void run(double deltaMs) {
-    this.elapsedMs += deltaMs;
+    //this.elapsedMs += deltaMs;
         
     setColors(LXColor.BLACK);
     
@@ -226,7 +223,7 @@ public class AtomPattern extends LXPattern {
       Iterator<Map.Entry<LXPoint, TailPoint>> tailIterator = this.tailPoints.entrySet().iterator();
       while(tailIterator.hasNext()) {
         Map.Entry<LXPoint, TailPoint> entry = tailIterator.next();
-        double remainingPercent = (entry.getValue().endTime - this.parent.elapsedMs) / entry.getValue().lifeTime;
+        double remainingPercent = (entry.getValue().endTime - this.parent.runMs) / entry.getValue().lifeTime;
         if (remainingPercent <= 0) {
           //Tail point has exceeded lifetime.  Remove from collection.
           tailIterator.remove();
@@ -262,16 +259,16 @@ public class AtomPattern extends LXPattern {
               if (distToElectron<thisTailPoint.distToElectron) {
                 thisTailPoint.distToElectron = distToElectron;
                 thisTailPoint.lifeTime = CalcTailLifetime(eSize, tailLength, distToElectron);
-                thisTailPoint.endTime = this.parent.elapsedMs + thisTailPoint.lifeTime;
+                thisTailPoint.endTime = this.parent.runMs + thisTailPoint.lifeTime;
               }
             } else {
               //Tailpoint is from a previous pass.  Make a new one.
-              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.elapsedMs, CalcTailLifetime(eSize, tailLength, distToElectron));
+              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
               this.tailPoints.put(p, newTailPoint);            
             }
           } else {
             //No tailpoint existed for this point.
-              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.elapsedMs, CalcTailLifetime(eSize, tailLength, distToElectron));
+              TailPoint newTailPoint = new TailPoint(GetTailColor(pointColor, tailHueOffset), distToElectron, this.parent.runMs, CalcTailLifetime(eSize, tailLength, distToElectron));
               this.tailPoints.put(p, newTailPoint);
           }          
           
@@ -287,7 +284,7 @@ public class AtomPattern extends LXPattern {
       
       //Track the previous frame for use in tapered tail calculations.
       //Use runMs as an ID for the frame.
-      this.previousFrame = this.parent.elapsedMs;
+      this.previousFrame = this.parent.runMs;
     }
     
     protected int GetTailColor(int pointColor, float tailHueOffset) {
