@@ -7,6 +7,8 @@ public abstract class TenerePattern extends LXPattern {
     this.model = (Tree) lx.model;
   }
   
+  public abstract String getAuthor();
+  
   public void onActive() {
     // TODO: report via OSC to blockchain
   }
@@ -14,8 +16,122 @@ public abstract class TenerePattern extends LXPattern {
   public void onInactive() {
     // TODO: report via OSC to blockchain
   }
+}
+
+public class Borealis extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
   
-  public abstract String getAuthor();
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", .5, .01, 1);
+  
+  public final CompoundParameter scale =
+    new CompoundParameter("Scale", .5, .1, 1);
+  
+  public final CompoundParameter spread =
+    new CompoundParameter("Spread", 6, .1, 10);
+  
+  public final CompoundParameter base =
+    new CompoundParameter("Base", .5, .2, 1);
+  
+  public Borealis(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("scale", this.scale);
+    addParameter("spread", this.spread);
+    addParameter("base", this.base);
+  }
+  
+  private float yBasis = 0;
+  
+  public void run(double deltaMs) {
+    this.yBasis -= deltaMs * .0005 * this.speed.getValuef();
+    float scale = this.scale.getValuef();
+    float spread = this.spread.getValuef();
+    float base = .01 * this.base.getValuef();
+    for (Leaf leaf : tree.leaves) {
+      float nv = noise(
+        scale * (base * leaf.point.rxz - spread * leaf.point.yn),
+        leaf.point.yn + this.yBasis
+      );
+      setColor(leaf, LXColor.gray(constrain(-50 + 150 * nv, 0, 100)));
+    }
+  }
+}
+
+public class Clouds extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter thickness =
+    new CompoundParameter("Thickness", 50, 100, 0)
+    .setDescription("Thickness of the cloud formation");
+  
+  public final CompoundParameter xSpeed =
+    new CompoundParameter("XSpd", 0, -1, 1)
+    .setDescription("Motion along the X axis");
+
+  public final CompoundParameter ySpeed =
+    new CompoundParameter("YSpd", 0, -1, 1)
+    .setDescription("Motion along the Y axis");
+    
+  public final CompoundParameter zSpeed =
+    new CompoundParameter("ZSpd", 0, -1, 1)
+    .setDescription("Motion along the Z axis");
+    
+  public final CompoundParameter scale = (CompoundParameter)
+    new CompoundParameter("Scale", 3, .25, 10)
+    .setDescription("Scale of the clouds")
+    .setExponent(2);
+
+  public final CompoundParameter xScale =
+    new CompoundParameter("XScale", 0, 0, 10)
+    .setDescription("Scale along the X axis");
+
+  public final CompoundParameter yScale =
+    new CompoundParameter("YScale", 0, 0, 10)
+    .setDescription("Scale along the Y axis");
+    
+  public final CompoundParameter zScale =
+    new CompoundParameter("ZScale", 0, 0, 10)
+    .setDescription("Scale along the Z axis");
+    
+  private float xBasis = 0, yBasis = 0, zBasis = 0;
+    
+  public Clouds(LX lx) {
+    super(lx);
+    addParameter("thickness", this.thickness);
+    addParameter("xSpeed", this.xSpeed);
+    addParameter("ySpeed", this.ySpeed);
+    addParameter("zSpeed", this.zSpeed);
+    addParameter("scale", this.scale);
+    addParameter("xScale", this.xScale);
+    addParameter("yScale", this.yScale);
+    addParameter("zScale", this.zScale);
+  }
+
+  private static final double MOTION = .0005;
+
+  public void run(double deltaMs) {
+    this.xBasis -= deltaMs * MOTION * this.xSpeed.getValuef();
+    this.yBasis -= deltaMs * MOTION * this.ySpeed.getValuef();
+    this.zBasis -= deltaMs * MOTION * this.zSpeed.getValuef();
+    float thickness = this.thickness.getValuef();
+    float scale = this.scale.getValuef();
+    float xScale = this.xScale.getValuef();
+    float yScale = this.yScale.getValuef();
+    float zScale = this.zScale.getValuef();
+    for (Leaf leaf : tree.leaves) {
+      float nv = noise(
+        (scale + leaf.point.xn * xScale) * leaf.point.xn + this.xBasis,
+        (scale + leaf.point.yn * yScale) * leaf.point.yn + this.yBasis, 
+        (scale + leaf.point.zn * zScale) * leaf.point.zn + this.zBasis
+      );
+      setColor(leaf, LXColor.gray(constrain(-thickness + (150 + thickness) * nv, 0, 100)));
+    }
+  }  
 }
 
 public class Scanner extends TenerePattern {
