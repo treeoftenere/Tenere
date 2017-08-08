@@ -59,6 +59,10 @@ public static class Tree extends LXModel {
         JSONArray fixtures = assemblages.getJSONArray("Fixtures");
         for (int fi = 0; fi < fixtures.size(); ++fi) {
           JSONObject branch = fixtures.getJSONObject(fi);
+          if (!branch.getString("FixtureType").equals("Tree branch")) {
+            continue;
+          }
+          
           JSONArray matrixArr = branch.getJSONArray("Matrix");
           float[] m = new float[16];
           for (int mi = 0; mi < m.length; ++mi) {
@@ -66,15 +70,17 @@ public static class Tree extends LXModel {
           }
           
           LXMatrix matrix = new LXMatrix();
-          matrix.scale(METERS_PER_INCH);
+          matrix.scaleX(-1);
+          matrix.scale(INCHES_PER_METER * INCHES);
           matrix.multiply(
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15]
+            m[0], m[4], m[8],  m[12],
+            m[1], m[5], m[9],  m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]
           );
-          matrix.scale(INCHES_PER_METER);
-                    
+          matrix.scale(METERS_PER_INCH / INCHES);
+          matrix.translate(0, LeafAssemblage.LENGTH / 2, 0);
+
           addAssemblage(new LXTransform(matrix));
         }
         

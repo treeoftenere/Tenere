@@ -6,7 +6,7 @@
 
 // Change this line to specify the model mode!
 Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
-final static String STELLAR_FILE = "stellartenereexporttest2.json";
+final static String STELLAR_FILE = "lastSleeExport.json";
 
 // Helpful global constants
 final static float INCHES = 5;
