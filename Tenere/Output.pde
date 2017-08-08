@@ -19,7 +19,7 @@ public static class TenereDatagram extends OPCDatagram {
   
   @Override
   protected LXDatagram copyPoints(int[] colors, int[] pointIndices, int offset) {
-    final byte[] gamma = GAMMA28[Math.round(255 * this.brightness.getValuef())]; 
+    final byte[] gamma = GAMMA28[Math.round(255 * this.brightness.getValuef())];
     int i = offset;
     for (int index : pointIndices) {
       int c = colors[index];

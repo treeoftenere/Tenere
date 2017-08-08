@@ -18,6 +18,24 @@ public abstract class TenerePattern extends LXPattern {
   }
 }
 
+public class White extends LXPattern {
+  
+  public final CompoundParameter h = new CompoundParameter("Hue", 0, 360);
+  public final CompoundParameter s = new CompoundParameter("Sat", 0, 100);
+  public final CompoundParameter b = new CompoundParameter("Brt", 100, 100);
+  
+  public White(LX lx) {
+    super(lx);
+    addParameter("h", this.h);
+    addParameter("s", this.s);
+    addParameter("b", this.b);
+  }
+  
+  public void run(double deltaMs) {
+    setColors(LXColor.hsb(this.h.getValue(), this.s.getValue(), this.b.getValue()));
+  }
+}
+
 public class Borealis extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
@@ -194,7 +212,7 @@ public class Starlight extends TenerePattern {
   });
   
   public final CompoundParameter speed =
-    new CompoundParameter("Speed", 3000, 9000, 500)
+    new CompoundParameter("Speed", 3000, 9000, 300)
     .setDescription("Speed of the twinkling");
     
   public final CompoundParameter variance =

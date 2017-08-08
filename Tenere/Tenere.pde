@@ -79,13 +79,19 @@ void setup() {
         try {          
 
           // Update appropriately for testing!
-          final String OPC_ADDRESS = "192.168.1.2"; 
-          final String OPC_ADDRESS_2 = "192.168.1.3"; 
-          final String OPC_ADDRESS_3 = "192.168.1.4";
-          final String OPC_ADDRESS_4= "192.168.1.5"; 
-          final String OPC_ADDRESS_5 = "192.168.1.6"; 
+          final String[] OPC_ADDRESS = new String[] {
+            "192.168.1.2",
+            "192.168.1.3",
+            "192.168.1.4",
+            "192.168.1.7",
+            "192.168.1.9",
+            "192.168.1.10",
+            "192.168.1.11",
+            "192.168.1.12",
+          };
           final int OPC_PORT = 1337;
 
+          int branchNum = 0;
           for (Branch branch : tree.branches) {
             int pointsPerPacket = branch.points.length / 2;
             int[] channels14 = new int[pointsPerPacket];
@@ -95,20 +101,16 @@ void setup() {
               channels58[i] = branch.points[i + pointsPerPacket].index;
             }
 
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS_2).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS_3).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x04).setAddress(OPC_ADDRESS_4).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x04).setAddress(OPC_ADDRESS_5).setPort(OPC_PORT));
-            // Only one branch for now... skip the rest!
-            break;
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
+            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
+            
+            // That's all we got...
+            if (++branchNum >= OPC_ADDRESS.length) {
+              break;
+            }
           }
 
+          // Create an LXDatagramOutput to own these packets
           LXDatagramOutput datagramOutput = new LXDatagramOutput(lx); 
           for (OPCDatagram datagram : datagrams) {
             datagramOutput.addDatagram(datagram);
@@ -116,7 +118,6 @@ void setup() {
 
           // Add to the output
           lx.engine.output.addChild(datagramOutput);
-          lx.engine.output.mode.setValue(LXOutput.Mode.RAW);
           
         } catch (Exception x) {
           println("Failed to construct UDP output: " + x);
@@ -152,14 +153,14 @@ void setup() {
         t.log("Initialized LX UI");
       }
     };
-  } 
-  catch (Exception x) {
+  } catch (Exception x) {
     println("Initialization error: " + x);
     x.printStackTrace();
   }
 
   // Use multi-threading for network output
-  //lx.engine.setNetworkMultithreaded(true);
+  lx.engine.output.mode.setValue(LXOutput.Mode.RAW);
+  lx.engine.setNetworkMultithreaded(true);
 }
 
 private class Settings extends LXComponent {
