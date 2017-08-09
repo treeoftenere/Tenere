@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502170312593,
+  "timestamp": 1502304733724,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -73,6 +73,18 @@
               "speed": 3040.1574803149606,
               "variance": 0.6889999974742531,
               "numStars": 3680.0000369548798
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 2291,
+            "class": "Tenere$Tumbler",
+            "parameters": {
+              "label": "Tumbler"
             },
             "modulation": {
               "modulators": [],
@@ -594,7 +606,7 @@
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
-          "fader": 0.0,
+          "fader": 1.0,
           "crossfadeGroup": 0,
           "blendMode": 0,
           "transitionEnabled": false,
@@ -671,6 +683,20 @@
             }
           },
           {
+            "id": 2031,
+            "class": "Tenere$ColorRain",
+            "parameters": {
+              "label": "ColorRain",
+              "speed": 1.0,
+              "range": 30.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
             "id": 749,
             "class": "Tenere$ColorSwirl",
             "parameters": {
@@ -704,7 +730,7 @@
       "parameters": {
         "label": "Audio",
         "enabled": true,
-        "mode": 0
+        "mode": 1
       },
       "meter": {
         "id": 23,
@@ -722,22 +748,22 @@
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
-          "Band-1": 0.0,
-          "Band-2": 0.047946321853909346,
-          "Band-3": 0.3355140124203443,
-          "Band-4": 0.5173156597914326,
-          "Band-5": 0.8253217895619597,
-          "Band-6": 1.0,
-          "Band-7": 0.8488799159829299,
-          "Band-8": 0.9414019069533076,
-          "Band-9": 1.0,
-          "Band-10": 0.9790062655840932,
-          "Band-11": 0.8533381541536706,
-          "Band-12": 0.8317327804576354,
-          "Band-13": 0.6714744099345841,
-          "Band-14": 0.6226077423730307,
-          "Band-15": 0.4775523865306055,
-          "Band-16": 0.29394852996180565
+          "Band-1": 0.24576214255184647,
+          "Band-2": 0.4165597469284531,
+          "Band-3": 0.4343694686503784,
+          "Band-4": 0.5041065617816227,
+          "Band-5": 0.4319587013813724,
+          "Band-6": 0.1885517170237222,
+          "Band-7": 0.17588960252784047,
+          "Band-8": 0.1660298573151049,
+          "Band-9": 0.13771079792918195,
+          "Band-10": 0.0,
+          "Band-11": 0.0,
+          "Band-12": 0.0,
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
         }
       },
       "input": {
@@ -746,6 +772,17 @@
         "parameters": {
           "label": "Audio Input",
           "device": 0
+        }
+      },
+      "output": {
+        "id": 22,
+        "class": "heronarts.lx.audio.LXAudioOutput",
+        "parameters": {
+          "label": "Audio Output",
+          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3",
+          "play": true,
+          "trigger": false,
+          "looping": false
         }
       }
     },
@@ -888,16 +925,16 @@
   },
   "externals": {
     "ui": {
-      "audioExpanded": false,
+      "audioExpanded": true,
       "paletteExpanded": true,
       "clipViewVisible": false,
       "modulatorExpanded": {
         "23": true
       },
       "preview": {
-        "radius": 5370.1656124029105,
-        "theta": -0.18820060491562401,
-        "phi": -0.08453293502330775
+        "radius": 6740.288941035266,
+        "theta": 0.10579939508437607,
+        "phi": -0.036532935023307726
       }
     }
   }
