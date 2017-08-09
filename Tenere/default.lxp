@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502304733724,
+  "timestamp": 1502310831140,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -16,7 +16,10 @@
       "speed": 1.0,
       "focusedChannel": 2,
       "cueA": false,
-      "cueB": false
+      "cueB": false,
+      "multithreaded": true,
+      "channelMultithreaded": true,
+      "networkMultithreaded": true
     },
     "palette": {
       "id": 2,
@@ -748,15 +751,15 @@
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
-          "Band-1": 0.24576214255184647,
-          "Band-2": 0.4165597469284531,
-          "Band-3": 0.4343694686503784,
-          "Band-4": 0.5041065617816227,
-          "Band-5": 0.4319587013813724,
-          "Band-6": 0.1885517170237222,
-          "Band-7": 0.17588960252784047,
-          "Band-8": 0.1660298573151049,
-          "Band-9": 0.13771079792918195,
+          "Band-1": 0.0,
+          "Band-2": 0.0,
+          "Band-3": 0.0,
+          "Band-4": 0.0,
+          "Band-5": 0.0,
+          "Band-6": 0.0,
+          "Band-7": 0.0,
+          "Band-8": 0.0,
+          "Band-9": 0.0,
           "Band-10": 0.0,
           "Band-11": 0.0,
           "Band-12": 0.0,
@@ -779,10 +782,10 @@
         "class": "heronarts.lx.audio.LXAudioOutput",
         "parameters": {
           "label": "Audio Output",
-          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3",
-          "play": true,
+          "play": false,
           "trigger": false,
-          "looping": false
+          "looping": false,
+          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3"
         }
       }
     },
@@ -927,6 +930,7 @@
     "ui": {
       "audioExpanded": true,
       "paletteExpanded": true,
+      "engineExpanded": false,
       "clipViewVisible": false,
       "modulatorExpanded": {
         "23": true

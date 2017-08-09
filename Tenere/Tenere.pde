@@ -52,7 +52,7 @@ void setup() {
   tree = buildTree();
   t.log("Built Tree Model");
   try {
-    lx = new LXStudio(this, tree, false) {
+    lx = new LXStudio(this, tree, true) {
       public void initialize(LXStudio lx, LXStudio.UI ui) {
         // Register a couple top-level effects
         lx.registerEffect(BlurEffect.class);
@@ -128,6 +128,8 @@ void setup() {
       }
 
       public void onUIReady(LXStudio lx, LXStudio.UI ui) {
+        ui.leftPane.engine.setVisible(true);
+        
         ui.preview.setRadius(80*FEET).setPhi(-PI/18).setTheta(PI/12);
         ui.preview.setCenter(0, model.cy - 2*FEET, 0);
         ui.preview.addComponent(new UISimulation());
@@ -160,7 +162,6 @@ void setup() {
 
   // Use multi-threading for network output
   lx.engine.output.mode.setValue(LXOutput.Mode.RAW);
-  lx.engine.setNetworkMultithreaded(true);
 }
 
 private class Settings extends LXComponent {
