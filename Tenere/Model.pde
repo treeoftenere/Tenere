@@ -98,7 +98,7 @@ public static class Tree extends LXModel {
         }
       } else {
         // Lowest layer of major limbs
-        addLimb(0.0*FT, 0.1 * TWO_PI/6, Limb.Size.FULL);
+        addLimb(0.0*FT, 0.1 * TWO_PI/6, Limb.Size.FULL); 
         addLimb(1.0*FT, 1.2 * TWO_PI/6, Limb.Size.FULL);
         addLimb(3.0*FT, 1.9 * TWO_PI/6, Limb.Size.FULL);
         addLimb(1.7*FT, 2.1 * TWO_PI/6, Limb.Size.FULL);
@@ -109,13 +109,15 @@ public static class Tree extends LXModel {
         // Medium layer of limbs
         addLimb(6.0*FT, 0.4 * TWO_PI/6, Limb.Size.MEDIUM);
         addLimb(5.4*FT, 1.5 * TWO_PI/6, Limb.Size.MEDIUM);
-        addLimb(4.2*FT, 2.9 * TWO_PI/6, Limb.Size.MEDIUM);
-        addLimb(5.9*FT, 4.1 * TWO_PI/6, Limb.Size.MEDIUM);
-        addLimb(6.3*FT, 5.3 * TWO_PI/6, Limb.Size.MEDIUM);
+        addLimb(4.2*FT, 3.4 * TWO_PI/6, Limb.Size.MEDIUM);
+        addLimb(5.9*FT, 4.9 * TWO_PI/6, Limb.Size.MEDIUM);
+        
+        // We probably don't have this many...
+        // addLimb(6.3*FT, 5.3 * TWO_PI/6, Limb.Size.MEDIUM);
         
         // A couple small top limbs
-        addLimb(7*FT, .3 * TWO_PI/6, Limb.Size.SMALL);
-        addLimb(7*FT, 3.1 * TWO_PI/6, Limb.Size.SMALL);
+        // addLimb(7*FT, .3 * TWO_PI/6, Limb.Size.SMALL);
+        // addLimb(7*FT, 3.1 * TWO_PI/6, Limb.Size.SMALL);
         
       }
     }

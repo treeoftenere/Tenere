@@ -35,6 +35,54 @@ public class ColorSpread extends TenerePattern {
   }
 }
 
+public class ColorRain extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 1, 5)
+    .setDescription("Speed of the rainfall");
+    
+  public final CompoundParameter range = (CompoundParameter)
+    new CompoundParameter("Range", 30, 5, 50)
+    .setDescription("Range of blue depth");
+
+  private static final int BUCKETS = 37;
+  private final float[][] buckets = new float[BUCKETS+1][BUCKETS+1];
+
+  public ColorRain(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("range", this.range);
+    for (int i = 0; i < BUCKETS+1; ++i) {
+      for (int j = 0; j < BUCKETS+1; ++j) {
+        this.buckets[i][j] = random(1);
+      }
+    }
+  }
+  
+  private double accum = 0;
+  
+  public void run(double deltaMs) {
+    int range = (int) this.range.getValue();
+    accum += this.speed.getValue() * .02 * deltaMs;
+    float saturation = palette.getSaturationf();
+    for (Leaf leaf : model.leaves) {
+      float offset = this.buckets[(int) (BUCKETS * leaf.point.xn)][(int) (BUCKETS * leaf.point.zn)];
+      int hMove = ((int) (180 * leaf.point.yn + 120 * offset + accum)) % 80;
+      if (hMove > range) {
+        hMove = max(0, range - 8*(hMove - range));
+      }
+      setColor(leaf, LXColor.hsb(
+        210 - hMove,
+        saturation,
+        100
+      ));
+    }
+  }
+}
+
 public class ColorAutumn extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
@@ -66,7 +114,7 @@ public class ColorSwirl extends TenerePattern {
   private float basis = 0;
   
   public final CompoundParameter speed =
-    new CompoundParameter("Speed", .5, 0, 20);
+    new CompoundParameter("Speed", .5, 0, 2);
       
   public final CompoundParameter slope = 
     new CompoundParameter("Slope", 1, .2, 3);    

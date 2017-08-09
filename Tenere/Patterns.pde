@@ -36,6 +36,30 @@ public class White extends LXPattern {
   }
 }
 
+public class Tumbler extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private LXModulator azimuthRotation = startModulator(new SawLFO(0, 1, 15000).randomBasis());
+  private LXModulator thetaRotation = startModulator(new SawLFO(0, 1, 13000).randomBasis());
+  
+  public Tumbler(LX lx) {
+    super(lx);
+  }
+    
+  public void run(double deltaMs) {
+    float azimuthRotation = this.azimuthRotation.getValuef();
+    float thetaRotation = this.thetaRotation.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float tri1 = LXUtils.trif(azimuthRotation + leaf.point.azimuth / PI);
+      float tri2 = LXUtils.trif(thetaRotation + (PI + leaf.point.theta) / PI);
+      float tri = max(tri1, tri2);
+      setColor(leaf, LXColor.gray(100 * tri * tri));
+    }
+  }
+}
+
 public class Borealis extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
