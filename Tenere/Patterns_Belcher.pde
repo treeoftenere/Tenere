@@ -41,12 +41,12 @@ public class AtomPattern extends LXPattern {
       addLayer(electronLayer);
       
       //Initialize electron parameters
-      electronLayer.enableElectron.setValue((i == 1) ? true : false);    //Only one electron visible to start
+      electronLayer.enableElectron.setValue((i == 1) ? true : false);      //Only one electron visible to start
       electronLayer.pathRadius.setValue(Math.max(1.0 - (0.25 * i), 0.2));  //Stagger the path radius
-      electronLayer.hueShift.setValue(((i-1)*115)%360);      //Offset the color of each electron
-      electronLayer.velocity.setValue(i*110);          //inner electrons run faster
-      electronLayer.tilt.setValue(((i-1)*60)%180);              //Offset the tilt of each electron
-      electronLayer.orient.setValue(((i-1)*60)%360);            //Offset the orientation of each electron
+      electronLayer.hueShift.setValue(((i-1)*115)%360);                    //Offset the color of each electron
+      electronLayer.velocity.setValue(i*110);                              //inner electrons run faster
+      electronLayer.tilt.setValue(((i-1)*60)%180);                         //Offset the tilt of each electron
+      electronLayer.orient.setValue(((i-1)*60)%360);                       //Offset the orientation of each electron
       
       //Add the electron parameters to the Atom pattern
       addParameter(electronLayer.enableElectron.getLabel() + i, electronLayer.enableElectron);
@@ -94,7 +94,7 @@ public class AtomPattern extends LXPattern {
     return (float) Math.sqrt(dx*dx + dy*dy + dz*dz);
   }
   
-  
+  //////////////////////////////////////////////////////////////////////////
   private class ElectronLayer extends LXLayer {
     
     private static final float MAX_TAIL_BRIGHTNESS = 0.85f;
@@ -145,7 +145,7 @@ public class AtomPattern extends LXPattern {
       new CompoundParameter("Wander", 0, 0, 180)
       .setDescription("How much would you wander if you were an electron right now?");
     
-    //To-Do: For very slow electron speed, we need the period to be a lot longer
+    //To-Do: For very slow electron speed, we need the period to be a lot longer. Use FunctionalParameter for period.
     //x=200, y=1600.  x=5, y=4000?
     private final LXModulator wanderLFO = startModulator(new TriangleLFO(0, this.wander, 1600));
         
@@ -303,7 +303,7 @@ public class AtomPattern extends LXPattern {
     
   }
   
-  
+  //////////////////////////////////////////////////////////////////////////  
   private class TailPoint {
     protected int c;
     protected float distToElectron;
