@@ -31,7 +31,7 @@ public class TheFourSeasons extends LXPattern {
   int blossumTime = 300;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
-  int startupPause = 50;
+  int startupPause = 20;
   
   
   int deltaMs2;
@@ -131,6 +131,7 @@ public class TheFourSeasons extends LXPattern {
         case SUMMER:
           season = SeasonsHelpers.Seasons.AUTUMN;
           nextSeasonChange = autumnDays;
+          CaptureColours();
           println("Autum");
           break;
         case AUTUMN:
@@ -241,12 +242,16 @@ public class TheFourSeasons extends LXPattern {
     }
     else if(dayOfTheSeason == blossumTime) 
     {
-     // InitializePseudoLeaves(); //reset ready for next growth
+      InitializePseudoLeaves(); //reset ready for next growth
     }
-    else if(dayOfTheSeason > blossumTime)
+    else if( dayOfTheSeason < blossumTime+300)
+    {
+     //wait
+    }
+    else //green time
     {
       GrowLeaves();
-      LeavesFadeIn(); //grow green leaves
+      LeavesFadeIn(0.03); //grow green leaves lighter
     }
 
 
@@ -295,7 +300,7 @@ public class TheFourSeasons extends LXPattern {
      {
        for(PseudoLeaf pleaf : pseudoLeaves)
         {
-          if(pleaf.size < pseudoLeafDiameter ) pleaf.size += random(.2);
+          if(pleaf.size < pseudoLeafDiameter ) pleaf.size += random(0,0.2);
         }
      }
      
@@ -316,14 +321,14 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.blossumColour,0.02)); 
+                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.blossumColour,0.01)); 
               }
            }
         }
      }
      
      //TODO: refactor 
-     void LeavesFadeIn()
+     void LeavesFadeIn(float lerp)
      {
        float distance = 0;
 
@@ -339,7 +344,9 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                  setColor(l, LXColor.lerp(colors[l.point.index],pleaf.greenColour,0.02));
+                  setColor(l, LXColor.lerp(colors[l.point.index],pleaf.greenColour,lerp));
+                 //pleaf.colour  = LXColor.lerp(pleaf.colour,pleaf.greenColour, 0.02); //transform
+                //IlluminateNearby(pleaf, pleaf.colour);
                 
               }
            }
@@ -398,9 +405,8 @@ public class TheFourSeasons extends LXPattern {
      
      void BrownAutumnLeaves()
      {
-
        //clear all colors
-  
+        ClearColors();
 
        //raindomly turn some to 'browning'
        
