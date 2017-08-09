@@ -27,7 +27,7 @@ public class TheFourSeasons extends LXPattern {
   int summerDays = 10;
   int autumnDays = 1800;
   int winterDays = 1000;
-  int springDays = 1500;
+  int springDays = 1000;
   int blossumTime = 300;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
@@ -55,8 +55,7 @@ public class TheFourSeasons extends LXPattern {
                                 LX.rgb(86,132,8),
                                 LX.rgb(75,124,0),
                                 LX.rgb(104,128,40),
-                                LX.rgb(91,143,19),
-                                LX.rgb(9,53,0)
+                                LX.rgb(91,143,19)
                                 
                               };
   
@@ -132,7 +131,6 @@ public class TheFourSeasons extends LXPattern {
         case SUMMER:
           season = SeasonsHelpers.Seasons.AUTUMN;
           nextSeasonChange = autumnDays;
-         
           println("Autum");
           break;
         case AUTUMN:
@@ -219,15 +217,11 @@ public class TheFourSeasons extends LXPattern {
   
   void Autumn()
   {
-    if (dayOfTheSeason == 0)
-    {
-      InitializePseudoLeaves();
-    }
     BrownAutumnLeaves();
   }
   
   void Winter()
-  {
+  { //<>//
     SnowFall();
   }
   
@@ -235,7 +229,7 @@ public class TheFourSeasons extends LXPattern {
   {
     if(dayOfTheSeason == 0)
     {
-      ClearColors();
+      ClearColors(); //move to season changer
       InitializePseudoLeaves();
     }
     
@@ -247,7 +241,7 @@ public class TheFourSeasons extends LXPattern {
     }
     else if(dayOfTheSeason == blossumTime) 
     {
-      InitializePseudoLeaves(); //reset ready for next growth
+     // InitializePseudoLeaves(); //reset ready for next growth
     }
     else if(dayOfTheSeason > blossumTime)
     {
@@ -322,8 +316,7 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                
-                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.blossum,0.02)); 
+                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.blossumColour,0.02)); 
               }
            }
         }
@@ -346,7 +339,8 @@ public class TheFourSeasons extends LXPattern {
                distance = dist(l.x, l.y,l.z, pleaf.x,pleaf.y,pleaf.z);
               if(distance < pleaf.size) //close enough to bother about
               {
-                setColor(l, LXColor.lerp(colors[l.point.index],pleaf.colour,0.02)); 
+                  setColor(l, LXColor.lerp(colors[l.point.index],pleaf.greenColour,0.02));
+                
               }
            }
         }
@@ -404,12 +398,9 @@ public class TheFourSeasons extends LXPattern {
      
      void BrownAutumnLeaves()
      {
-        if(dayOfTheSeason == 0)
-        {
-         CaptureColours();
-        }
+
        //clear all colors
-       ClearColors();
+  
 
        //raindomly turn some to 'browning'
        
@@ -419,7 +410,8 @@ public class TheFourSeasons extends LXPattern {
           if(pleaf.status == SeasonsHelpers.LeafStatus.GROWING)
           {
             //make green
-               IlluminateNearby(pleaf, pleaf.colour);
+              pleaf.colour  = LXColor.lerp(pleaf.greenColour,pleaf.colour,0.05); //transform
+              IlluminateNearby(pleaf, pleaf.colour);
           }
           
            if(pleaf.status == SeasonsHelpers.LeafStatus.BROWNING) //BROWNING
@@ -431,24 +423,24 @@ public class TheFourSeasons extends LXPattern {
              }
              
              //Continue Browning
-              pleaf.colour  = LXColor.lerp(pleaf.colour,pleaf.browningColor,0.05); //transform
+              pleaf.colour  = LXColor.lerp(pleaf.colour,pleaf.browningColour,0.05); //transform
               IlluminateNearby(pleaf, pleaf.colour);
 
              pleaf.brownTime++;
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //write over static leaves with falling leaf
            {
-            pleaf.y -= 10; //<>//
+            pleaf.y -= 10;
              
              if(pleaf.y < -400)//completed fall
              {
-               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing. //<>//
+               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
              }
              
              else //make the leaves fall
              {
                //Check if each branch is in the fall path of this pLeaf.
-               IlluminateNearby(pleaf, pleaf.browningColor); //<>// //<>//
+               IlluminateNearby(pleaf, pleaf.browningColour); //<>//
              }
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
@@ -499,7 +491,7 @@ public class TheFourSeasons extends LXPattern {
                     float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
                     if(dist < pseudoLeafDiameter)
                     {
-                       // colors[ll.point.index] = colour; // pleaf.browningColor;
+                       // colors[ll.point.index] = colour; // pleaf.browningColour;
                        pleaf.colour = LXColor.lerp(pleaf.colour,colour,0.02);
                        setColor(ll, pleaf.colour);
                     }
@@ -520,23 +512,24 @@ public class TheFourSeasons extends LXPattern {
   int assemblageIndex;
   int branchIndex;
   int colour = LX.rgb(0,0,0);
-  int blossum ;
+  int blossumColour ;
   float size = 0;
   SeasonsHelpers.LeafStatus status = SeasonsHelpers.LeafStatus.GROWING;
   int brownTime = 0;
-  int browningColor;
+  int browningColour;
+  int greenColour;
   
  
-  public PseudoLeaf(float _x, float _y, float _z, int _branchIdx, int _assemblageIdx, int _blossum, int _green, int _browningColor)
+  public PseudoLeaf(float _x, float _y, float _z, int _branchIdx, int _assemblageIdx, int _blossum, int _green, int _browningColour)
   {
     x = _x;
     y = _y; 
     z = _z;
     branchIndex =_branchIdx;
     assemblageIndex = _assemblageIdx;
-    blossum = _blossum;
-    colour = _green;
-    browningColor = _browningColor;
+    blossumColour = _blossum;
+    greenColour = _green;
+    browningColour = _browningColour;
   }
 
 }
