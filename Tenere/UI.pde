@@ -530,7 +530,7 @@ public class UISensors extends UICollapsibleSection {
     patternLabel.addToContainer(this);
     
     
-}
+  }
   
   class UIParameterMeter extends UI2dComponent implements UIModulationSource {
     
@@ -610,4 +610,33 @@ public class UIOutputControls extends UICollapsibleSection {
       return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
     }
   }
+}
+
+
+
+//UI component for each Muse
+public class UIMuse extends UICollapsibleSection {
+  
+  private final static int LABEL_WIDTH = 60;
+  private final static int ICON_SIZE = 16;
+  private final static int PADDING = 4;
+  public UIMuse(UI ui, float w, Muse museObj) {
+    super(ui, 0, 0, w, 250);
+    setTitle("Muse: " + museObj.OSC_PORT);
+        
+    new UIImage(loadImage("brain.png"), 0, 20).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg0).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 40, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg1).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 60, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg2).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 80, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg3).addToContainer(this);
+    new UIImage(loadImage("acc.png"), 0, 100).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 100, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc0).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 120, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc1).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 140, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc2).addToContainer(this);
+    new UIImage(loadImage("gyro.png"), 0, 160).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 160, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro0).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 180, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro1).addToContainer(this);
+    new UISlider(ICON_SIZE + PADDING, 200, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro2).addToContainer(this);
+      
+  } //<>//
 }
