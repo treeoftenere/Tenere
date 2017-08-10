@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502317641971,
+  "timestamp": 1502330066008,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -807,7 +807,109 @@
         "class": "Tenere$Sensors",
         "parameters": {
           "label": "Sensors"
-        }
+        },
+        "sensors": [
+          {
+            "id": 33,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "A",
+              "enabled": true,
+              "source": 7,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 35,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "B",
+              "enabled": true,
+              "source": 5,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 37,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "C",
+              "enabled": true,
+              "source": 4,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 39,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "D",
+              "enabled": true,
+              "source": 3,
+              "heartBeat": false,
+              "eeg0": 0.5,
+              "eeg1": 0.21437500417232513,
+              "eeg2": 0.9375,
+              "eeg3": 0.6868749856948853,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 41,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "E",
+              "enabled": true,
+              "source": 0,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          }
+        ]
       },
       "tenereSettings": {
         "pointsVisible": false,
@@ -815,6 +917,7 @@
         "structureVisible": true,
         "controlsExpanded": false,
         "sensorsExpanded": true,
+        "sourcesExpanded": true,
         "outputExpanded": false
       }
     },

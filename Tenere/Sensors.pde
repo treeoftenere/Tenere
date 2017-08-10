@@ -7,7 +7,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
   private static final int NUM_MUSES = 3;
   private static final int MUSE_BASE_PORT = 7810;
   
-  private static final int NUM_TPIS = 5;
+  private static final int NUM_TENERE_PIS = 10;
   
   private static final int OSC_PORT = 7878;
   
@@ -29,7 +29,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     for (int i = 0; i < NUM_MUSES; ++i) {
       registerSourcePort(MUSE_BASE_PORT + i);
     }
-    for (int i = 0; i < NUM_TPIS; ++i) {
+    for (int i = 0; i < NUM_TENERE_PIS; ++i) {
       registerSourcePrefix(String.format("tp%02d", i));
     }
     
@@ -78,22 +78,22 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final LinearEnvelope heartLevel = (LinearEnvelope) new LinearEnvelope("Heart Beat", 0, 0, 500).setDescription("Heart beat indicator");
     
     public final NormalizedParameter[] eeg = new NormalizedParameter[] {
-      new NormalizedParameter("eegBL", 0).setDescription("Brain wave input from the Muse Back Left"),
-      new NormalizedParameter("eegFL", 0).setDescription("Brain wave input from the Muse Front Left"),
-      new NormalizedParameter("eegFR", 0).setDescription("Brain wave input from the Muse Front Right"),
-      new NormalizedParameter("eegBR", 0).setDescription("Brain wave input from the Muse Back Right"),
+      new NormalizedParameter("EEG BL", 0).setDescription("Brain wave input from the Muse Back Left"),
+      new NormalizedParameter("EEG FL", 0).setDescription("Brain wave input from the Muse Front Left"),
+      new NormalizedParameter("EEG FR", 0).setDescription("Brain wave input from the Muse Front Right"),
+      new NormalizedParameter("EEG BR", 0).setDescription("Brain wave input from the Muse Back Right"),
     };
     
     public final NormalizedParameter[] acc = new NormalizedParameter[] {
-      new NormalizedParameter("acc0", 0).setDescription("Accelerometer input from Muse, axis 0"),
-      new NormalizedParameter("acc1", 0).setDescription("Accelerometer input from Muse, axis 1"),
-      new NormalizedParameter("acc2", 0).setDescription("Accelerometer input from Muse, axis 2"),
+      new NormalizedParameter("Acc 0", 0).setDescription("Accelerometer input from Muse axis 0"),
+      new NormalizedParameter("Acc 1", 0).setDescription("Accelerometer input from Muse axis 1"),
+      new NormalizedParameter("Acc 2", 0).setDescription("Accelerometer input from Muse axis 2"),
     };
     
     public final NormalizedParameter[] gyro = new NormalizedParameter[] {
-      new NormalizedParameter("gyro0", 0).setDescription("Gyro input from Muse, axis 0"),
-      new NormalizedParameter("gyro1", 0).setDescription("Gyro input from Muse, axis 1"),
-      new NormalizedParameter("gyro2", 0).setDescription("Gyro input from Muse, axis 2"),
+      new NormalizedParameter("Gyro 0", 0).setDescription("Gyro input from Muse axis 0"),
+      new NormalizedParameter("Gyro 1", 0).setDescription("Gyro input from Muse axis 1"),
+      new NormalizedParameter("Gyro 2", 0).setDescription("Gyro input from Muse axis 2"),
     };
     
     public final static int HEART = 0;
@@ -156,18 +156,22 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
 
   public class Source extends Input implements LXOscListener {
     
+    final boolean isNull;
     final String label;
     
     Source() {
       this.label = "No Input";
+      this.isNull = true;
     }
     
     Source(String prefix) {
-      this.label = prefix;
+      this.label = "/" + prefix;
+      this.isNull = false;
     }
     
     Source(int port) {
-      this.label = "" + port;
+      this.label = "Port " + port;
+      this.isNull = false;
       try {
         // Register for OSC messages on a dedicated port
         lx.engine.osc.receiver(port).addListener(this);
@@ -183,7 +187,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     void set(int field, OscMessage message, float scale, float offset) {
       super.set(field, message, scale, offset);
       for (Sensor s : sensor) {
-        if (s.getSource() == this) {
+        if (s.enabled.isOn() && s.getSource() == this) {
           s.input.set(field, message, scale, offset);
         }
       }
@@ -206,10 +210,15 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final NormalizedParameter[] acc = input.acc;
     public final NormalizedParameter[] gyro = input.gyro;
     
-    public final DiscreteParameter source = new DiscreteParameter("Source", sources.toArray(new Source[]{}));  
+    public final BooleanParameter enabled = new BooleanParameter("Enabled", true)
+      .setDescription("Whether the sensor is enabled");
+    
+    public final DiscreteParameter source = new DiscreteParameter("Source", sources.toArray(new Source[]{}))
+      .setDescription("Which source input this sensor uses");  
 
     public Sensor(LX lx, String label) {
       super(lx, label);
+      addParameter("enabled", this.enabled);
       addParameter("source", this.source);
       addParameter("heartBeat", this.heartBeat);
       addModulator(this.heartLevel);
@@ -226,7 +235,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     
     public void onParameterChanged(LXParameter p) {
       if (p == this.source) {
-        this.input.set(getSource());
+        if (this.enabled.isOn()) {
+          this.input.set(getSource());
+        }
       }
     }
     

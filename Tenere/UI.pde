@@ -481,46 +481,81 @@ public class UITreeControls extends UICollapsibleSection {
   }
 }
 
+abstract class UIInput extends UI2dContainer {
+  static final int PADDING = 4;
+  static final int METER_Y = 26;
+  static final int COLLAPSED_HEIGHT = 24;
+  static final int HEIGHT = METER_Y + 2*PADDING + UISensorInput.HEIGHT;
+  
+  protected boolean expanded = false;
+  
+  private final UISensorInput uiInput;
+  
+  UIInput(UI ui, Sensors.Input input, float x, float y, float w) {
+    super(x, y, w, COLLAPSED_HEIGHT);
+    setBackgroundColor(ui.theme.getPaneBackgroundColor());
+    setBorderRounding(4);
+    
+    this.uiInput = (UISensorInput) new UISensorInput(ui, input, PADDING, METER_Y, getContentWidth() - 2*PADDING).addToContainer(this);
+    this.uiInput.setVisible(this.expanded);
+  }
+  
+  public void onDraw(UI ui, PGraphics pg) {
+    pg.noStroke();
+    pg.fill(ui.theme.getControlTextColor());
+    pg.beginShape();
+    if (!this.expanded) {
+      pg.vertex(this.width - PADDING - 2, 10);
+      pg.vertex(this.width - PADDING - 8, 10);
+      pg.vertex(this.width - PADDING - 5, 15);
+    } else {
+      pg.vertex(this.width - PADDING - 2, 14);
+      pg.vertex(this.width - PADDING - 8, 14);
+      pg.vertex(this.width - PADDING - 5, 9);
+    }
+    pg.endShape(CLOSE);
+  }
+  
+  public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+    if (my < METER_Y && mx > this.width - 20) {
+      this.expanded = !this.expanded;
+      this.uiInput.setVisible(this.expanded);
+      setContentHeight(this.expanded ? HEIGHT : COLLAPSED_HEIGHT);
+    }
+  }
+}
+
 public class UISensors extends UICollapsibleSection {
   
   final static int SENSOR_Y = 22;
   
   public UISensors(UI ui, Sensors sensors, float w) {
-    super(ui, 0, 0, w, 24 + SENSOR_Y + UISensor.HEIGHT);
+    super(ui, 0, 0, w, 0);
     setTitle("SENSORS");
 
-    final UISensor[] uiSensors = new UISensor[sensors.sensor.length];
-    int si = 0;
+    setLayout(UI2dContainer.Layout.VERTICAL);
+    setChildMargin(2, 0);
+
     for (Sensors.Sensor sensor : sensors.sensor) {
-      uiSensors[si] = new UISensor(ui, sensor, 0, SENSOR_Y, getContentWidth());
-      uiSensors[si].setVisible(si == 0);   
-      ++si;
-    }
-    
-    new UIToggleSet(0, 0, getContentWidth(), 18) {
-      public void onToggle(int value) {
-        for (int si = 0; si < uiSensors.length; ++si) {
-          uiSensors[si].setVisible(si == value);
-        }
-      }
-    }
-    .setEvenSpacing()
-    .setOptions(sensors.SENSOR_LABELS)
-    .addToContainer(this);
-    
-    for (UISensor uiSensor : uiSensors) { 
-      uiSensor.addToContainer(this);
+      new UISensor(ui, sensor, 0, SENSOR_Y, getContentWidth())
+      .addToContainer(this);
     }
   }
   
-  class UISensor extends UI2dContainer {
-    
-    static final int HEIGHT = 20 + UISensorInput.HEIGHT;
-    
+  class UISensor extends UIInput {
     UISensor(UI ui, final Sensors.Sensor sensor, float x, float y, float w) {
-      super(x, y, w, HEIGHT);
-      new UISensorInput(ui, sensor.input, 0, 20, getContentWidth()).addToContainer(this);
-      new UIDropMenu(0, 0, getContentWidth(), 16, sensor.source).addToContainer(this);
+      super(ui, sensor.input, x, y, w);
+            
+      new UILabel(PADDING, 2*PADDING, 16, 16)
+      .setLabel(sensor.getLabel())
+      .setTextAlignment(PConstants.CENTER, PConstants.TOP)
+      .addToContainer(this);
+      
+      new UIButton(24, PADDING, 16, 16)
+      .setParameter(sensor.enabled)
+      .addToContainer(this);
+      
+      new UIEnumBox(44, PADDING, getContentWidth() - 62, 16).setParameter(sensor.source).addToContainer(this);
     }
   }
 }
@@ -534,29 +569,25 @@ public class UISources extends UICollapsibleSection {
     super(ui, 0, 0, w, HEIGHT);
     setTitle("SOURCES");
     
-    List<Sensors.Source> validSources = new ArrayList<Sensors.Source>(sensors.sources);
-    validSources.remove(0);
+    setLayout(UI2dContainer.Layout.VERTICAL);
+    setChildMargin(2, 0);
     
-    final DiscreteParameter sources = new DiscreteParameter("Source", validSources.toArray(new Sensors.Source[] {}));
-    
-    final UISensorInput[] uiInputs = new UISensorInput[validSources.size()];
-    int i = 0;
-    for (Sensors.Source source : validSources) { 
-      uiInputs[i] = new UISensorInput(ui, source, 0, SENSOR_Y, getContentWidth());
-      uiInputs[i].setVisible(i == sources.getValuei());
-      uiInputs[i].addToContainer(this);
-      ++i;
-    }
-    
-    sources.addListener(new LXParameterListener() {
-      public void onParameterChanged(LXParameter p) {
-        for (int i = 0; i < uiInputs.length; ++i) {
-          uiInputs[i].setVisible(i == sources.getValuei());
-        }
+    for (Sensors.Source source : sensors.sources) {
+      if (!source.isNull) {
+        new UISource(ui, source, 0, 0, getContentWidth()).addToContainer(this);
       }
-    });
-    
-    new UIDropMenu(0, 0, getContentWidth(), 16, sources).addToContainer(this);
+    }    
+  }
+  
+  class UISource extends UIInput {
+    UISource(UI ui, final Sensors.Source source, float x, float y, float w) {
+      super(ui, source, x, y, w);
+      
+      new UILabel(PADDING, 2*PADDING, 100, 16)
+      .setLabel(source.label)
+      .setTextAlignment(PConstants.LEFT, PConstants.TOP)
+      .addToContainer(this);
+    }
   }
   
 }
