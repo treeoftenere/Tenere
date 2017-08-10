@@ -65,30 +65,40 @@ void setup() {
 
           // Update appropriately for testing!
           final String[] OPC_ADDRESS = new String[] {
+            "192.168.1.59",
             "192.168.1.2",
-            "192.168.1.3",
-            "192.168.1.4",
-            "192.168.1.7",
-            "192.168.1.10",
-            "192.168.1.11",
-            "192.168.1.12",
-            "192.168.1.15",
+            "192.168.1.9",
+            "192.168.1.131",
           };
           final int OPC_PORT = 1337;
 
+          final int[] LEAF_ORDER = {
+            0, 1, 3, 5, 2, 4, 6, 7, 8, 9, 12, 10, 11, 13, 14
+          };
           int branchNum = 0;
+          
           for (Branch branch : tree.branches) {
             int pointsPerPacket = branch.points.length / 2;
             int[] channels14 = new int[pointsPerPacket];
             int[] channels58 = new int[pointsPerPacket];
-            for (int i = 0; i < pointsPerPacket; ++i) {
-              channels14[i] = branch.points[i].index;
-              channels58[i] = branch.points[i + pointsPerPacket].index;
+            int pi = 0;
+            for (LeafAssemblage assemblage : branch.assemblages) {
+              for (int li : LEAF_ORDER) {
+                Leaf leaf = assemblage.leaves.get(li);
+                for (LXPoint p : leaf.points) {
+                  if (pi < pointsPerPacket) {
+                    channels14[pi] = p.index;
+                  } else {
+                    channels58[pi - pointsPerPacket] = p.index;
+                  }
+                  ++pi;
+                }
+              }
             }
 
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
-            
+                        
             // That's all we got...
             if (++branchNum >= OPC_ADDRESS.length) {
               break;
@@ -126,7 +136,7 @@ void setup() {
         ui.preview.perspective.setValue(30);
 
         // Sensor integrations
-        uiSensors = (UISensors) new UISensors(ui, sensors, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
+        uiSensors = (UISensors) new UISensors(ui, sensors, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);  
         uiSources = (UISources) new UISources(ui, sensors, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
         
         // Custom tree rendering controls

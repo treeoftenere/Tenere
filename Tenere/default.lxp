@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502330066008,
+  "timestamp": 1502348106219,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -11,7 +11,7 @@
       "scene-3": false,
       "scene-4": false,
       "scene-5": false,
-      "crossfader": 0.5,
+      "crossfader": 0.1889763779527559,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
       "focusedChannel": 2,
@@ -27,16 +27,16 @@
       "parameters": {
         "label": "",
         "cue": false,
-        "hueMode": 2,
-        "color/hue": 0.0,
+        "hueMode": 0,
+        "color/hue": 170.1176300048828,
         "color/brightness": 100.0,
         "color/saturation": 100.0,
-        "color": -65536,
+        "color": -16711723,
         "period": 103000.0,
         "range": 0.0,
-        "spreadX": -79.19999822974205,
-        "spreadY": 93.59999790787697,
-        "spreadZ": 115.19999742507935,
+        "spreadX": 0.0,
+        "spreadY": 0.0,
+        "spreadZ": 0.0,
         "spreadR": 0.0,
         "offsetX": 0.0,
         "offsetY": 0.0,
@@ -66,7 +66,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 8,
         "patterns": [
           {
             "id": 451,
@@ -573,7 +573,7 @@
             "class": "Tenere$Sizzle",
             "parameters": {
               "label": "Sizzle",
-              "base": 1.0,
+              "base": 1.839999981224537,
               "max": 1.8400001153349876
             },
             "modulation": {
@@ -658,7 +658,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 3,
         "patterns": [
           {
             "id": 97,
@@ -707,6 +707,58 @@
               "speed": 0.5,
               "slope": 1.951999977707863,
               "amount": 4
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          }
+        ]
+      },
+      {
+        "id": 2698,
+        "class": "heronarts.lx.LXChannel",
+        "parameters": {
+          "label": "Tests",
+          "arm": false,
+          "enabled": false,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": false,
+          "autoCycleTimeSecs": 60.0,
+          "fader": 1.0,
+          "crossfadeGroup": 0,
+          "blendMode": 0,
+          "transitionEnabled": false,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 0,
+        "patterns": [
+          {
+            "id": 2699,
+            "class": "Tenere$TestAssemblageOrder",
+            "parameters": {
+              "label": "TestAssemblageOrder",
+              "index": 0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 2701,
+            "class": "Tenere$TestFramerate",
+            "parameters": {
+              "label": "TestFramerate",
+              "rate": 500.0,
+              "size": 3.0
             },
             "modulation": {
               "modulators": [],
@@ -915,9 +967,9 @@
         "pointsVisible": false,
         "leavesVisible": true,
         "structureVisible": true,
-        "controlsExpanded": false,
-        "sensorsExpanded": true,
-        "sourcesExpanded": true,
+        "controlsExpanded": true,
+        "sensorsExpanded": false,
+        "sourcesExpanded": false,
         "outputExpanded": false
       }
     },
@@ -975,7 +1027,7 @@
   },
   "externals": {
     "ui": {
-      "audioExpanded": true,
+      "audioExpanded": false,
       "paletteExpanded": true,
       "engineExpanded": false,
       "clipViewVisible": false,
@@ -983,9 +1035,9 @@
         "23": true
       },
       "preview": {
-        "radius": 6740.288941035266,
-        "theta": 0.10579939508437607,
-        "phi": -0.036532935023307726
+        "radius": 4558.138682402772,
+        "theta": -0.11920060491562412,
+        "phi": 0.14046706497669226
       }
     }
   }
