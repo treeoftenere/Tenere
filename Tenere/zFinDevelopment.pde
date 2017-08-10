@@ -19,6 +19,14 @@ public class TheFourSeasons extends LXPattern {
       snow piles up on the tree
       Snow melts away. 
       
+     /Point is within the electron
+     //Fade the outer 10% to make a soft edge.
+          float pointPercentile = (eSize - distToElectron) / eSize;
+          float brightness = (pointPercentile > 0.1f) ? 100f : pointPercentile / 0.1f * 100f;
+          int pointColor = OffsetColor(palette.getColor(p, brightness), hueShift); 
+          colors[p.index] = pointColor;
+      
+      
      */
 
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.STARTUP;
