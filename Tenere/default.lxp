@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502348072069,
+  "timestamp": 1502348106219,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -846,7 +846,7 @@
       "class": "heronarts.lx.LXEngine$Output",
       "parameters": {
         "label": "Output",
-        "enabled": true,
+        "enabled": false,
         "mode": 2,
         "fps": 0.0,
         "gamma": 0,
