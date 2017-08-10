@@ -29,19 +29,12 @@ Sensors sensors;
 UITreeStructure uiTreeStructure;
 UILeaves uiLeaves;
 UISensors uiSensors;
+UISources uiSources;
 
 UITreeControls uiTreeControls;
 UIOutputControls uiOutputControls;
 
-
-//Muliple Muses
-//each muse sends to a differnt port numbered sequentially starting with musePortOffset
-Muse[] muse;
-UIMuse[] uiMuse;
-int num_muses = 3;
-int musePortOffset=7810;
-
-List<OPCDatagram> datagrams = new ArrayList<OPCDatagram>();
+List<TenereDatagram> datagrams = new ArrayList<TenereDatagram>();
 
 // Processing's main invocation, build our model and set up LX
 void setup() {
@@ -65,14 +58,6 @@ void setup() {
         sensors = new Sensors(lx);
         lx.engine.registerComponent("sensors", sensors);
         lx.engine.addLoopTask(sensors);
-
-        // Register a bunch of Muses
-        muse = new Muse[num_muses];
-        for (int k=0; k<num_muses;k=k+1){  
-          muse[k] = new Muse(lx,musePortOffset+k);
-          lx.engine.registerComponent("Muse"+k, muse[k]);
-          lx.engine.addLoopTask(muse[k]);
-        }
        
         // End-to-end test, sending one branch worth of data
         // 8 assemblages, 15 leaves, 7 leds = 840 points = 2,520 RGB bytes = 2,524 OPC bytes
@@ -101,8 +86,8 @@ void setup() {
               channels58[i] = branch.points[i + pointsPerPacket].index;
             }
 
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
-            datagrams.add((OPCDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
+            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
+            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
             
             // That's all we got...
             if (++branchNum >= OPC_ADDRESS.length) {
@@ -141,13 +126,9 @@ void setup() {
         ui.preview.perspective.setValue(30);
 
         // Sensor integrations
-        uiSensors = (UISensors) new UISensors(ui, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
+        uiSensors = (UISensors) new UISensors(ui, sensors, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
+        uiSources = (UISources) new UISources(ui, sensors, ui.leftPane.global.getContentWidth()).addToContainer(ui.leftPane.global);
         
-        //Add a UI for each Muse.
-        uiMuse = new UIMuse[num_muses];
-        for (int k=0; k<num_muses;k=k+1){  
-           uiMuse[k] = (UIMuse) new UIMuse(ui, ui.leftPane.global.getContentWidth(),muse[k]).addToContainer(ui.leftPane.global);
-        }
         // Custom tree rendering controls
         uiTreeControls = (UITreeControls) new UITreeControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
         uiOutputControls = (UIOutputControls) new UIOutputControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
@@ -178,7 +159,7 @@ private class Settings extends LXComponent {
   private static final String KEY_STRUCTURE_VISIBLE = "structureVisible";
   private static final String KEY_CONTROLS_EXPANDED = "controlsExpanded";
   private static final String KEY_SENSORS_EXPANDED = "sensorsExpanded";
-  private static final String KEY_MUSE_EXPANDED = "museExpanded";
+  private static final String KEY_SOURCES_EXPANDED = "sourcesExpanded";
   private static final String KEY_OUTPUT_EXPANDED = "outputExpanded";
 
   @Override
@@ -188,10 +169,8 @@ private class Settings extends LXComponent {
     obj.addProperty(KEY_STRUCTURE_VISIBLE, uiTreeStructure.isVisible());
     obj.addProperty(KEY_CONTROLS_EXPANDED, uiTreeControls.isExpanded());
     obj.addProperty(KEY_SENSORS_EXPANDED, uiSensors.isExpanded());
+    obj.addProperty(KEY_SOURCES_EXPANDED, uiSources.isExpanded());
     obj.addProperty(KEY_OUTPUT_EXPANDED, uiOutputControls.isExpanded());
-    for (int k=0; k<num_muses;k=k+1){  
-      obj.addProperty(KEY_MUSE_EXPANDED+k, uiMuse[k].isExpanded());
-    }
   }
 
   @Override
@@ -211,13 +190,11 @@ private class Settings extends LXComponent {
     if (obj.has(KEY_SENSORS_EXPANDED)) {
       uiSensors.setExpanded(obj.get(KEY_SENSORS_EXPANDED).getAsBoolean());
     }
+    if (obj.has(KEY_SOURCES_EXPANDED)) {
+      uiSources.setExpanded(obj.get(KEY_SOURCES_EXPANDED).getAsBoolean());
+    }
     if (obj.has(KEY_OUTPUT_EXPANDED)) {
       uiOutputControls.setExpanded(obj.get(KEY_OUTPUT_EXPANDED).getAsBoolean());
-    }
-    for (int k=0; k<num_muses;k=k+1){
-      if (obj.has(KEY_MUSE_EXPANDED+k)) {
-        uiMuse[k].setExpanded(obj.get(KEY_MUSE_EXPANDED+k).getAsBoolean());
-      }
     }
   }
 }

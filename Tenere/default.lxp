@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502310831140,
+  "timestamp": 1502317641971,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -806,60 +806,7 @@
         "id": 32,
         "class": "Tenere$Sensors",
         "parameters": {
-          "label": "Sensors",
-          "heartRate": 80.0,
-          "muse": 0.0
-        }
-      },
-      "Muse1": {
-        "id": 37,
-        "class": "Tenere$Muse",
-        "parameters": {
-          "label": "Muse",
-          "eegBL": 0.0,
-          "eegFL": 0.0,
-          "eegFR": 0.0,
-          "eegBR": 0.0,
-          "acc0": 0.0,
-          "acc1": 0.0,
-          "acc2": 0.0,
-          "gyro0": 0.0,
-          "gyro1": 0.0,
-          "gyro2": 0.0
-        }
-      },
-      "Muse0": {
-        "id": 36,
-        "class": "Tenere$Muse",
-        "parameters": {
-          "label": "Muse",
-          "eegBL": 0.0,
-          "eegFL": 0.0,
-          "eegFR": 0.0,
-          "eegBR": 0.0,
-          "acc0": 0.0,
-          "acc1": 0.0,
-          "acc2": 0.0,
-          "gyro0": 0.0,
-          "gyro1": 0.0,
-          "gyro2": 0.0
-        }
-      },
-      "Muse2": {
-        "id": 38,
-        "class": "Tenere$Muse",
-        "parameters": {
-          "label": "Muse",
-          "eegBL": 0.0,
-          "eegFL": 0.0,
-          "eegFR": 0.0,
-          "eegBR": 0.0,
-          "acc0": 0.0,
-          "acc1": 0.0,
-          "acc2": 0.0,
-          "gyro0": 0.0,
-          "gyro1": 0.0,
-          "gyro2": 0.0
+          "label": "Sensors"
         }
       },
       "tenereSettings": {
@@ -867,11 +814,8 @@
         "leavesVisible": true,
         "structureVisible": true,
         "controlsExpanded": false,
-        "sensorsExpanded": false,
-        "outputExpanded": false,
-        "museExpanded0": false,
-        "museExpanded1": false,
-        "museExpanded2": false
+        "sensorsExpanded": true,
+        "outputExpanded": false
       }
     },
     "modulation": {

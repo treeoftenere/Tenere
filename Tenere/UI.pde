@@ -483,90 +483,172 @@ public class UITreeControls extends UICollapsibleSection {
 
 public class UISensors extends UICollapsibleSection {
   
-  private final UILabel meditationLabel;
-  private final UILabel patternLabel;
-  private final static int HEART_RATE_WIDTH = 48;
-  private final static int LABEL_WIDTH = 60;
-  private final static int ICON_SIZE = 16;
-  private final static int PADDING = 4;
-
+  final static int SENSOR_Y = 22;
   
-  public UISensors(UI ui, float w) {
-    super(ui, 0, 0, w, 120);
+  public UISensors(UI ui, Sensors sensors, float w) {
+    super(ui, 0, 0, w, 24 + SENSOR_Y + UISensor.HEIGHT);
     setTitle("SENSORS");
-    
-    new UIImage(loadImage("heart.png")) {
-      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
-        sensors.heartBeat.trigger();
-      }
-    }.addToContainer(this);
-    new UIParameterMeter(ui, sensors.heartBeat, ICON_SIZE + PADDING, 0, getContentWidth() - ICON_SIZE - HEART_RATE_WIDTH - 2*PADDING, 16).addToContainer(this);  
-    new UIDoubleBox(getContentWidth() - HEART_RATE_WIDTH, 0, HEART_RATE_WIDTH, 16).setParameter(sensors.heartRate).addToContainer(this);
-    
-    new UIImage(loadImage("brain.png"), 0, 20).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(sensors.muse).addToContainer(this);
-  
-    
-    new UIImage(loadImage("trigger.png"), 0, 40) {
-      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
-        sensors.commandPattern.trigger();
-      }
-    }.addToContainer(this);
-    new UIParameterMeter(ui, sensors.commandPattern, ICON_SIZE + PADDING, 40, getContentWidth() - ICON_SIZE - LABEL_WIDTH - 2*PADDING, 16).addToContainer(this);  
-    this.meditationLabel = (UILabel) new UILabel(ICON_SIZE + PADDING + 90, 35,  LABEL_WIDTH, ICON_SIZE);
-    meditationLabel.setLabel("Meditation");
-    meditationLabel.addToContainer(this);
 
-
-
-    new UIImage(loadImage("trigger.png"), 0, 60) {
-      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
-        sensors.commandMeditation.trigger();
+    final UISensor[] uiSensors = new UISensor[sensors.sensor.length];
+    int si = 0;
+    for (Sensors.Sensor sensor : sensors.sensor) {
+      uiSensors[si] = new UISensor(ui, sensor, 0, SENSOR_Y, getContentWidth());
+      uiSensors[si].setVisible(si == 0);   
+      ++si;
+    }
+    
+    new UIToggleSet(0, 0, getContentWidth(), 18) {
+      public void onToggle(int value) {
+        for (int si = 0; si < uiSensors.length; ++si) {
+          uiSensors[si].setVisible(si == value);
+        }
       }
-    }.addToContainer(this);
-    new UIParameterMeter(ui, sensors.commandMeditation, ICON_SIZE + PADDING, 60, getContentWidth() - ICON_SIZE - LABEL_WIDTH - 2*PADDING, 16).addToContainer(this);  
-    this.patternLabel = (UILabel) new UILabel(ICON_SIZE + PADDING + 90, 55,  LABEL_WIDTH, ICON_SIZE);
-    patternLabel.setLabel("Pattern");
-    patternLabel.addToContainer(this);
+    }
+    .setEvenSpacing()
+    .setOptions(sensors.SENSOR_LABELS)
+    .addToContainer(this);
     
-    
+    for (UISensor uiSensor : uiSensors) { 
+      uiSensor.addToContainer(this);
+    }
   }
   
-  class UIParameterMeter extends UI2dComponent implements UIModulationSource {
+  class UISensor extends UI2dContainer {
     
-    private float level;
-    private final LXNormalizedParameter parameter; 
+    static final int HEIGHT = 20 + UISensorInput.HEIGHT;
     
-    public UIParameterMeter(UI ui, final LXNormalizedParameter parameter, float x, float y, float w, float h) {
-      super(x, y, w, h);
-      setBackgroundColor(ui.theme.getControlBackgroundColor());
-      setBorderColor(ui.theme.getControlBorderColor());
-      this.parameter = parameter;
-      this.level = parameter.getNormalizedf();
-      addLoopTask(new LXLoopTask() {
-        public void loop(double deltaMs) {
-          float l2 = parameter.getNormalizedf();
-          if (l2 != level) {
-            level = l2;
-            redraw();
-          }
+    UISensor(UI ui, final Sensors.Sensor sensor, float x, float y, float w) {
+      super(x, y, w, HEIGHT);
+      new UISensorInput(ui, sensor.input, 0, 20, getContentWidth()).addToContainer(this);
+      new UIDropMenu(0, 0, getContentWidth(), 16, sensor.source).addToContainer(this);
+    }
+  }
+}
+
+public class UISources extends UICollapsibleSection {
+  
+  final static int SENSOR_Y = 22;
+  final static int HEIGHT = 24 + SENSOR_Y + UISensorInput.HEIGHT;
+  
+  public UISources(UI ui, Sensors sensors, float w) {
+    super(ui, 0, 0, w, HEIGHT);
+    setTitle("SOURCES");
+    
+    List<Sensors.Source> validSources = new ArrayList<Sensors.Source>(sensors.sources);
+    validSources.remove(0);
+    
+    final DiscreteParameter sources = new DiscreteParameter("Source", validSources.toArray(new Sensors.Source[] {}));
+    
+    final UISensorInput[] uiInputs = new UISensorInput[validSources.size()];
+    int i = 0;
+    for (Sensors.Source source : validSources) { 
+      uiInputs[i] = new UISensorInput(ui, source, 0, SENSOR_Y, getContentWidth());
+      uiInputs[i].setVisible(i == sources.getValuei());
+      uiInputs[i].addToContainer(this);
+      ++i;
+    }
+    
+    sources.addListener(new LXParameterListener() {
+      public void onParameterChanged(LXParameter p) {
+        for (int i = 0; i < uiInputs.length; ++i) {
+          uiInputs[i].setVisible(i == sources.getValuei());
         }
-      });
+      }
+    });
+    
+    new UIDropMenu(0, 0, getContentWidth(), 16, sources).addToContainer(this);
+  }
+  
+}
+
+class UISensorInput extends UI2dContainer {
+  
+  static final int HEIGHT = 138;
+  
+  static final int METER_X = 20;
+  static final int METER_MARGIN = 2;
+  static final int METER_HEIGHT = 10;
+  
+  UISensorInput(UI ui, final Sensors.Input input, float x, float y, float w) {
+    super(x, y, w, HEIGHT);
+    y = 0;
+
+    new UIImage(loadImage("heart.png"), 0, y) {
+      public void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+        input.heartBeat.setValue(true);
+      }
+    }.addToContainer(this);
+    new UIParameterMeter(ui, input.heartLevel, METER_X, y, getContentWidth() - METER_X, 18).addToContainer(this);
+    y += 18 + METER_MARGIN;
+    
+    new UIImage(loadImage("brain.png"), 0, y).addToContainer(this);
+    for (NormalizedParameter p : input.eeg) {
+      new UIParameterMeter(ui, p, METER_X, y, getContentWidth() - METER_X, METER_HEIGHT).addToContainer(this);
+      y += METER_HEIGHT + METER_MARGIN;
     }
     
-    public void onDraw(UI ui, PGraphics pg) {
-      pg.noStroke();
-      pg.fill(ui.theme.getPrimaryColor());
-      pg.rect(0, 0, getWidth() * this.level, getHeight());
+    new UIImage(loadImage("acc.png"), 0, y).addToContainer(this);
+    for (NormalizedParameter p : input.acc) {
+      new UIParameterMeter(ui, p, METER_X, y, getContentWidth() - METER_X, METER_HEIGHT).addToContainer(this);
+      y += METER_HEIGHT + METER_MARGIN;
     }
     
-    public String getDescription() {
-      return this.parameter.getDescription();
+    new UIImage(loadImage("gyro.png"), 0, y).addToContainer(this);
+    for (NormalizedParameter p : input.gyro) {
+      new UIParameterMeter(ui, p, METER_X, y, getContentWidth() - METER_X, METER_HEIGHT).addToContainer(this);
+      y += METER_HEIGHT + METER_MARGIN;
     }
     
-    public LXNormalizedParameter getModulationSource() {
-      return this.parameter;
+  }
+}
+  
+class UIParameterMeter extends UI2dComponent implements UIModulationSource {
+  
+  private float level;
+  private final LXNormalizedParameter parameter; 
+  
+  public UIParameterMeter(UI ui, final LXNormalizedParameter parameter, float x, float y, float w, float h) {
+    super(x, y, w, h);
+    setBackgroundColor(ui.theme.getControlBackgroundColor());
+    setBorderColor(ui.theme.getControlBorderColor());
+    this.parameter = parameter;
+    this.level = parameter.getNormalizedf();
+    addLoopTask(new LXLoopTask() {
+      public void loop(double deltaMs) {
+        float l2 = parameter.getNormalizedf();
+        if (l2 != level) {
+          level = l2;
+          redraw();
+        }
+      }
+    });
+  }
+  
+  private void mouseValue(MouseEvent mouseEvent, float mx) {
+    if (mouseEvent.isShiftDown() || mouseEvent.isMetaDown() || mouseEvent.isControlDown()) {
+      parameter.setValue(mx / (this.width-1));
     }
+  }
+  protected void onMousePressed(MouseEvent mouseEvent, float mx, float my) {
+    mouseValue(mouseEvent, mx);
+  }
+  
+  protected void onMouseDragged(MouseEvent mouseEvent, float mx, float my, float dx, float dy) {
+    mouseValue(mouseEvent, mx);
+  }
+  
+  public void onDraw(UI ui, PGraphics pg) {
+    pg.noStroke();
+    pg.fill(ui.theme.getPrimaryColor());
+    pg.rect(0, 0, getWidth() * this.level, getHeight());
+  }
+  
+  public String getDescription() {
+    return this.parameter.getDescription();
+  }
+  
+  public LXNormalizedParameter getModulationSource() {
+    return this.parameter.getComponent() != null ? this.parameter : null;
   }
 }
 
@@ -610,33 +692,4 @@ public class UIOutputControls extends UICollapsibleSection {
       return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
     }
   }
-}
-
-
-
-//UI component for each Muse
-public class UIMuse extends UICollapsibleSection {
-  
-  private final static int LABEL_WIDTH = 60;
-  private final static int ICON_SIZE = 16;
-  private final static int PADDING = 4;
-  public UIMuse(UI ui, float w, Muse museObj) {
-    super(ui, 0, 0, w, 250);
-    setTitle("Muse: " + museObj.OSC_PORT);
-        
-    new UIImage(loadImage("brain.png"), 0, 20).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 20, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg0).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 40, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg1).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 60, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg2).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 80, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.eeg3).addToContainer(this);
-    new UIImage(loadImage("acc.png"), 0, 100).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 100, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc0).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 120, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc1).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 140, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.acc2).addToContainer(this);
-    new UIImage(loadImage("gyro.png"), 0, 160).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 160, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro0).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 180, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro1).addToContainer(this);
-    new UISlider(ICON_SIZE + PADDING, 200, getContentWidth() - ICON_SIZE - PADDING, 16).setShowLabel(false).setParameter(museObj.gyro2).addToContainer(this);
-      
-  } //<>//
 }
