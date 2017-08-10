@@ -79,6 +79,8 @@ public static class Tree extends LXModel {
             m[3], m[7], m[11], m[15]
           );
           matrix.scale(METERS_PER_INCH / INCHES);
+          
+          // NOTE: Stellar places assemblages by roughly center position
           matrix.translate(0, LeafAssemblage.LENGTH / 2, 0);
 
           addAssemblage(new LXTransform(matrix));
@@ -406,8 +408,8 @@ public static class LeafAssemblage extends LXModel {
   
   public static final int NUM_LEAVES = 15;
   
-  public static final float LENGTH = 28*IN;
-  public static final float WIDTH = 28*IN;
+  public static final float LENGTH = 26*IN;
+  public static final float WIDTH = 24*IN;
 
   // Orientation of a leaf assemblage, relative to parent branch
   public static class Orientation {
@@ -441,14 +443,14 @@ public static class LeafAssemblage extends LXModel {
   // is the leaf pointing "up", HALF_PI is pointing to the left,
   // -HALF_PI is pointing to the right, etc.
   public static final Leaf.Orientation[] LEAVES = {    
-    new Leaf.Orientation(0,  6.4*IN,  8.8*IN, -HALF_PI - QUARTER_PI), // A
-    new Leaf.Orientation(1,  6.9*IN, 10.0*IN, -HALF_PI), // B
-    new Leaf.Orientation(2, 10.4*IN, 14.7*IN, -HALF_PI - .318), // C
-    new Leaf.Orientation(3, 10.0*IN, 16.1*IN, -.900), // D
-    new Leaf.Orientation(4,  1.2*IN, 13.9*IN, -1.08), // E
-    new Leaf.Orientation(5,  3.5*IN, 22.2*IN, -HALF_PI - .2), // F
-    new Leaf.Orientation(6,  2.9*IN, 23.3*IN, -.828), // G
-    new Leaf.Orientation(7,  0.0*IN, 23.9*IN, 0), // H
+    new Leaf.Orientation(0,  4.5*IN, -1.7*IN, -HALF_PI - QUARTER_PI), // A
+    new Leaf.Orientation(1,  5.5*IN,    0*IN, -HALF_PI), // B
+    new Leaf.Orientation(2,  2.0*IN,  3.5*IN, -HALF_PI + QUARTER_PI), // C
+    new Leaf.Orientation(3,  3.5*IN,  7.5*IN, -HALF_PI), // D
+    new Leaf.Orientation(4,  4.0*IN, 11.2*IN, -HALF_PI), // E
+    new Leaf.Orientation(5,  3.0*IN,  9.5*IN, -HALF_PI + QUARTER_PI), // F
+    new Leaf.Orientation(6,  3.5*IN, 12.7*IN, -HALF_PI + QUARTER_PI), // G
+    new Leaf.Orientation(7,  0.0*IN, 13.5*IN, 0), // H
     null, // I
     null, // J
     null, // K
@@ -490,6 +492,8 @@ public static class LeafAssemblage extends LXModel {
     private final List<Leaf> leaves = new ArrayList<Leaf>();
     
     Fixture(LXTransform t) {
+      t.push();
+      t.translate(0, 5*INCHES, 0);
       for (int i = 0; i < NUM_LEAVES; ++i) {
         Leaf.Orientation leafOrientation = LEAVES[i];
         t.push();
@@ -499,7 +503,9 @@ public static class LeafAssemblage extends LXModel {
         this.leaves.add(leaf);
         addPoints(leaf);
         t.pop();
-      } 
+      }
+      
+      t.pop();
     }
   }
 }
@@ -510,8 +516,9 @@ public static class LeafAssemblage extends LXModel {
  */
 public static class Leaf extends LXModel {
   public static final int NUM_LEDS = 7;
-  public static final float LED_SPACING = 1*IN;
-  public static final float WIDTH = 5*IN; 
+  public static final float LED_OFFSET = .75*IN;
+  public static final float LED_SPACING = 1.3*IN;
+  public static final float WIDTH = 4.75*IN; 
   public static final float LENGTH = 6.5*IN;
   
   // Orientation of a leaf relative to leaf assemblage
@@ -582,15 +589,15 @@ public static class Leaf extends LXModel {
   private static class Fixture extends LXAbstractFixture {
     Fixture(LXTransform t, Orientation orientation) {
       t.push();
-      t.translate(.25*INCHES, LED_SPACING, 0);
+      t.translate(.1*INCHES, LED_OFFSET, 0);
       addPoint(new LXPoint(t));
       t.translate(0, LED_SPACING, 0);
       addPoint(new LXPoint(t));
       t.translate(0, LED_SPACING, 0);
       addPoint(new LXPoint(t));
-      t.translate(-.25*INCHES, LED_SPACING, 0);
+      t.translate(-.1*INCHES, LED_SPACING, 0);
       addPoint(new LXPoint(t));
-      t.translate(-.25*INCHES, -LED_SPACING, 0);
+      t.translate(-.1*INCHES, -LED_SPACING, 0);
       addPoint(new LXPoint(t));
       t.translate(0, -LED_SPACING, 0);
       addPoint(new LXPoint(t));

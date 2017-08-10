@@ -18,6 +18,65 @@ public abstract class TenerePattern extends LXPattern {
   }
 }
 
+public class TestAssemblageOrder extends TenerePattern {
+  
+  public final DiscreteParameter index = new DiscreteParameter("Index", 0, 15); 
+  
+  private int[] mask = new int[15];
+  
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public TestAssemblageOrder(LX lx) {
+    super(lx);
+    addParameter("index", this.index);
+  }
+  
+  public void run(double deltaMs) {
+    int index = this.index.getValuei();
+    for (int i = 0; i < mask.length; ++i) {
+      this.mask[i] = (i == index) ? #ffffff : #000000;
+    }
+    for (LeafAssemblage assemblage : model.assemblages) {
+      int li = 0;
+      for (Leaf leaf : assemblage.leaves) {
+        setColor(leaf, this.mask[li++]);
+      }
+    }
+  }
+}
+
+public class TestFramerate extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  public final CompoundParameter rate = new CompoundParameter("Rate", 500, 25, 2000);
+  public final CompoundParameter size = new CompoundParameter("Size", 3, 1, Leaf.NUM_LEDS);
+  public LXModulator pos = startModulator(new SawLFO(0, Leaf.NUM_LEDS, rate)); 
+  
+  private int[] mask = new int[Leaf.NUM_LEDS];
+  
+  public TestFramerate(LX lx) {
+    super(lx);
+    addParameter("rate", this.rate);
+    addParameter("size", this.size);
+  }
+  
+  public void run(double deltaMs) {
+    float pos = this.pos.getValuef();
+    float falloff = 100 / this.size.getValuef();
+    for (int i = 0; i < mask.length; ++i) {
+      mask[i] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(i, pos, Leaf.NUM_LEDS)));
+    }
+    for (Leaf leaf : model.leaves) {
+      for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
+        colors[leaf.point.index + i] = mask[i];
+      }
+    }
+  }
+}
+
 public class White extends LXPattern {
   
   public final CompoundParameter h = new CompoundParameter("Hue", 0, 360);
