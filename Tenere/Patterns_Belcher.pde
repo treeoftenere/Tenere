@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
-public class AtomPattern extends LXPattern {
+public class AtomPattern extends TenerePattern {
   // by Justin Belcher
   //
   // Note: The fun parameters are at the end.  Check out Wobble Width, Wobble Frequency, and Wander.
@@ -64,6 +64,11 @@ public class AtomPattern extends LXPattern {
       addParameter(electronLayer.wander.getLabel() + i, electronLayer.wander);
     }
   }
+  
+  public String getAuthor()
+  {
+    return "Justin Belcher";
+  }  
 
   @Override
   protected void run(double deltaMs) {
