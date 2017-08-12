@@ -4,9 +4,10 @@
  * There is code for an example pattern there, which gives some guidance.
  */
 
-// Change this line to specify the model mode!
+// Choose one of these line to specify the model mode!
 Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
-final static String STELLAR_FILE = "lastSleeExport.json";
+// Tree.ModelMode modelMode = Tree.ModelMode.STELLAR_IMPORT;
+final static String STELLAR_FILE = "last_setup.json";
 
 // Helpful global constants
 final static float INCHES = 5;
@@ -65,42 +66,52 @@ void setup() {
 
           // Update appropriately for testing!
           final String[] OPC_ADDRESS = new String[] {
-            "192.168.1.59",
-            "192.168.1.2",
+            "192.168.1.4",
             "192.168.1.9",
+            "192.168.1.12",
+            "192.168.1.59",
             "192.168.1.131",
+            "192.168.1.134"
           };
           final int OPC_PORT = 1337;
 
           final int[] LEAF_ORDER = {
-            0, 1, 3, 5, 2, 4, 6, 7, 8, 9, 12, 10, 11, 13, 14
+            0, 1, 3, 5, 2, 4, 6, 7, 8, 10, 12, 9, 11, 13, 14
           };
           int branchNum = 0;
           
           for (Branch branch : tree.branches) {
-            int pointsPerPacket = branch.points.length / 2;
+            int pointsPerPacket = Branch.NUM_LEDS / 2;
             int[] channels14 = new int[pointsPerPacket];
             int[] channels58 = new int[pointsPerPacket];
-            int pi = 0;
+            for (int i = 0; i < pointsPerPacket; ++i) {
+              // Initialize to nothing
+              channels14[i] = channels58[i] = -1;
+            }
             for (LeafAssemblage assemblage : branch.assemblages) {
+              int[] buffer = (assemblage.channel < 4) ? channels14 : channels58;
+              int pi = (assemblage.channel % 4) * LeafAssemblage.NUM_LEDS;
               for (int li : LEAF_ORDER) {
                 Leaf leaf = assemblage.leaves.get(li);
                 for (LXPoint p : leaf.points) {
-                  if (pi < pointsPerPacket) {
-                    channels14[pi] = p.index;
-                  } else {
-                    channels58[pi - pointsPerPacket] = p.index;
-                  }
-                  ++pi;
+                  buffer[pi++] = p.index;
                 }
               }
             }
+            
+            // IP address is either specified from stellar mapping, or we use the
+            // manual list above...
+            String ip = branch.ip;
+            if (ip == null) {
+              ip = OPC_ADDRESS[branchNum++];
+            }
 
-            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
-            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(OPC_ADDRESS[branchNum]).setPort(OPC_PORT));
-                        
-            // That's all we got...
-            if (++branchNum >= OPC_ADDRESS.length) {
+            // Add the datagrams
+            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(ip).setPort(OPC_PORT));
+            datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(ip).setPort(OPC_PORT));
+            
+            // Are we out of manual addresses?
+            if (branchNum >= OPC_ADDRESS.length) {
               break;
             }
           }

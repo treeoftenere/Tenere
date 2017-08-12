@@ -157,7 +157,9 @@ public class UITreeStructure extends UI3dComponent {
       addChild(new UILimb(limb));
     }
     for (Branch branch : tree.branches) {
-      addChild(new UIBranch(branch));
+      if (branch.orientation != null) {
+        addChild(new UIBranch(branch));
+      }
     }
   }
  

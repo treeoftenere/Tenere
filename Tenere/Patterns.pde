@@ -302,8 +302,9 @@ public class Starlight extends TenerePattern {
     new CompoundParameter("Variance", .5, 0, .9)
     .setDescription("Variance of the twinkling");    
   
-  public final CompoundParameter numStars =
-    new CompoundParameter("Num", 5000, 1000, MAX_STARS)
+  public final CompoundParameter numStars = (CompoundParameter)
+    new CompoundParameter("Num", 5000, 50, MAX_STARS)
+    .setExponent(2)
     .setDescription("Number of stars");
   
   private final Star[] stars = new Star[MAX_STARS];
@@ -358,8 +359,12 @@ public class Starlight extends TenerePattern {
     
     void run(double deltaMs) {
       int c = LXColor.gray(this.amplitude * flicker.get(this.accum / this.period));
+      int maxLeaves = shuffledLeaves.size();
       for (int i = 0; i < LEAVES_PER_STAR; ++i) {
-        setColor(shuffledLeaves.get(num * LEAVES_PER_STAR + i), c);
+        int leafIndex = num * LEAVES_PER_STAR + i;
+        if (leafIndex < maxLeaves) {
+          setColor(shuffledLeaves.get(leafIndex), c);
+        }
       }
       this.accum += deltaMs;
       if (this.accum > this.period) {

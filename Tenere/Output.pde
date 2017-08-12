@@ -22,7 +22,7 @@ public static class TenereDatagram extends OPCDatagram {
     final byte[] gamma = GAMMA28[Math.round(255 * this.brightness.getValuef())];
     int i = offset;
     for (int index : pointIndices) {
-      int c = colors[index];
+      int c = (index >= 0) ? colors[index] : #000000;
       this.buffer[i    ] = gamma[0xff & (c >> 16)]; // R
       this.buffer[i + 1] = gamma[0xff & (c >> 8)]; // G
       this.buffer[i + 2] = gamma[0xff & c]; // B
