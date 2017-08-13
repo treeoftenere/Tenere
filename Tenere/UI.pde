@@ -726,3 +726,19 @@ public class UIOutputControls extends UICollapsibleSection {
     }
   }
 }
+
+public class UIBoardTest extends UICollapsibleSection {
+  public UIBoardTest(final LXStudio.UI ui, LX lx) {
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 60);
+    setTitle("BOARD TEST");
+    
+    new UIIntegerBox(0, 0, getContentWidth(), 16)
+    .setParameter(boardNumber)
+    .addToContainer(this);
+    
+    new UIButton(0, 20, getContentWidth(), 16)
+    .setParameter(lx.engine.output.enabled)
+    .setLabel("Output On")
+    .addToContainer(this);
+  }
+}

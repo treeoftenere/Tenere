@@ -37,6 +37,10 @@ UIOutputControls uiOutputControls;
 
 List<TenereDatagram> datagrams = new ArrayList<TenereDatagram>();
 
+DiscreteParameter boardNumber = (DiscreteParameter)
+  new DiscreteParameter("BoardNumber", 1, 1, 256)
+  .setUnits(LXParameter.Units.INTEGER);
+
 // Processing's main invocation, build our model and set up LX
 void setup() {
   size(1200, 960, P3D);
@@ -107,6 +111,10 @@ void setup() {
             }
 
             // Add the datagrams
+            //datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(ip).setPort(OPC_PORT));
+            //datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(ip).setPort(OPC_PORT));
+            
+            ip = "192.168.1." + boardNumber.getValuei();
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(ip).setPort(OPC_PORT));
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(ip).setPort(OPC_PORT));
             
@@ -114,6 +122,9 @@ void setup() {
             if (branchNum >= OPC_ADDRESS.length) {
               break;
             }
+            
+            // TODO(mcslee): remove this, just for testing...
+            break;
           }
 
           // Create an LXDatagramOutput to own these packets
@@ -129,6 +140,20 @@ void setup() {
           println("Failed to construct UDP output: " + x);
           x.printStackTrace();
         }
+
+        boardNumber.addListener(new LXParameterListener() {
+          public void onParameterChanged(LXParameter p) {
+            for (LXDatagram datagram : datagrams) {
+              try {
+                datagram.setAddress("192.168.1." + boardNumber.getValuei());
+              } catch (Exception x) {
+                println("BAD ADDRESS: " + x.getLocalizedMessage());
+                x.printStackTrace();
+                exit();
+              }
+            }
+          }
+        });
 
         t.log("Initialized LXStudio");
       }
@@ -153,6 +178,8 @@ void setup() {
         // Custom tree rendering controls
         uiTreeControls = (UITreeControls) new UITreeControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
         uiOutputControls = (UIOutputControls) new UIOutputControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
+
+        new UIBoardTest(ui, lx).setExpanded(true).addToContainer(ui.leftPane.global);
 
         t.log("Initialized LX UI");
       }
