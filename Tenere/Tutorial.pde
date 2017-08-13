@@ -102,3 +102,52 @@ public class Plane extends LXPattern {
     }
   }
 }
+
+public class SlideshowPattern extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private final String[] PATHS = {
+    "main_1200.jpg",
+    "The Great Heads-X2proc.jpg"
+  };
+  
+  private final PImage[] images;
+  
+  private final SawLFO imageIndex;
+  
+  public final CompoundParameter rate = new CompoundParameter("Rate", 3000, 6000, 500);
+  
+  public SlideshowPattern(LX lx) {
+    super(lx);
+    this.images = new PImage[PATHS.length];
+    for (int i = 0; i < this.images.length; ++i) {
+      this.images[i] = loadImage(PATHS[i]);
+      this.images[i].loadPixels();
+    }
+    addParameter("rate", this.rate);
+    this.imageIndex = new SawLFO(0, this.images.length, rate);
+    startModulator(this.imageIndex);
+  }
+  
+  public void run(double deltaMs) {
+    float imageIndex = this.imageIndex.getValuef();
+    int imageFloor = (int) Math.floor(imageIndex); 
+    PImage image1 = this.images[imageFloor % this.images.length];
+    PImage image2 = this.images[(imageFloor + 1) % this.images.length];
+    float imageLerp = imageIndex - imageFloor;
+    
+    for (Leaf leaf : model.leaves) {
+      int c1 = image1.get(
+        (int) (leaf.point.xn * (image1.width-1)),
+        (int) ((1-leaf.point.yn) * (image1.height-1))
+      );
+      int c2 = image2.get(
+        (int) (leaf.point.xn * (image2.width-1)),
+        (int) ((1-leaf.point.yn) * (image2.height-1))
+      );
+      setColor(leaf, LXColor.lerp(c1, c2, imageLerp));
+    }
+  }
+}

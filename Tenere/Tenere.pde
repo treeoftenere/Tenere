@@ -69,14 +69,20 @@ void setup() {
         try {          
 
           // Update appropriately for testing!
-          final String[] OPC_ADDRESS = new String[] {
-            "192.168.1.4",
-            "192.168.1.9",
-            "192.168.1.12",
-            "192.168.1.59",
-            "192.168.1.131",
-            "192.168.1.134"
-          };
+          //final String[] OPC_ADDRESS = new String[] {
+          //  "192.168.1.4",
+          //  "192.168.1.9",
+          //  "192.168.1.12",
+          //  "192.168.1.59",
+          //  "192.168.1.131",
+          //  "192.168.1.134"
+          //};
+          
+          final String[] OPC_ADDRESS = new String[150];
+          for (int i = 0; i < OPC_ADDRESS.length; ++i) {
+            OPC_ADDRESS[i] = String.format("192.168.1.%d", (4 + i));
+          }
+          
           final int OPC_PORT = 1337;
 
           final int[] LEAF_ORDER = {
