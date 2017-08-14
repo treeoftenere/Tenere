@@ -9,6 +9,9 @@ Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
 // Tree.ModelMode modelMode = Tree.ModelMode.STELLAR_IMPORT;
 final static String STELLAR_FILE = "last_setup.json";
 
+// Special board testing mode
+final static boolean BOARD_TEST_MODE = false;
+
 // Helpful global constants
 final static float INCHES = 5;
 final static float IN = INCHES;
@@ -116,21 +119,24 @@ void setup() {
               ip = OPC_ADDRESS[branchNum++];
             }
 
+            // Use manual IP in board test mode 
+            if (BOARD_TEST_MODE) {
+              ip = "192.168.1." + boardNumber.getValuei();
+            }
+
             // Add the datagrams
-            //datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(ip).setPort(OPC_PORT));
-            //datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(ip).setPort(OPC_PORT));
-            
-            ip = "192.168.1." + boardNumber.getValuei();
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels14, (byte) 0x00).setAddress(ip).setPort(OPC_PORT));
             datagrams.add((TenereDatagram) new TenereDatagram(lx, channels58, (byte) 0x04).setAddress(ip).setPort(OPC_PORT));
-            
+                        
             // Are we out of manual addresses?
             if (branchNum >= OPC_ADDRESS.length) {
               break;
             }
             
-            // TODO(mcslee): remove this, just for testing...
-            break;
+            // Only add one set of datagrams if in board test mode!
+            if (BOARD_TEST_MODE) {
+              break;
+            }
           }
 
           // Create an LXDatagramOutput to own these packets
@@ -147,19 +153,21 @@ void setup() {
           x.printStackTrace();
         }
 
-        boardNumber.addListener(new LXParameterListener() {
-          public void onParameterChanged(LXParameter p) {
-            for (LXDatagram datagram : datagrams) {
-              try {
-                datagram.setAddress("192.168.1." + boardNumber.getValuei());
-              } catch (Exception x) {
-                println("BAD ADDRESS: " + x.getLocalizedMessage());
-                x.printStackTrace();
-                exit();
+        if (BOARD_TEST_MODE) {
+          boardNumber.addListener(new LXParameterListener() {
+            public void onParameterChanged(LXParameter p) {
+              for (LXDatagram datagram : datagrams) {
+                try {
+                  datagram.setAddress("192.168.1." + boardNumber.getValuei());
+                } catch (Exception x) {
+                  println("BAD ADDRESS: " + x.getLocalizedMessage());
+                  x.printStackTrace();
+                  exit();
+                }
               }
             }
-          }
-        });
+          });
+        }
 
         t.log("Initialized LXStudio");
       }
@@ -185,7 +193,10 @@ void setup() {
         uiTreeControls = (UITreeControls) new UITreeControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
         uiOutputControls = (UIOutputControls) new UIOutputControls(ui).setExpanded(false).addToContainer(ui.leftPane.global);
 
-        new UIBoardTest(ui, lx).setExpanded(true).addToContainer(ui.leftPane.global);
+        // Board testing mode
+        if (BOARD_TEST_MODE) {
+          new UIBoardTest(ui, lx).setExpanded(true).addToContainer(ui.leftPane.global);
+        }
 
         t.log("Initialized LX UI");
       }
