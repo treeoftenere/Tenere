@@ -108,16 +108,16 @@ public static class GameOfLife extends LXPattern {
 
   double time = 0;
   int wait;
-  final static int startBPM = 120;
-  final static int minBPM = 60;
-  final static int maxBPM = 720;  // Probably dictated by processing speed???
+  final static int startBPM = 720;
+  final static int minBPM = 300;
+  final static int maxBPM = 1500;  // Probably dictated by processing speed???
   final static int startRate = 60000/startBPM;
   final static int minRate = 60000/minBPM;
   final static int maxRate = 60000/maxBPM;
 
-  final static int startRand = 5;
-  final static int minRand = 1;
-  final static int maxRand = 20;
+  final static int startRand = 20;
+  final static int minRand = 10;
+  final static int maxRand = 50;
 
   private boolean[] isAlive;
   private boolean[] tempLives;
@@ -229,6 +229,7 @@ public static class Splashes extends LXPattern {
   
   private final static int NUM_SPLASHES = 4;
   private final static float RIPPLE_WIDTH = 2*FT;
+  private final static float MIN_BRIGHT = 50.0;
   final static float centerX = 0*FEET;
   final static float centerY = 8*FEET;
   final static float centerZ = 0*FEET;
@@ -248,10 +249,6 @@ public static class Splashes extends LXPattern {
   private final CompoundParameter rippleRate = 
     new CompoundParameter("Rate", startRate, minRate, maxRate)
     .setDescription("Controls the rate of the ripple instance");
-
-  private final SawLFO hue = new SawLFO(0, 360, 27000);
-  private final TriangleLFO sat = new TriangleLFO(20, 100, 42000);
-  private final SinLFO bri = new SinLFO(20, 100, 75000);
 
 
   public Splashes(LX lx) {
@@ -275,9 +272,6 @@ public static class Splashes extends LXPattern {
     ripples = getLayers();
     
     addParameter(rippleRate);
-    startModulator(hue);
-    startModulator(sat);
-    startModulator(bri);
   }
   
   // Helper function to know current modulation rate, in BPM
@@ -292,20 +286,17 @@ public static class Splashes extends LXPattern {
 
   public void run(double deltaMs) {
     for (LXPoint p : model.points) {
-      float tempHue = hue.getValuef();
-      float tempSat = sat.getValuef();
-      float tempBri = bri.getValuef();
+      float tempHue = palette.getHuef(p);
+      float tempBri = MIN_BRIGHT;
       
       for (int i=0; i<ripples.size(); i++) {
         float effect = ((Ripple)ripples.get(i)).isAffected(p);
         tempHue += effect;
-        tempSat += effect;
         tempBri += effect;
       }
       tempHue = tempHue%360;
-      tempSat = tempSat%100;
       tempBri = tempBri%100;
-      colors[p.index] = LX.hsb(tempHue, tempSat, tempBri);
+      colors[p.index] = LX.hsb(tempHue,100,tempBri);
     }
   }
 

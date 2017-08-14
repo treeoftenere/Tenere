@@ -59,7 +59,7 @@ public static class Tutorial extends LXPattern {
       if (brightness > 0) {
         // There's a color here! Let's use the global color palette
         colors[p.index] = palette.getColor(p, brightness);
-        
+
         // Alternatively, if we wanted to do our own color scheme, we
         // could do a manual color computation:
         //   colors[p.index] = LX.hsb(hue[0-360], saturation[0-100], brightness[0-100])
@@ -67,7 +67,6 @@ public static class Tutorial extends LXPattern {
         //
         // Note that we do *NOT* use Processing's color() function. That
         // function employs global state and is not thread safe!
-        
       } else {
         // This point is not even on! Best practice is to skip calling
         // the color palette if we don't need it, just set nothing.
@@ -78,21 +77,21 @@ public static class Tutorial extends LXPattern {
 }
 
 public class Plane extends LXPattern {
-  
+
   public final CompoundParameter yPos = (CompoundParameter)
     new CompoundParameter("YPos", model.cy, model.yMin, model.yMax)
     .setDescription("Position of the plane on the Y-axis");
-    
+
   public final CompoundParameter size = (CompoundParameter)
     new CompoundParameter("Size", 8*FT, 1*FT, 20*FT)
     .setDescription("Size of the plane");
-  
+
   public Plane(LX lx) {
     super(lx);
     addParameter("yPos", this.yPos);
     addParameter("size", this.size);
   }
-  
+
   public void run(double deltaMs) {
     float falloff = 100 / this.size.getValuef();
     float yPos = this.yPos.getValuef();
