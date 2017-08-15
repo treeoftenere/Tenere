@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502836721399,
+  "timestamp": 1502838634742,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -942,18 +942,18 @@
             "parameters": {
               "label": "A",
               "enabled": true,
-              "source": 7,
+              "source": 1,
               "heartBeat": false,
-              "eeg0": 0.0,
-              "eeg1": 0.0,
-              "eeg2": 0.0,
-              "eeg3": 0.0,
-              "acc0": 0.0,
-              "acc1": 0.0,
-              "acc2": 0.0,
-              "gyro0": 0.0,
-              "gyro1": 0.0,
-              "gyro2": 0.0
+              "eeg0": 0.5298529267311096,
+              "eeg1": 0.1966802030801773,
+              "eeg2": 0.8861941695213318,
+              "eeg3": 0.535896897315979,
+              "acc0": 0.5145049691200256,
+              "acc1": 0.4802911579608917,
+              "acc2": 0.25477591156959534,
+              "gyro0": 0.4999252259731293,
+              "gyro1": 0.4960971176624298,
+              "gyro2": 0.49265778064727783
             }
           },
           {
@@ -1043,8 +1043,8 @@
         "leavesVisible": false,
         "structureVisible": true,
         "controlsExpanded": false,
-        "sensorsExpanded": false,
-        "sourcesExpanded": false,
+        "sensorsExpanded": true,
+        "sourcesExpanded": true,
         "outputExpanded": false
       }
     },
