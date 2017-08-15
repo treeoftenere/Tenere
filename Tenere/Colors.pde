@@ -1,21 +1,28 @@
-public class ColorSpread extends TenerePattern {
+public class ColorGradientTree extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  public ColorSpread(LX lx) {
+  private final LXModulator spreadX = startModulator(new DampedParameter(palette.spreadX, 720, 720));
+  private final LXModulator spreadY = startModulator(new DampedParameter(palette.spreadY, 720, 720));
+  private final LXModulator spreadZ = startModulator(new DampedParameter(palette.spreadZ, 720, 720));
+  private final LXModulator offsetX = startModulator(new DampedParameter(palette.offsetX, 5, 5));
+  private final LXModulator offsetY = startModulator(new DampedParameter(palette.offsetY, 5, 5));
+  private final LXModulator offsetZ = startModulator(new DampedParameter(palette.offsetZ, 5, 5));
+    
+  public ColorGradientTree(LX lx) {
     super(lx);
   }
   
   public void run(double deltaMs) {
     float hue = palette.getHuef();
     float sat = palette.getSaturationf();
-    float spreadX = palette.spreadX.getValuef();
-    float spreadY = palette.spreadY.getValuef();
-    float spreadZ = palette.spreadZ.getValuef();
-    float offsetX = palette.offsetX.getValuef();
-    float offsetY = palette.offsetY.getValuef();
-    float offsetZ = palette.offsetZ.getValuef();
+    float spreadX = this.spreadX.getValuef();
+    float spreadY = this.spreadY.getValuef();
+    float spreadZ = this.spreadZ.getValuef();
+    float offsetX = this.offsetX.getValuef();
+    float offsetY = this.offsetY.getValuef();
+    float offsetZ = this.offsetZ.getValuef();
     boolean mirror = palette.mirror.isOn();
     for (Leaf leaf : tree.leaves) {
       float dx = leaf.point.xn - .5 - offsetX;
@@ -31,6 +38,56 @@ public class ColorSpread extends TenerePattern {
         sat,
         100
       ));
+    }
+  }
+}
+
+public class ColorGradientAssemblage extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter spread =
+    new CompoundParameter("Spread", 0, 360)
+    .setDescription("Amount of hue spread across the assemblage");
+
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 8000, 15000, 1000)
+    .setExponent(.5)
+    .setDescription("Speed of hue motion thru the assemblage");
+  
+  private final int[] rawGradient = new int[LeafAssemblage.NUM_LEAVES];
+  private final int[] assemblageGradient = new int[LeafAssemblage.NUM_LEAVES]; 
+  
+  public final LXModulator offset = startModulator(new SawLFO(0, LeafAssemblage.NUM_LEAVES, speed));
+  public final LXModulator spreadDamped = startModulator(new DampedParameter(this.spread, 360, 540));
+    
+  public ColorGradientAssemblage(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("spread", this.spread);
+  }
+  
+  public void run(double deltaMs) {
+    float hue = palette.getHuef();
+    float sat = palette.getSaturationf();
+    float spread = this.spreadDamped.getValuef() / LeafAssemblage.NUM_LEAVES;
+    float offset = this.offset.getValuef();
+    float offsetLerp = offset % 1;
+    int offsetFloor = (int) offset;
+    for (int i = 0; i < LeafAssemblage.NUM_LEAVES; ++i) {
+      this.rawGradient[i] = LXColor.hsb(hue + spread * i, sat, 100);
+    }
+    for (int i = 0; i < LeafAssemblage.NUM_LEAVES; ++i) {      
+      int i1 = (i + offsetFloor) % LeafAssemblage.NUM_LEAVES;
+      int i2 = (i + offsetFloor + 1) % LeafAssemblage.NUM_LEAVES;
+      this.assemblageGradient[i] = LXColor.lerp(this.rawGradient[i1], this.rawGradient[i2], offsetLerp); 
+    }
+    for (LeafAssemblage assemblage : model.assemblages) {
+      int li = 0;
+      for (Leaf leaf : assemblage.leaves) {
+        setColor(leaf, this.assemblageGradient[li++]);
+      }
     }
   }
 }

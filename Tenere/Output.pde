@@ -1,11 +1,14 @@
 public static class TenereDatagram extends OPCDatagram {
   
-  static final byte[][] GAMMA28 = new byte[256][256];
+  // TODO(mcslee): Tweak this value on-playa for best results
+  static final float GAMMA = 1.8;
+  
+  static final byte[][] GAMMA_LUT = new byte[256][256];
   
   static {
     for (int b = 0; b < 256; ++b) {
       for (int in = 0; in < 256; ++in) {
-        GAMMA28[b][in] = (byte) (0xff & (int) Math.round(Math.pow(in * b / 65025.f, 2.8) * 255.f));
+        GAMMA_LUT[b][in] = (byte) (0xff & (int) Math.round(Math.pow(in * b / 65025.f, GAMMA) * 255.f));
       }
     }
   }
@@ -19,7 +22,7 @@ public static class TenereDatagram extends OPCDatagram {
   
   @Override
   protected LXDatagram copyPoints(int[] colors, int[] pointIndices, int offset) {
-    final byte[] gamma = GAMMA28[Math.round(255 * this.brightness.getValuef())];
+    final byte[] gamma = GAMMA_LUT[Math.round(255 * this.brightness.getValuef())];
     int i = offset;
     for (int index : pointIndices) {
       int c = (index >= 0) ? colors[index] : #000000;

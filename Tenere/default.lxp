@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502580666824,
+  "timestamp": 1502836721399,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -11,7 +11,7 @@
       "scene-3": false,
       "scene-4": false,
       "scene-5": false,
-      "crossfader": 0.5,
+      "crossfader": 0.49606299212598426,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
       "focusedChannel": 0,
@@ -27,16 +27,16 @@
       "parameters": {
         "label": "",
         "cue": false,
-        "hueMode": 2,
-        "color/hue": 170.1176300048828,
+        "hueMode": 0,
+        "color/hue": 211.76470947265625,
         "color/brightness": 100.0,
         "color/saturation": 100.0,
-        "color": -16711723,
-        "period": 6000.0,
+        "color": -16746241,
+        "period": 32000.0,
         "range": 0.0,
-        "spreadX": 79.19999822974205,
-        "spreadY": 259.1999942064285,
-        "spreadZ": 129.59999710321426,
+        "spreadX": 0.0,
+        "spreadY": 320.3149606299213,
+        "spreadZ": 0.0,
         "spreadR": 0.0,
         "offsetX": 0.0,
         "offsetY": 0.0,
@@ -55,7 +55,7 @@
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
-          "autoCycleEnabled": true,
+          "autoCycleEnabled": false,
           "autoCycleTimeSecs": 58.0,
           "fader": 1.0,
           "crossfadeGroup": 0,
@@ -66,16 +66,31 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 2,
         "patterns": [
+          {
+            "id": 3137,
+            "class": "Tenere$Solid",
+            "parameters": {
+              "label": "Solid",
+              "h": 0.0,
+              "s": 0.0,
+              "b": 100.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
           {
             "id": 451,
             "class": "Tenere$Starlight",
             "parameters": {
               "label": "Starlight",
-              "speed": 3693.0001186206937,
-              "variance": 0.6889999974742531,
-              "numStars": 1403.7097494881543
+              "speed": 3314.173228346457,
+              "variance": 0.3543306992748591,
+              "numStars": 5000.0
             },
             "modulation": {
               "modulators": [],
@@ -419,7 +434,7 @@
             "parameters": {
               "label": "Waves",
               "rate": 18228.032057898068,
-              "size": 307.19999849796284,
+              "size": 139.20000225305546,
               "amp1": 1.0,
               "amp2": 1.7959999666512012,
               "amp3": 1.2379999822825196,
@@ -598,18 +613,18 @@
         ]
       },
       {
-        "id": 1902,
+        "id": 3835,
         "class": "heronarts.lx.LXChannel",
         "parameters": {
-          "label": "White",
+          "label": "Midi",
           "arm": false,
-          "enabled": false,
+          "enabled": true,
           "cue": false,
-          "midiMonitor": false,
+          "midiMonitor": true,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
-          "fader": 0.0,
+          "fader": 1.0,
           "crossfadeGroup": 0,
           "blendMode": 0,
           "transitionEnabled": false,
@@ -621,13 +636,80 @@
         "patternIndex": 0,
         "patterns": [
           {
-            "id": 1903,
-            "class": "Tenere$White",
+            "id": 3836,
+            "class": "Tenere$MidiPattern",
             "parameters": {
-              "label": "White",
-              "h": 0.0,
-              "s": 0.0,
-              "b": 100.0
+              "label": "Midi",
+              "attack": 50.0,
+              "decay": 1000.0,
+              "sustain": 0.5,
+              "release": 1000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          }
+        ]
+      },
+      {
+        "id": 2698,
+        "class": "heronarts.lx.LXChannel",
+        "parameters": {
+          "label": "Texturize",
+          "arm": false,
+          "enabled": true,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": false,
+          "autoCycleTimeSecs": 60.0,
+          "fader": 1.0,
+          "crossfadeGroup": 0,
+          "blendMode": 1,
+          "transitionEnabled": true,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 1,
+        "patterns": [
+          {
+            "id": 2988,
+            "class": "Tenere$TextureLoop",
+            "parameters": {
+              "label": "TextureLoop",
+              "rate": 1068.656038403024,
+              "size": 3.220472440944882
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 2991,
+            "class": "Tenere$TextureSparkle",
+            "parameters": {
+              "label": "TextureSparkle",
+              "speed": 1000.0,
+              "bright": 60.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 3139,
+            "class": "Tenere$TextureWave",
+            "parameters": {
+              "label": "TextureWave",
+              "speed": 2304.614878954809
             },
             "modulation": {
               "modulators": [],
@@ -661,10 +743,24 @@
         "patternIndex": 0,
         "patterns": [
           {
-            "id": 97,
-            "class": "Tenere$ColorSpread",
+            "id": 3290,
+            "class": "Tenere$ColorGradientTree",
             "parameters": {
-              "label": "ColorSpread"
+              "label": "ColorGradientTree"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 3288,
+            "class": "Tenere$ColorGradientAssemblage",
+            "parameters": {
+              "label": "ColorGradientAssemblage",
+              "speed": 8000.0,
+              "spread": 0.0
             },
             "modulation": {
               "modulators": [],
@@ -715,58 +811,6 @@
             }
           }
         ]
-      },
-      {
-        "id": 2698,
-        "class": "heronarts.lx.LXChannel",
-        "parameters": {
-          "label": "Tests",
-          "arm": false,
-          "enabled": false,
-          "cue": false,
-          "midiMonitor": false,
-          "midiChannel": 16,
-          "autoCycleEnabled": false,
-          "autoCycleTimeSecs": 60.0,
-          "fader": 1.0,
-          "crossfadeGroup": 0,
-          "blendMode": 0,
-          "transitionEnabled": false,
-          "transitionTimeSecs": 5.0,
-          "transitionBlendMode": 0
-        },
-        "effects": [],
-        "clips": [],
-        "patternIndex": 0,
-        "patterns": [
-          {
-            "id": 2699,
-            "class": "Tenere$TestAssemblageOrder",
-            "parameters": {
-              "label": "TestAssemblageOrder",
-              "index": 2
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 2701,
-            "class": "Tenere$TestFramerate",
-            "parameters": {
-              "label": "TestFramerate",
-              "rate": 500.0,
-              "size": 3.0
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          }
-        ]
       }
     ],
     "master": {
@@ -776,7 +820,38 @@
         "label": "Master",
         "arm": false
       },
-      "effects": [],
+      "effects": [
+        {
+          "id": 3556,
+          "class": "heronarts.lx.effect.StrobeEffect",
+          "parameters": {
+            "label": "Strobe",
+            "enabled": false,
+            "frequency": 4.94900385027194,
+            "shape": 1,
+            "depth": 0.5
+          },
+          "modulation": {
+            "modulators": [],
+            "modulations": [],
+            "triggers": []
+          }
+        },
+        {
+          "id": 3560,
+          "class": "heronarts.lx.effect.BlurEffect",
+          "parameters": {
+            "label": "Blur",
+            "enabled": true,
+            "amount": 0.0
+          },
+          "modulation": {
+            "modulators": [],
+            "modulations": [],
+            "triggers": []
+          }
+        }
+      ],
       "clips": []
     },
     "audio": {
@@ -964,8 +1039,8 @@
         ]
       },
       "tenereSettings": {
-        "pointsVisible": false,
-        "leavesVisible": true,
+        "pointsVisible": true,
+        "leavesVisible": false,
         "structureVisible": true,
         "controlsExpanded": false,
         "sensorsExpanded": false,
@@ -1060,7 +1135,7 @@
         {
           "name": "CoreMIDI4J - APC40 mkII",
           "channel": false,
-          "control": false,
+          "control": true,
           "sync": false
         }
       ],
@@ -1069,7 +1144,15 @@
           "description": "APC40 mkII"
         }
       ],
-      "mapping": []
+      "mapping": [
+        {
+          "channel": 0,
+          "type": "CONTROL_CHANGE",
+          "componentId": 2,
+          "parameterPath": "spreadY",
+          "cc": 49
+        }
+      ]
     }
   },
   "externals": {
@@ -1084,9 +1167,9 @@
         "2844": true
       },
       "preview": {
-        "radius": 5964.193149905729,
-        "theta": 0.4597993950843755,
-        "phi": 0.15546706497669233
+        "radius": 5118.606138708371,
+        "theta": 0.2617993950843769,
+        "phi": 0.15846706497669233
       }
     }
   }

@@ -47,43 +47,13 @@ public class TestAssemblageOrder extends TenerePattern {
   }
 }
 
-public class TestFramerate extends TenerePattern {
-  public String getAuthor() {
-    return "Mark C. Slee";
-  }
-  public final CompoundParameter rate = new CompoundParameter("Rate", 500, 25, 2000);
-  public final CompoundParameter size = new CompoundParameter("Size", 3, 1, Leaf.NUM_LEDS);
-  public LXModulator pos = startModulator(new SawLFO(0, Leaf.NUM_LEDS, rate)); 
-  
-  private int[] mask = new int[Leaf.NUM_LEDS];
-  
-  public TestFramerate(LX lx) {
-    super(lx);
-    addParameter("rate", this.rate);
-    addParameter("size", this.size);
-  }
-  
-  public void run(double deltaMs) {
-    float pos = this.pos.getValuef();
-    float falloff = 100 / this.size.getValuef();
-    for (int i = 0; i < mask.length; ++i) {
-      mask[i] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(i, pos, Leaf.NUM_LEDS)));
-    }
-    for (Leaf leaf : model.leaves) {
-      for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
-        colors[leaf.point.index + i] = mask[i];
-      }
-    }
-  }
-}
-
-public class White extends LXPattern {
+public class Solid extends LXPattern {
   
   public final CompoundParameter h = new CompoundParameter("Hue", 0, 360);
   public final CompoundParameter s = new CompoundParameter("Sat", 0, 100);
   public final CompoundParameter b = new CompoundParameter("Brt", 100, 100);
   
-  public White(LX lx) {
+  public Solid(LX lx) {
     super(lx);
     addParameter("h", this.h);
     addParameter("s", this.s);
@@ -170,16 +140,19 @@ public class Clouds extends TenerePattern {
     new CompoundParameter("Thickness", 50, 100, 0)
     .setDescription("Thickness of the cloud formation");
   
-  public final CompoundParameter xSpeed =
+  public final CompoundParameter xSpeed = (CompoundParameter)
     new CompoundParameter("XSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the X axis");
 
-  public final CompoundParameter ySpeed =
+  public final CompoundParameter ySpeed = (CompoundParameter)
     new CompoundParameter("YSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the Y axis");
     
-  public final CompoundParameter zSpeed =
+  public final CompoundParameter zSpeed = (CompoundParameter)
     new CompoundParameter("ZSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the Z axis");
     
   public final CompoundParameter scale = (CompoundParameter)
@@ -381,6 +354,12 @@ public class Waves extends TenerePattern {
   }
 
   final int NUM_LAYERS = 3;
+  
+  final float AMP_DAMPING_V = 1.5;
+  final float AMP_DAMPING_A = 2.5;
+  
+  final float LEN_DAMPING_V = 1.5;
+  final float LEN_DAMPING_A = 1.5;
 
   public final CompoundParameter rate = (CompoundParameter)
     new CompoundParameter("Rate", 6000, 48000, 2000)
@@ -388,13 +367,13 @@ public class Waves extends TenerePattern {
     .setExponent(.3);
 
   public final CompoundParameter size =
-    new CompoundParameter("Size", 4*FEET, 28*FEET)
+    new CompoundParameter("Size", 4*FEET, 6*INCHES, 28*FEET)
     .setDescription("Width of the wave");
     
   public final CompoundParameter amp1 =
     new CompoundParameter("Amp1", .5, 2, .2)
     .setDescription("First modulation size");
-    
+        
   public final CompoundParameter amp2 =
     new CompoundParameter("Amp2", 1.4, 2, .2)
     .setDescription("Second modulation size");
@@ -417,6 +396,16 @@ public class Waves extends TenerePattern {
     
   private final LXModulator phase =
     startModulator(new SawLFO(0, TWO_PI, rate));
+    
+  private final LXModulator amp1Damp = startModulator(new DampedParameter(this.amp1, AMP_DAMPING_V, AMP_DAMPING_A));
+  private final LXModulator amp2Damp = startModulator(new DampedParameter(this.amp2, AMP_DAMPING_V, AMP_DAMPING_A));
+  private final LXModulator amp3Damp = startModulator(new DampedParameter(this.amp3, AMP_DAMPING_V, AMP_DAMPING_A));
+  
+  private final LXModulator len1Damp = startModulator(new DampedParameter(this.len1, LEN_DAMPING_V, LEN_DAMPING_A));
+  private final LXModulator len2Damp = startModulator(new DampedParameter(this.len2, LEN_DAMPING_V, LEN_DAMPING_A));
+  private final LXModulator len3Damp = startModulator(new DampedParameter(this.len3, LEN_DAMPING_V, LEN_DAMPING_A));  
+
+  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 20*FEET, 40*FEET));
 
   private final double[] bins = new double[512];
 
@@ -434,21 +423,21 @@ public class Waves extends TenerePattern {
 
   public void run(double deltaMs) {
     double phaseValue = phase.getValue();
-    float amp1 = this.amp1.getValuef();
-    float amp2 = this.amp2.getValuef();
-    float amp3 = this.amp3.getValuef();
-    float len1 = this.len1.getValuef();
-    float len2 = this.len2.getValuef();
-    float len3 = this.len3.getValuef();
+    float amp1 = this.amp1Damp.getValuef();
+    float amp2 = this.amp2Damp.getValuef();
+    float amp3 = this.amp3Damp.getValuef();
+    float len1 = this.len1Damp.getValuef();
+    float len2 = this.len2Damp.getValuef();
+    float len3 = this.len3Damp.getValuef();    
+    float falloff = 100 / this.sizeDamp.getValuef();
     
-    float falloff = 100 / size.getValuef();
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
     }
     for (Leaf leaf : tree.leaves) {
       int idx = Math.round((bins.length-1) * (len1 * leaf.point.xn)) % bins.length;
       int idx2 = Math.round((bins.length-1) * (len2 * (.2 + leaf.point.xn))) % bins.length;
-      int idx3 = Math.round((bins.length-1) * (len2 * (1.7 - leaf.point.xn))) % bins.length; 
+      int idx3 = Math.round((bins.length-1) * (len3 * (1.7 - leaf.point.xn))) % bins.length; 
       
       float y1 = (float) bins[idx];
       float y2 = (float) bins[idx2];
