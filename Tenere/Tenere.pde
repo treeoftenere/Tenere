@@ -7,7 +7,7 @@
 // Choose one of these line to specify the model mode!
 Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
 // Tree.ModelMode modelMode = Tree.ModelMode.STELLAR_IMPORT;
-final static String STELLAR_FILE = "last_setup.json";
+final static String STELLAR_FILE = "sleeexportTenereBuild.json";
 
 // Special board testing mode
 final static boolean BOARD_TEST_MODE = false;

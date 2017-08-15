@@ -12,6 +12,53 @@ public static class StellarBranchConfig {
   
   public StellarBranchConfig(String ip) {
     this.ip = ip;
+    for (int i = 0; i < channels.length; ++i) {
+      channels[i] = null;
+    }
+  }
+}
+
+public static class StellarFixtureConfig {
+  
+  static final String CHANNEL_ZERO = "Leafs Chanel Zero";
+  static final String CHANNEL_FOUR = "Leafs Chanel Four";
+  static final int NO_FIXTURE_ID = -1;
+  
+  // TODO(mcslee): determine accurately what this is!
+  static final float ASSEMBLAGE_Y_OFFSET = 4*INCHES;
+  
+  final String ip;
+  final LXMatrix matrix;
+  final int fixtureId;
+  final int nextFixtureId;
+  final int channel;
+  
+  public StellarFixtureConfig(JSONObject fixture, String fixtureType) {
+    this.ip = fixture.getString("IP", null);
+    this.fixtureId = fixture.getInt("FixtureId", NO_FIXTURE_ID);
+    this.nextFixtureId = fixture.getInt("NextFixtureId", NO_FIXTURE_ID);
+    this.channel = fixtureType.equals(CHANNEL_ZERO) ? 0 : 4;
+    
+    // Load matrix values
+    JSONArray matrixArr = fixture.getJSONArray("Matrix");
+    float[] m = new float[16];
+    for (int mi = 0; mi < m.length; ++mi) {
+      m[mi] = matrixArr.getFloat(mi);
+    }
+    
+    // Construct matrix converted into LX space
+    this.matrix = new LXMatrix()
+    .scaleX(-1)
+    .scale(INCHES_PER_METER * INCHES)
+    .multiply(
+      // NOTE: stellar indexes matrix vertically
+      m[0], m[4], m[8],  m[12],
+      m[1], m[5], m[9],  m[13],
+      m[2], m[6], m[10], m[14],
+      m[3], m[7], m[11], m[15]
+    )
+    .scale(METERS_PER_INCH / INCHES)
+    .translate(0, ASSEMBLAGE_Y_OFFSET, 0);
   }
 }
 
@@ -61,78 +108,67 @@ public static class Tree extends LXModel {
     private final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     private final List<Limb> limbs = new ArrayList<Limb>();
     
-    private static final String FIXTURES_CHANNEL_ZERO = "Leafs Chanel Zero";
-    private static final String FIXTURES_CHANNEL_FOUR = "Leafs Chanel Four";
-    
-    // TODO(mcslee): determine accurately what this is!
-    private static final float STELLAR_ASSEMBLAGE_Y_OFFSET = 4*INCHES;
-    
     Fixture(ModelMode mode) {
       if (mode == ModelMode.STELLAR_IMPORT) {
+                
         // Load up the Stellar export file
-        JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);
+        JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);        
         JSONArray fixtures = assemblages.getJSONArray("Fixtures");
         
-        // We will construct a map from IP address to assemblages
-        Map<String, StellarBranchConfig> branchMap = new HashMap<String, StellarBranchConfig>();
-        
-        int channel = -1;
-        StellarBranchConfig branch = null;
-        
+        // Load up all of the fixtures and index them by ID
+        Map<Integer, StellarFixtureConfig> fixtureMap = new HashMap<Integer, StellarFixtureConfig>();
         for (int fi = 0; fi < fixtures.size(); ++fi) {
-          JSONObject assemblageObj = fixtures.getJSONObject(fi);
-          String fixtureType = assemblageObj.getString("FixtureType");
-          if (!fixtureType.equals(FIXTURES_CHANNEL_ZERO) && !fixtureType.equals(FIXTURES_CHANNEL_FOUR)) {
+          JSONObject fixtureObj = fixtures.getJSONObject(fi);
+          String fixtureType = fixtureObj.getString("FixtureType");
+          if (!fixtureType.equals(StellarFixtureConfig.CHANNEL_ZERO) && !fixtureType.equals(StellarFixtureConfig.CHANNEL_FOUR)) {
             println("Skipping unknown Stellar Fixture type: " + fixtureType);
-            branch = null;
-            channel = -1;
             continue;
           }
-          String ip = assemblageObj.getString("IP");
-          if (ip == null) {
-            ++channel;
-          } else {
-            branch = branchMap.get(ip);
-            if (branch == null) {
-              branch = new StellarBranchConfig(ip);
-              branchMap.put(ip, branch);
-            }
-            channel = fixtureType.equals(FIXTURES_CHANNEL_ZERO) ? 0 : 4;
-          }
-          if (branch == null || channel < 0) {
-            println("No Stellar branch/channel could be determined, skipping");
-            continue;
-          }
-          
-          // Load up the matrix for this assemblage
-          JSONArray matrixArr = assemblageObj.getJSONArray("Matrix");
-          float[] m = new float[16];
-          for (int mi = 0; mi < m.length; ++mi) {
-            m[mi] = matrixArr.getFloat(mi);
-          }
-          
-          // Matrix-ify and do a units translation from Stellar to LX space
-          LXMatrix matrix = new LXMatrix();
-          matrix.scaleX(-1);
-          matrix.scale(INCHES_PER_METER * INCHES);
-          matrix.multiply(
-            m[0], m[4], m[8],  m[12],
-            m[1], m[5], m[9],  m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]
-          );
-          matrix.scale(METERS_PER_INCH / INCHES);
-          matrix.translate(0, STELLAR_ASSEMBLAGE_Y_OFFSET, 0);
-
-          // Put the matrix in the assemblage map
-          branch.channels[channel] = matrix;
+          // Make a fixture object, add to the list
+          StellarFixtureConfig fixture = new StellarFixtureConfig(fixtureObj, fixtureType);
+          fixtureMap.put(fixture.fixtureId, fixture);
         }
         
-        // Okay, we've built up the whole map of IP -> branch, now modelify them...
-        println("Adding stellar branches");
+        // Now, take a pass and construct a map of branches
+        Map<String, StellarBranchConfig> branchMap = new HashMap<String, StellarBranchConfig>();
+        for (StellarFixtureConfig fixture : fixtureMap.values()) {
+          if (fixture.ip != null) {
+            // Find the branch for this IP address
+            StellarBranchConfig branch = branchMap.get(fixture.ip);
+            if (branch == null) {
+              // First time we've seen it, construct one
+              branch = new StellarBranchConfig(fixture.ip);
+              branchMap.put(fixture.ip, branch);
+            }
+            // Load the base channel for this branch
+            int channel = fixture.channel;
+            branch.channels[channel] = fixture.matrix;
+            
+            // Traverse next fixture ID for other fixtures in this chain and
+            // assemble them up into branches
+            int nextFixtureId = fixture.nextFixtureId;
+            while (nextFixtureId != StellarFixtureConfig.NO_FIXTURE_ID) {
+              StellarFixtureConfig nextFixture = fixtureMap.get(nextFixtureId);
+              if (nextFixture == null) {
+                println("No fixture found for NextFixtureId: " + nextFixtureId);
+                break;
+              }
+              if (++channel >= branch.channels.length) {
+                println("Too many channels were found in fixture chain: " + branch.ip);
+                break;
+              }
+              branch.channels[channel] = nextFixture.matrix;
+              nextFixtureId = nextFixture.nextFixtureId;
+            }
+          }
+        }
+
+        // Okay, we've built up the whole set of branch controllers and we have
+        // them organized by their IP addresses, now we finally add them to the model
         for (StellarBranchConfig branchConfig : branchMap.values()) {
           addBranch(branchConfig);
         }
+        
         println("Stellar import done.");
         
       } else if (mode == ModelMode.UNIFORM_BRANCHES) {
@@ -431,7 +467,7 @@ public static class Branch extends LXModel {
     this.y = this.leaves.get(0).y;
     this.z = this.leaves.get(0).z;
     this.azimuth = atan2(this.z, this.x);
-    this.elevation = atan2(this.y, dist(0, 0, this.x, this.z));
+    this.elevation = atan2(this.y, dist(0, 0, this.x, this.z));  
   }
   
   public Branch(LXTransform t) {
@@ -585,6 +621,7 @@ public static class LeafAssemblage extends LXModel {
     
     Fixture(LXTransform t) {
       t.push();
+      // TODO(mcslee): do we want this?
       t.translate(0, 5*INCHES, 0);
       for (int i = 0; i < NUM_LEAVES; ++i) {
         Leaf.Orientation leafOrientation = LEAVES[i];
@@ -596,7 +633,6 @@ public static class LeafAssemblage extends LXModel {
         addPoints(leaf);
         t.pop();
       }
-      
       t.pop();
     }
   }
