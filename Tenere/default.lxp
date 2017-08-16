@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502838634742,
+  "timestamp": 1502848760023,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -14,7 +14,7 @@
       "crossfader": 0.49606299212598426,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
-      "focusedChannel": 0,
+      "focusedChannel": 2,
       "cueA": false,
       "cueB": false,
       "multithreaded": true,
@@ -66,13 +66,13 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 2,
+        "patternIndex": 1,
         "patterns": [
           {
-            "id": 3137,
-            "class": "Tenere$Solid",
+            "id": 4756,
+            "class": "Tenere$PatternSolid",
             "parameters": {
-              "label": "Solid",
+              "label": "PatternSolid",
               "h": 0.0,
               "s": 0.0,
               "b": 100.0
@@ -84,12 +84,282 @@
             }
           },
           {
-            "id": 451,
-            "class": "Tenere$Starlight",
+            "id": 4758,
+            "class": "Tenere$PatternBorealis",
             "parameters": {
-              "label": "Starlight",
-              "speed": 3314.173228346457,
-              "variance": 0.3543306992748591,
+              "label": "PatternBorealis",
+              "speed": 0.5989999978095293,
+              "scale": 0.5,
+              "spread": 6.791999982178211,
+              "base": 0.5,
+              "contrast": 1.1799999959766865
+            },
+            "modulation": {
+              "modulators": [
+                {
+                  "id": 5115,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "LFO",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 192.23532104492188,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -16724993,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 32882.48147072408,
+                    "skew": 0.0,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.0
+                  }
+                }
+              ],
+              "modulations": [
+                {
+                  "source": {
+                    "id": 5115
+                  },
+                  "target": {
+                    "componentId": 4758,
+                    "parameterPath": "base"
+                  },
+                  "id": 5116,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 1,
+                    "Range": 0.08
+                  }
+                }
+              ],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4760,
+            "class": "Tenere$PatternClouds",
+            "parameters": {
+              "label": "PatternClouds",
+              "thickness": 100.0,
+              "xSpeed": 0.5599999874830246,
+              "ySpeed": 0.3399999924004078,
+              "zSpeed": 0.0,
+              "scale": 1.51360004811883,
+              "xScale": 3.4999999217689037,
+              "yScale": 0.0,
+              "zScale": 0.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4772,
+            "class": "Tenere$PatternScanner",
+            "parameters": {
+              "label": "PatternScanner",
+              "speed": -0.03999998793005943,
+              "sharp": -41.99999916553495,
+              "xSlope": 0.3399999961256981,
+              "zSlope": -0.1600000001490116
+            },
+            "modulation": {
+              "modulators": [
+                {
+                  "id": 5106,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "Speed",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 62.35294723510742,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -655616,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 24648.47708309631,
+                    "skew": 0.0,
+                    "shape": -0.13999999687075615,
+                    "phase": 0.13999999687075615,
+                    "exp": 0.0
+                  }
+                },
+                {
+                  "id": 5108,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "Sharp",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 201.1764678955078,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -16734721,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 27196.563807434504,
+                    "skew": -0.13999999687075615,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.1599999964237213
+                  }
+                },
+                {
+                  "id": 5110,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "XSlope",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 195.7646942138672,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -16728833,
+                    "loop": true,
+                    "wave": 1,
+                    "period": 37701.103999128485,
+                    "skew": 0.13999999687075615,
+                    "shape": 0.19999999552965164,
+                    "phase": 0.0,
+                    "exp": -0.3799999915063381
+                  }
+                },
+                {
+                  "id": 5113,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "ZSlope",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 29.88235092163086,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -33024,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 16207.235927699854,
+                    "skew": 0.17999999597668648,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.0
+                  }
+                }
+              ],
+              "modulations": [
+                {
+                  "source": {
+                    "id": 5106
+                  },
+                  "target": {
+                    "componentId": 4772,
+                    "parameterPath": "speed"
+                  },
+                  "id": 5107,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 1,
+                    "Range": 0.3199999928474426
+                  }
+                },
+                {
+                  "source": {
+                    "id": 5108
+                  },
+                  "target": {
+                    "componentId": 4772,
+                    "parameterPath": "sharp"
+                  },
+                  "id": 5109,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 0,
+                    "Range": 0.4499999899417162
+                  }
+                },
+                {
+                  "source": {
+                    "id": 5110
+                  },
+                  "target": {
+                    "componentId": 4772,
+                    "parameterPath": "xSlope"
+                  },
+                  "id": 5111,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 0,
+                    "Range": -0.3799999915063381
+                  }
+                },
+                {
+                  "source": {
+                    "id": 5113
+                  },
+                  "target": {
+                    "componentId": 4772,
+                    "parameterPath": "zSlope"
+                  },
+                  "id": 5114,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 1,
+                    "Range": 0.199999997317791
+                  }
+                }
+              ],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4774,
+            "class": "Tenere$PatternSirens",
+            "parameters": {
+              "label": "PatternSirens",
+              "speed1": 9000.0,
+              "speed2": 9000.0,
+              "speed3": 9000.0,
+              "speed4": 9000.0,
+              "size1": 0.39269909262657166,
+              "size2": 0.39269909262657166,
+              "size3": 0.39269909262657166,
+              "size4": 0.39269909262657166
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4779,
+            "class": "Tenere$PatternSlideshow",
+            "parameters": {
+              "label": "PatternSlideshow",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4784,
+            "class": "Tenere$PatternStarlight",
+            "parameters": {
+              "label": "PatternStarlight",
+              "speed": 3000.0,
+              "variance": 0.5,
               "numStars": 5000.0
             },
             "modulation": {
@@ -99,483 +369,13 @@
             }
           },
           {
-            "id": 2291,
-            "class": "Tenere$Tumbler",
+            "id": 4786,
+            "class": "Tenere$PatternSwarm",
             "parameters": {
-              "label": "Tumbler"
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 1176,
-            "class": "Tenere$Clouds",
-            "parameters": {
-              "label": "Clouds",
-              "thickness": 89.99999798834324,
-              "xSpeed": 0.5800000093877316,
-              "ySpeed": 0.6799999848008156,
-              "zSpeed": -0.3799999952316284,
-              "scale": 0.29777499786429107,
-              "xScale": 2.399999927729368,
-              "yScale": 5.49999987706542,
-              "zScale": 4.29999990388751
-            },
-            "modulation": {
-              "modulators": [
-                {
-                  "id": 1290,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "YScale",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 306.82354736328125,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -65310,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 8957.280938218739,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.0,
-                    "exp": 0.0
-                  }
-                },
-                {
-                  "id": 1292,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "Scale",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 28.94117546081543,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -34048,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 57665.163828770885,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.0,
-                    "exp": 0.0
-                  }
-                }
-              ],
-              "modulations": [
-                {
-                  "source": {
-                    "id": 1290
-                  },
-                  "target": {
-                    "componentId": 1176,
-                    "parameterPath": "yScale"
-                  },
-                  "id": 1291,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": 0.010000002458691606
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1292
-                  },
-                  "target": {
-                    "componentId": 1176,
-                    "parameterPath": "scale"
-                  },
-                  "id": 1293,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.2799999937415123
-                  }
-                }
-              ],
-              "triggers": []
-            }
-          },
-          {
-            "id": 953,
-            "class": "Tenere$Scanner",
-            "parameters": {
-              "label": "Scanner",
-              "speed": -0.0599999763071537,
-              "sharp": 31.919999198913573,
-              "xSlope": 1.4901161193847656E-8,
-              "zSlope": -0.339999970048666
-            },
-            "modulation": {
-              "modulators": [
-                {
-                  "id": 1057,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "LFO",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 204.0,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -16737793,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 37762.96114280075,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.06999999843537807,
-                    "exp": 0.19999999552965164
-                  }
-                },
-                {
-                  "id": 1058,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "LFO",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 104.23529052734375,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -12321024,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 21156.672121338997,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.0,
-                    "exp": 0.0
-                  }
-                }
-              ],
-              "modulations": [
-                {
-                  "source": {
-                    "id": 1057
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "xSlope"
-                  },
-                  "id": 1059,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": 0.1699999962002039
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1058
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "zSlope"
-                  },
-                  "id": 1060,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": 0.14
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1058
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "speed"
-                  },
-                  "id": 1061,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.009999999776482582
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1057
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "speed"
-                  },
-                  "id": 1062,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": -0.2299999948590994
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1057
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "sharp"
-                  },
-                  "id": 1063,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.2500000002235174
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1058
-                  },
-                  "target": {
-                    "componentId": 953,
-                    "parameterPath": "sharp"
-                  },
-                  "id": 1064,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": -0.25999999418854713
-                  }
-                }
-              ],
-              "triggers": []
-            }
-          },
-          {
-            "id": 1650,
-            "class": "Tenere$Borealis",
-            "parameters": {
-              "label": "Borealis",
-              "speed": 0.7624000052571297,
-              "scale": 0.5809999980553986,
-              "spread": 6.296999993316829,
-              "base": 0.5239999993741511
-            },
-            "modulation": {
-              "modulators": [
-                {
-                  "id": 1652,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "LFO",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 42.82352828979492,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -18944,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 20095.464261698933,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.0,
-                    "exp": 0.0
-                  }
-                }
-              ],
-              "modulations": [
-                {
-                  "source": {
-                    "id": 1652
-                  },
-                  "target": {
-                    "componentId": 1650,
-                    "parameterPath": "spread"
-                  },
-                  "id": 1654,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": -0.05999999865889549
-                  }
-                },
-                {
-                  "source": {
-                    "id": 1652
-                  },
-                  "target": {
-                    "componentId": 1650,
-                    "parameterPath": "scale"
-                  },
-                  "id": 1777,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.09999999776482582
-                  }
-                }
-              ],
-              "triggers": []
-            }
-          },
-          {
-            "id": 258,
-            "class": "Tenere$Waves",
-            "parameters": {
-              "label": "Waves",
-              "rate": 18228.032057898068,
-              "size": 139.20000225305546,
-              "amp1": 1.0,
-              "amp2": 1.7959999666512012,
-              "amp3": 1.2379999822825196,
-              "len1": 1.1979999952465294,
-              "len2": 1.0160000067353248,
-              "len3": 1.4280000017285346
-            },
-            "modulation": {
-              "modulators": [
-                {
-                  "id": 348,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "Len",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 320.70587158203125,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -65369,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 53152.99050000056,
-                    "skew": 0.0,
-                    "shape": 0.0,
-                    "phase": 0.0,
-                    "exp": 0.0
-                  }
-                },
-                {
-                  "id": 352,
-                  "class": "heronarts.lx.modulator.VariableLFO",
-                  "parameters": {
-                    "label": "Size",
-                    "running": true,
-                    "trigger": false,
-                    "color/hue": 28.235292434692383,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -34816,
-                    "loop": true,
-                    "wave": 0,
-                    "period": 32882.48118675034,
-                    "skew": 0.0,
-                    "shape": -0.9400000013411045,
-                    "phase": 0.0,
-                    "exp": 1.0
-                  }
-                }
-              ],
-              "modulations": [
-                {
-                  "source": {
-                    "id": 348
-                  },
-                  "target": {
-                    "componentId": 258,
-                    "parameterPath": "len2"
-                  },
-                  "id": 349,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": 0.12999999709427357
-                  }
-                },
-                {
-                  "source": {
-                    "id": 352
-                  },
-                  "target": {
-                    "componentId": 258,
-                    "parameterPath": "size"
-                  },
-                  "id": 353,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.40999999083578587
-                  }
-                },
-                {
-                  "source": {
-                    "id": 348
-                  },
-                  "target": {
-                    "componentId": 258,
-                    "parameterPath": "len1"
-                  },
-                  "id": 354,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 1,
-                    "Range": -0.05999999865889549
-                  }
-                },
-                {
-                  "source": {
-                    "id": 348
-                  },
-                  "target": {
-                    "componentId": 258,
-                    "parameterPath": "len3"
-                  },
-                  "id": 355,
-                  "class": "heronarts.lx.parameter.LXCompoundModulation",
-                  "parameters": {
-                    "label": "",
-                    "Polarity": 0,
-                    "Range": 0.06999999843537807
-                  }
-                }
-              ],
-              "triggers": []
-            }
-          },
-          {
-            "id": 171,
-            "class": "Tenere$Vortex",
-            "parameters": {
-              "label": "Vortex",
-              "Base": 94.74999922327697,
-              "Mod": 173.99999611079693
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 55,
-            "class": "Tenere$Swarm",
-            "parameters": {
-              "label": "Swarm",
+              "label": "PatternSwarm",
               "speed": 2000.0,
               "base": 10.0,
-              "floor": 14.000000134110453
+              "floor": 20.0
             },
             "modulation": {
               "modulators": [],
@@ -584,12 +384,44 @@
             }
           },
           {
-            "id": 80,
-            "class": "Tenere$Sizzle",
+            "id": 4811,
+            "class": "Tenere$PatternTumbler",
             "parameters": {
-              "label": "Sizzle",
-              "base": 1.839999981224537,
-              "max": 1.8400001153349876
+              "label": "PatternTumbler"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4815,
+            "class": "Tenere$PatternVortex",
+            "parameters": {
+              "label": "PatternVortex",
+              "Base": 60.0,
+              "Mod": 0.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 4830,
+            "class": "Tenere$PatternWaves",
+            "parameters": {
+              "label": "PatternWaves",
+              "rate": 6000.0,
+              "size": 240.0,
+              "amp1": 0.5,
+              "amp2": 1.399999976158142,
+              "amp3": 0.5,
+              "len1": 1.0,
+              "len2": 0.800000011920929,
+              "len3": 1.5
             },
             "modulation": {
               "modulators": [],
@@ -609,6 +441,53 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 5688,
+            "class": "Tenere$PatternAxisPlanes",
+            "parameters": {
+              "label": "PatternAxisPlanes",
+              "xSpeed": 11000.0,
+              "ySpeed": 13000.0,
+              "zSpeed": 17000.0,
+              "xSize": 0.10000000149011612,
+              "ySize": 0.10000000149011612,
+              "zSize": 0.10000000149011612
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 6001,
+            "class": "Tenere$PatternAudioMeter",
+            "parameters": {
+              "label": "PatternAudioMeter",
+              "mode": 0.0,
+              "size": 0.20000000298023224
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 6311,
+            "class": "Tenere$PatternAudioWaves",
+            "parameters": {
+              "label": "PatternAudioWaves",
+              "speed": 256.0,
+              "manual": false,
+              "level": 0.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -616,7 +495,7 @@
         "id": 3835,
         "class": "heronarts.lx.LXChannel",
         "parameters": {
-          "label": "Midi",
+          "label": "Note",
           "arm": false,
           "enabled": true,
           "cue": false,
@@ -633,17 +512,36 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 1,
         "patterns": [
           {
-            "id": 3836,
-            "class": "Tenere$MidiPattern",
+            "id": 4706,
+            "class": "Tenere$NoteAssemblages",
             "parameters": {
-              "label": "Midi",
+              "label": "NoteAssemblages",
               "attack": 50.0,
-              "decay": 1000.0,
+              "decay": 500.0,
               "sustain": 0.5,
-              "release": 1000.0
+              "release": 500.0,
+              "velocityBrightness": 0.5
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 6623,
+            "class": "Tenere$NoteWaves",
+            "parameters": {
+              "label": "NoteWaves",
+              "speed": 759.4330708661417,
+              "attack": 50.0,
+              "decay": 500.0,
+              "sustain": 0.5,
+              "release": 500.0,
+              "velocityBrightness": 0.5
             },
             "modulation": {
               "modulators": [],
@@ -669,12 +567,12 @@
           "crossfadeGroup": 0,
           "blendMode": 1,
           "transitionEnabled": true,
-          "transitionTimeSecs": 5.0,
+          "transitionTimeSecs": 1.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 0,
         "patterns": [
           {
             "id": 2988,
@@ -716,6 +614,18 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 5693,
+            "class": "Tenere$TextureNone",
+            "parameters": {
+              "label": "TextureNone"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -746,7 +656,9 @@
             "id": 3290,
             "class": "Tenere$ColorGradientTree",
             "parameters": {
-              "label": "ColorGradientTree"
+              "label": "ColorGradientTree",
+              "slopeX": 0.0,
+              "slopeZ": 0.0
             },
             "modulation": {
               "modulators": [],
@@ -842,7 +754,7 @@
           "class": "heronarts.lx.effect.BlurEffect",
           "parameters": {
             "label": "Blur",
-            "enabled": true,
+            "enabled": false,
             "amount": 0.0
           },
           "modulation": {
@@ -859,7 +771,7 @@
       "class": "heronarts.lx.audio.LXAudioEngine",
       "parameters": {
         "label": "Audio",
-        "enabled": false,
+        "enabled": true,
         "mode": 0
       },
       "meter": {
@@ -867,7 +779,7 @@
         "class": "heronarts.lx.audio.GraphicMeter",
         "parameters": {
           "label": "Meter",
-          "running": false,
+          "running": true,
           "trigger": false,
           "color/hue": 339.0588073730469,
           "color/brightness": 100.0,
@@ -879,21 +791,21 @@
           "release": 587.1049740012817,
           "slope": 4.5,
           "Band-1": 0.0,
-          "Band-2": 0.14300697733655166,
-          "Band-3": 0.22370794836655794,
-          "Band-4": 0.3607704821846881,
-          "Band-5": 0.3645598374317842,
-          "Band-6": 0.14043265142782646,
-          "Band-7": 0.07964494466590999,
-          "Band-8": 0.295924156443339,
-          "Band-9": 0.3281040731954046,
-          "Band-10": 0.319516578393095,
-          "Band-11": 0.2498920466012301,
-          "Band-12": 0.30597318842775445,
-          "Band-13": 0.4251230051807827,
-          "Band-14": 0.29174672969458204,
-          "Band-15": 0.0,
-          "Band-16": 0.0
+          "Band-2": 0.0345694022110814,
+          "Band-3": 0.2498316585442315,
+          "Band-4": 0.40937086966151337,
+          "Band-5": 0.36081111715569325,
+          "Band-6": 0.0021752766559970382,
+          "Band-7": 0.0,
+          "Band-8": 0.0,
+          "Band-9": 0.17145083091178026,
+          "Band-10": 0.09091273270198652,
+          "Band-11": 0.19151610722987733,
+          "Band-12": 0.36673626050314034,
+          "Band-13": 0.5057898864289065,
+          "Band-14": 0.3423533924695161,
+          "Band-15": 0.2809659735552522,
+          "Band-16": 0.23822762433511047
         }
       },
       "input": {
@@ -944,16 +856,16 @@
               "enabled": true,
               "source": 1,
               "heartBeat": false,
-              "eeg0": 0.5298529267311096,
-              "eeg1": 0.1966802030801773,
-              "eeg2": 0.8861941695213318,
-              "eeg3": 0.535896897315979,
-              "acc0": 0.5145049691200256,
-              "acc1": 0.4802911579608917,
-              "acc2": 0.25477591156959534,
-              "gyro0": 0.4999252259731293,
-              "gyro1": 0.4960971176624298,
-              "gyro2": 0.49265778064727783
+              "eeg0": 0.0,
+              "eeg1": 0.600869357585907,
+              "eeg2": 0.6461989879608154,
+              "eeg3": 1.0,
+              "acc0": 0.5174059867858887,
+              "acc1": 0.5058019757270813,
+              "acc2": 0.25390860438346863,
+              "gyro0": 0.5009869337081909,
+              "gyro1": 0.49605223536491394,
+              "gyro2": 0.4925979673862457
             }
           },
           {
@@ -1043,78 +955,14 @@
         "leavesVisible": false,
         "structureVisible": true,
         "controlsExpanded": false,
-        "sensorsExpanded": true,
-        "sourcesExpanded": true,
+        "sensorsExpanded": false,
+        "sourcesExpanded": false,
         "outputExpanded": false
       }
     },
     "modulation": {
-      "modulators": [
-        {
-          "id": 2843,
-          "class": "heronarts.lx.modulator.VariableLFO",
-          "parameters": {
-            "label": "LFO 1",
-            "running": false,
-            "trigger": false,
-            "color/hue": 114.82352447509766,
-            "color/brightness": 100.0,
-            "color/saturation": 100.0,
-            "color": -15270144,
-            "loop": false,
-            "wave": 0,
-            "period": 1000.0,
-            "skew": 0.0,
-            "shape": 0.0,
-            "phase": 0.0,
-            "exp": 0.0
-          }
-        },
-        {
-          "id": 2844,
-          "class": "heronarts.lx.audio.BandGate",
-          "parameters": {
-            "label": "Beat 1",
-            "running": true,
-            "trigger": false,
-            "color/hue": 256.4705810546875,
-            "color/brightness": 100.0,
-            "color/saturation": 100.0,
-            "color": -12189441,
-            "gain": 0.0,
-            "range": 36.0,
-            "attack": 10.0,
-            "release": 100.0,
-            "slope": 4.5,
-            "threshold": 0.8,
-            "floor": 0.75,
-            "decay": 400.0,
-            "minFreq": 60.0,
-            "maxFreq": 120.0,
-            "gate": false,
-            "average": 0.0,
-            "tap": false
-          }
-        }
-      ],
-      "modulations": [
-        {
-          "source": {
-            "id": 23
-          },
-          "target": {
-            "componentId": 55,
-            "parameterPath": "floor"
-          },
-          "id": 99,
-          "class": "heronarts.lx.parameter.LXCompoundModulation",
-          "parameters": {
-            "label": "",
-            "Polarity": 0,
-            "Range": 0.2899999972432852
-          }
-        }
-      ],
+      "modulators": [],
+      "modulations": [],
       "triggers": []
     },
     "osc": {
@@ -1136,6 +984,12 @@
           "name": "CoreMIDI4J - APC40 mkII",
           "channel": false,
           "control": true,
+          "sync": false
+        },
+        {
+          "name": "CoreMIDI4J - KEYBOARD",
+          "channel": true,
+          "control": false,
           "sync": false
         }
       ],
@@ -1161,15 +1015,11 @@
       "paletteExpanded": true,
       "engineExpanded": false,
       "clipViewVisible": false,
-      "modulatorExpanded": {
-        "23": true,
-        "2843": true,
-        "2844": true
-      },
+      "modulatorExpanded": {},
       "preview": {
         "radius": 5118.606138708371,
-        "theta": 0.2617993950843769,
-        "phi": 0.15846706497669233
+        "theta": 0.2767993950843779,
+        "phi": 0.023467064976692237
       }
     }
   }

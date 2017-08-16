@@ -3,6 +3,16 @@ public class ColorGradientTree extends TenerePattern {
     return "Mark C. Slee";
   }
   
+  public final CompoundParameter slopeX = (CompoundParameter)
+    new CompoundParameter("SlpX", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("Slope of gradient on X-axis");
+    
+  public final CompoundParameter slopeZ = (CompoundParameter)
+    new CompoundParameter("SlpZ", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("Slope of gradient on Z-axis");    
+  
   private final LXModulator spreadX = startModulator(new DampedParameter(palette.spreadX, 720, 720));
   private final LXModulator spreadY = startModulator(new DampedParameter(palette.spreadY, 720, 720));
   private final LXModulator spreadZ = startModulator(new DampedParameter(palette.spreadZ, 720, 720));
@@ -12,6 +22,8 @@ public class ColorGradientTree extends TenerePattern {
     
   public ColorGradientTree(LX lx) {
     super(lx);
+    addParameter("slopeX", this.slopeX);
+    addParameter("slopeZ", this.slopeZ);
   }
   
   public void run(double deltaMs) {
@@ -23,10 +35,12 @@ public class ColorGradientTree extends TenerePattern {
     float offsetX = this.offsetX.getValuef();
     float offsetY = this.offsetY.getValuef();
     float offsetZ = this.offsetZ.getValuef();
+    float slopeX = this.slopeX.getValuef();
+    float slopeZ = this.slopeZ.getValuef();
     boolean mirror = palette.mirror.isOn();
     for (Leaf leaf : tree.leaves) {
       float dx = leaf.point.xn - .5 - offsetX;
-      float dy = leaf.point.yn - .5 - offsetY;
+      float dy = leaf.point.yn - .5 - offsetY + slopeX * (.5 - leaf.point.xn) + slopeZ * (.5 - leaf.point.zn);
       float dz = leaf.point.zn - .5 - offsetZ;
       if (mirror) {
         dx = abs(dx);

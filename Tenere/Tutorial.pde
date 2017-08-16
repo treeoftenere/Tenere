@@ -77,7 +77,7 @@ public class Tutorial extends LXPattern {
   }
 }
 
-public class Plane extends LXPattern {
+public class TutorialPlane extends LXPattern {
   
   public final CompoundParameter yPos = (CompoundParameter)
     new CompoundParameter("YPos", model.cy, model.yMin, model.yMax)
@@ -87,7 +87,7 @@ public class Plane extends LXPattern {
     new CompoundParameter("Size", 8*FT, 1*FT, 20*FT)
     .setDescription("Size of the plane");
   
-  public Plane(LX lx) {
+  public TutorialPlane(LX lx) {
     super(lx);
     addParameter("yPos", this.yPos);
     addParameter("size", this.size);
@@ -98,56 +98,62 @@ public class Plane extends LXPattern {
     float yPos = this.yPos.getValuef();
     for (Leaf leaf : tree.leaves) {
       float b = 100 - falloff * abs(leaf.y - yPos); 
-      setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
+      setColor(leaf, LXColor.gray(max(0, 100)));
     }
   }
 }
 
-public class SlideshowPattern extends TenerePattern {
+public class TestAssemblageOrder extends TenerePattern {
+  
+  public final DiscreteParameter index = new DiscreteParameter("Index", 0, 15); 
+  
+  private int[] mask = new int[15];
+  
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  private final String[] PATHS = {
-    "main_1200.jpg",
-    "The Great Heads-X2proc.jpg"
-  };
-  
-  private final PImage[] images;
-  
-  private final SawLFO imageIndex;
-  
-  public final CompoundParameter rate = new CompoundParameter("Rate", 3000, 6000, 500);
-  
-  public SlideshowPattern(LX lx) {
+  public TestAssemblageOrder(LX lx) {
     super(lx);
-    this.images = new PImage[PATHS.length];
-    for (int i = 0; i < this.images.length; ++i) {
-      this.images[i] = loadImage(PATHS[i]);
-      this.images[i].loadPixels();
-    }
-    addParameter("rate", this.rate);
-    this.imageIndex = new SawLFO(0, this.images.length, rate);
-    startModulator(this.imageIndex);
+    addParameter("index", this.index);
   }
   
   public void run(double deltaMs) {
-    float imageIndex = this.imageIndex.getValuef();
-    int imageFloor = (int) Math.floor(imageIndex); 
-    PImage image1 = this.images[imageFloor % this.images.length];
-    PImage image2 = this.images[(imageFloor + 1) % this.images.length];
-    float imageLerp = imageIndex - imageFloor;
-    
-    for (Leaf leaf : model.leaves) {
-      int c1 = image1.get(
-        (int) (leaf.point.xn * (image1.width-1)),
-        (int) ((1-leaf.point.yn) * (image1.height-1))
-      );
-      int c2 = image2.get(
-        (int) (leaf.point.xn * (image2.width-1)),
-        (int) ((1-leaf.point.yn) * (image2.height-1))
-      );
-      setColor(leaf, LXColor.lerp(c1, c2, imageLerp));
+    int index = this.index.getValuei();
+    for (int i = 0; i < mask.length; ++i) {
+      this.mask[i] = (i == index) ? #ffffff : #000000;
+    }
+    for (LeafAssemblage assemblage : model.assemblages) {
+      int li = 0;
+      for (Leaf leaf : assemblage.leaves) {
+        setColor(leaf, this.mask[li++]);
+      }
+    }
+  }
+}
+
+public class TestAxis extends LXPattern {
+ 
+  public final CompoundParameter xPos = new CompoundParameter("X", 0);
+  public final CompoundParameter yPos = new CompoundParameter("Y", 0);
+  public final CompoundParameter zPos = new CompoundParameter("Z", 0);
+
+  public TestAxis(LX lx) {
+    super(lx);
+    addParameter("xPos", xPos);
+    addParameter("yPos", yPos);
+    addParameter("zPos", zPos);
+  }
+
+  public void run(double deltaMs) {
+    float x = this.xPos.getValuef();
+    float y = this.yPos.getValuef();
+    float z = this.zPos.getValuef();
+    for (LXPoint p : model.points) {
+      float d = abs(p.xn - x);
+      d = min(d, abs(p.yn - y));
+      d = min(d, abs(p.zn - z));
+      colors[p.index] = palette.getColor(p, max(0, 100 - 1000*d));
     }
   }
 }
