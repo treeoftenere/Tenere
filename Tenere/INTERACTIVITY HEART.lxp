@@ -1,0 +1,393 @@
+{
+  "version": "0.1",
+  "timestamp": 1502855076195,
+  "engine": {
+    "id": 1,
+    "class": "heronarts.lx.LXEngine",
+    "parameters": {
+      "label": "Engine",
+      "scene-1": false,
+      "scene-2": false,
+      "scene-3": false,
+      "scene-4": false,
+      "scene-5": false,
+      "crossfader": 0.49606299212598426,
+      "crossfaderBlendMode": 0,
+      "speed": 1.0,
+      "focusedChannel": 0,
+      "cueA": false,
+      "cueB": false,
+      "multithreaded": true,
+      "channelMultithreaded": true,
+      "networkMultithreaded": true
+    },
+    "palette": {
+      "id": 2,
+      "class": "heronarts.lx.color.LXPalette",
+      "parameters": {
+        "label": "",
+        "cue": false,
+        "hueMode": 0,
+        "color/hue": 211.76470947265625,
+        "color/brightness": 100.0,
+        "color/saturation": 100.0,
+        "color": -16746241,
+        "period": 32000.0,
+        "range": 0.0,
+        "spreadX": 0.0,
+        "spreadY": 320.3149606299213,
+        "spreadZ": 0.0,
+        "spreadR": 0.0,
+        "offsetX": 0.0,
+        "offsetY": 0.0,
+        "offsetZ": 0.0,
+        "mirror": true
+      }
+    },
+    "channels": [
+      {
+        "id": 6940,
+        "class": "heronarts.lx.LXChannel",
+        "parameters": {
+          "label": "Hearts",
+          "arm": false,
+          "enabled": true,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": true,
+          "autoCycleTimeSecs": 180.0,
+          "fader": 1.0,
+          "crossfadeGroup": 0,
+          "blendMode": 0,
+          "transitionEnabled": true,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 1,
+        "patterns": [
+          {
+            "id": 6953,
+            "class": "Tenere$HeartLoops",
+            "parameters": {
+              "label": "HeartLoops",
+              "baseSaturation": 40.0,
+              "decay": 2979.999989271164
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 6996,
+            "class": "Tenere$HeartPride",
+            "parameters": {
+              "label": "HeartPride",
+              "baseSaturation": 40.0,
+              "baseBrightness": 40.0,
+              "decay": 2500.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          }
+        ]
+      }
+    ],
+    "master": {
+      "id": 18,
+      "class": "heronarts.lx.LXMasterChannel",
+      "parameters": {
+        "label": "Master",
+        "arm": false
+      },
+      "effects": [
+        {
+          "id": 3556,
+          "class": "heronarts.lx.effect.StrobeEffect",
+          "parameters": {
+            "label": "Strobe",
+            "enabled": false,
+            "frequency": 4.94900385027194,
+            "shape": 1,
+            "depth": 0.5
+          },
+          "modulation": {
+            "modulators": [],
+            "modulations": [],
+            "triggers": []
+          }
+        },
+        {
+          "id": 3560,
+          "class": "heronarts.lx.effect.BlurEffect",
+          "parameters": {
+            "label": "Blur",
+            "enabled": false,
+            "amount": 0.0
+          },
+          "modulation": {
+            "modulators": [],
+            "modulations": [],
+            "triggers": []
+          }
+        }
+      ],
+      "clips": []
+    },
+    "audio": {
+      "id": 20,
+      "class": "heronarts.lx.audio.LXAudioEngine",
+      "parameters": {
+        "label": "Audio",
+        "enabled": false,
+        "mode": 0
+      },
+      "meter": {
+        "id": 23,
+        "class": "heronarts.lx.audio.GraphicMeter",
+        "parameters": {
+          "label": "Meter",
+          "running": false,
+          "trigger": false,
+          "color/hue": 339.0588073730469,
+          "color/brightness": 100.0,
+          "color/saturation": 100.0,
+          "color": -65447,
+          "gain": 18.24000000000001,
+          "range": 36.30000000000002,
+          "attack": 39.999999329447746,
+          "release": 587.1049740012817,
+          "slope": 4.5,
+          "Band-1": 0.0,
+          "Band-2": 0.0,
+          "Band-3": 0.0,
+          "Band-4": 0.0,
+          "Band-5": 0.0,
+          "Band-6": 0.0,
+          "Band-7": 0.0,
+          "Band-8": 0.0,
+          "Band-9": 0.0,
+          "Band-10": 0.0,
+          "Band-11": 0.07190616119034099,
+          "Band-12": 0.09720469268017928,
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
+        }
+      },
+      "input": {
+        "id": 21,
+        "class": "heronarts.lx.audio.LXAudioInput",
+        "parameters": {
+          "label": "Audio Input",
+          "device": 0
+        }
+      },
+      "output": {
+        "id": 22,
+        "class": "heronarts.lx.audio.LXAudioOutput",
+        "parameters": {
+          "label": "Audio Output",
+          "play": false,
+          "trigger": false,
+          "looping": false,
+          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3"
+        }
+      }
+    },
+    "output": {
+      "id": 19,
+      "class": "heronarts.lx.LXEngine$Output",
+      "parameters": {
+        "label": "Output",
+        "enabled": false,
+        "mode": 2,
+        "fps": 0.0,
+        "gamma": 0,
+        "brightness": 1.0
+      }
+    },
+    "components": {
+      "sensors": {
+        "id": 32,
+        "class": "Tenere$Sensors",
+        "parameters": {
+          "label": "Sensors"
+        },
+        "sensors": [
+          {
+            "id": 33,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "A",
+              "enabled": true,
+              "source": 1,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.600869357585907,
+              "eeg2": 0.6461989879608154,
+              "eeg3": 1.0,
+              "acc0": 0.5174059867858887,
+              "acc1": 0.5058019757270813,
+              "acc2": 0.25390860438346863,
+              "gyro0": 0.5009869337081909,
+              "gyro1": 0.49605223536491394,
+              "gyro2": 0.4925979673862457
+            }
+          },
+          {
+            "id": 35,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "B",
+              "enabled": true,
+              "source": 5,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 37,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "C",
+              "enabled": true,
+              "source": 4,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 39,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "D",
+              "enabled": true,
+              "source": 3,
+              "heartBeat": false,
+              "eeg0": 0.5,
+              "eeg1": 0.21437500417232513,
+              "eeg2": 0.9375,
+              "eeg3": 0.6868749856948853,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          },
+          {
+            "id": 41,
+            "class": "Tenere$Sensors$Sensor",
+            "parameters": {
+              "label": "E",
+              "enabled": true,
+              "source": 0,
+              "heartBeat": false,
+              "eeg0": 0.0,
+              "eeg1": 0.0,
+              "eeg2": 0.0,
+              "eeg3": 0.0,
+              "acc0": 0.0,
+              "acc1": 0.0,
+              "acc2": 0.0,
+              "gyro0": 0.0,
+              "gyro1": 0.0,
+              "gyro2": 0.0
+            }
+          }
+        ]
+      },
+      "tenereSettings": {
+        "pointsVisible": true,
+        "leavesVisible": false,
+        "structureVisible": true,
+        "controlsExpanded": false,
+        "sensorsExpanded": false,
+        "sourcesExpanded": false,
+        "outputExpanded": false
+      }
+    },
+    "modulation": {
+      "modulators": [],
+      "modulations": [],
+      "triggers": []
+    },
+    "osc": {
+      "id": 24,
+      "class": "heronarts.lx.osc.LXOscEngine",
+      "parameters": {
+        "label": "OSC",
+        "receiveHost": "0.0.0.0",
+        "receivePort": 3030,
+        "receiveActive": true,
+        "transmitHost": "localhost",
+        "transmitPort": 3131,
+        "transmitActive": false
+      }
+    },
+    "midi": {
+      "inputs": [
+        {
+          "name": "CoreMIDI4J - APC40 mkII",
+          "channel": false,
+          "control": true,
+          "sync": false
+        },
+        {
+          "name": "CoreMIDI4J - KEYBOARD",
+          "channel": true,
+          "control": false,
+          "sync": false
+        }
+      ],
+      "surfaces": [
+        {
+          "description": "APC40 mkII"
+        }
+      ],
+      "mapping": []
+    }
+  },
+  "externals": {
+    "ui": {
+      "audioExpanded": false,
+      "paletteExpanded": true,
+      "engineExpanded": false,
+      "clipViewVisible": false,
+      "modulatorExpanded": {},
+      "preview": {
+        "radius": 5118.606138708371,
+        "theta": 0.2767993950843779,
+        "phi": 0.023467064976692237
+      }
+    }
+  }
+}
