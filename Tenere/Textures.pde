@@ -28,6 +28,19 @@ public abstract class TexturePattern extends TenerePattern {
   }
 }
 
+public class TextureNone extends TexturePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+ 
+  public TextureNone(LX lx) {
+    super(lx);
+    setColors(#ffffff);
+  }
+  
+  public void run(double deltaMs) {}
+}
+
 public class TextureLoop extends TexturePattern {
   public String getAuthor() {
     return "Mark C. Slee";
@@ -112,29 +125,37 @@ public class TextureWave extends TexturePattern {
   }
   
   public final CompoundParameter speed = (CompoundParameter)
-    new CompoundParameter("Speed", 1000, 4000, 100)
+    new CompoundParameter("Speed", 1000, 4000, 250)
     .setDescription("Speed of oscillation between sides of the leaf")
     .setExponent(.5);
     
-  private final SinLFO side = (SinLFO) startModulator(new SinLFO("Side", 0, 100, speed));
-  
-  private final int[] leafMask = new int[Leaf.NUM_LEDS];
+  private final LXModulator[] side = new LXModulator[LeafAssemblage.NUM_LEAVES];
+  private final int[] assemblageMask = new int[LeafAssemblage.NUM_LEDS];
   
   public TextureWave(LX lx) {
     super(lx);
+    for (int i = 0; i < this.side.length; ++i) {
+      this.side[i] = startModulator(new SinLFO("Side", 0, 100, speed).setBasis(i / (float) this.side.length));
+    }
+    for (int i = 0; i < this.assemblageMask.length; ++i) {
+      this.assemblageMask[i] = #000000;
+    }
     addParameter("speed", this.speed);
-    this.leafMask[3] = #000000;
   }
   
   public void run(double deltaMs) {
-    float side = this.side.getValuef();
-    for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
-      if (i < 3) {
-        this.leafMask[i] = LXColor.gray(side);
-      } else if (i > 3) {
-        this.leafMask[i] = LXColor.gray(100 - side);
+    int i = 0;
+    for (int ai = 0; ai < LeafAssemblage.NUM_LEAVES; ++ai) {
+      float side = this.side[ai].getValuef();
+      for (int li = 0; li < Leaf.NUM_LEDS; ++li) {
+        if (li < 3) {
+          this.assemblageMask[i] = LXColor.gray(side);
+        } else if (li > 3) {
+          this.assemblageMask[i] = LXColor.gray(100 - side);
+        }
+        ++i;
       }
     }
-    setLeafMask(this.leafMask);
+    setAssemblageMask(this.assemblageMask);
   }
 }
