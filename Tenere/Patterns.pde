@@ -18,13 +18,13 @@ public abstract class TenerePattern extends LXPattern {
   }
 }
 
-public class White extends LXPattern {
+public class PatternSolid extends LXPattern {
   
   public final CompoundParameter h = new CompoundParameter("Hue", 0, 360);
   public final CompoundParameter s = new CompoundParameter("Sat", 0, 100);
   public final CompoundParameter b = new CompoundParameter("Brt", 100, 100);
   
-  public White(LX lx) {
+  public PatternSolid(LX lx) {
     super(lx);
     addParameter("h", this.h);
     addParameter("s", this.s);
@@ -36,7 +36,7 @@ public class White extends LXPattern {
   }
 }
 
-public class Tumbler extends TenerePattern {
+public class PatternTumbler extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
@@ -44,7 +44,7 @@ public class Tumbler extends TenerePattern {
   private LXModulator azimuthRotation = startModulator(new SawLFO(0, 1, 15000).randomBasis());
   private LXModulator thetaRotation = startModulator(new SawLFO(0, 1, 13000).randomBasis());
   
-  public Tumbler(LX lx) {
+  public PatternTumbler(LX lx) {
     super(lx);
   }
     
@@ -60,29 +60,38 @@ public class Tumbler extends TenerePattern {
   }
 }
 
-public class Borealis extends TenerePattern {
+public class PatternBorealis extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
   public final CompoundParameter speed =
-    new CompoundParameter("Speed", .5, .01, 1);
+    new CompoundParameter("Speed", .5, .01, 1)
+    .setDescription("Speed of motion");
   
   public final CompoundParameter scale =
-    new CompoundParameter("Scale", .5, .1, 1);
+    new CompoundParameter("Scale", .5, .1, 1)
+    .setDescription("Scale of lights");
   
   public final CompoundParameter spread =
-    new CompoundParameter("Spread", 6, .1, 10);
+    new CompoundParameter("Spread", 6, .1, 10)
+    .setDescription("Spreading of the motion");
   
   public final CompoundParameter base =
-    new CompoundParameter("Base", .5, .2, 1);
+    new CompoundParameter("Base", .5, .2, 1)
+    .setDescription("Base brightness level");
+    
+  public final CompoundParameter contrast =
+    new CompoundParameter("Contrast", 1, .5, 2)
+    .setDescription("Contrast of the lights");    
   
-  public Borealis(LX lx) {
+  public PatternBorealis(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
     addParameter("scale", this.scale);
     addParameter("spread", this.spread);
     addParameter("base", this.base);
+    addParameter("contrast", this.contrast);
   }
   
   private float yBasis = 0;
@@ -92,17 +101,18 @@ public class Borealis extends TenerePattern {
     float scale = this.scale.getValuef();
     float spread = this.spread.getValuef();
     float base = .01 * this.base.getValuef();
+    float contrast = this.contrast.getValuef();
     for (Leaf leaf : tree.leaves) {
       float nv = noise(
         scale * (base * leaf.point.rxz - spread * leaf.point.yn),
         leaf.point.yn + this.yBasis
       );
-      setColor(leaf, LXColor.gray(constrain(-50 + 150 * nv, 0, 100)));
+      setColor(leaf, LXColor.gray(constrain(contrast * (-50 + 180 * nv), 0, 100)));
     }
   }
 }
 
-public class Clouds extends TenerePattern {
+public class PatternClouds extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
@@ -111,16 +121,19 @@ public class Clouds extends TenerePattern {
     new CompoundParameter("Thickness", 50, 100, 0)
     .setDescription("Thickness of the cloud formation");
   
-  public final CompoundParameter xSpeed =
+  public final CompoundParameter xSpeed = (CompoundParameter)
     new CompoundParameter("XSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the X axis");
 
-  public final CompoundParameter ySpeed =
+  public final CompoundParameter ySpeed = (CompoundParameter)
     new CompoundParameter("YSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the Y axis");
     
-  public final CompoundParameter zSpeed =
+  public final CompoundParameter zSpeed = (CompoundParameter)
     new CompoundParameter("ZSpd", 0, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Motion along the Z axis");
     
   public final CompoundParameter scale = (CompoundParameter)
@@ -142,7 +155,7 @@ public class Clouds extends TenerePattern {
     
   private float xBasis = 0, yBasis = 0, zBasis = 0;
     
-  public Clouds(LX lx) {
+  public PatternClouds(LX lx) {
     super(lx);
     addParameter("thickness", this.thickness);
     addParameter("xSpeed", this.xSpeed);
@@ -176,13 +189,14 @@ public class Clouds extends TenerePattern {
   }  
 }
 
-public class Scanner extends TenerePattern {
+public class PatternScanner extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter speed =
+  public final CompoundParameter speed = (CompoundParameter)
     new CompoundParameter("Speed", .5, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Speed that the plane moves at");
     
   public final CompoundParameter sharp = (CompoundParameter)
@@ -200,7 +214,7 @@ public class Scanner extends TenerePattern {
   
   private float basis = 0;
   
-  public Scanner(LX lx) {
+  public PatternScanner(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
     addParameter("sharp", this.sharp);
@@ -221,7 +235,7 @@ public class Scanner extends TenerePattern {
   }
 }
 
-public class Starlight extends TenerePattern {
+public class PatternStarlight extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
@@ -243,15 +257,16 @@ public class Starlight extends TenerePattern {
     new CompoundParameter("Variance", .5, 0, .9)
     .setDescription("Variance of the twinkling");    
   
-  public final CompoundParameter numStars =
-    new CompoundParameter("Num", 5000, 1000, MAX_STARS)
+  public final CompoundParameter numStars = (CompoundParameter)
+    new CompoundParameter("Num", 5000, 50, MAX_STARS)
+    .setExponent(2)
     .setDescription("Number of stars");
   
   private final Star[] stars = new Star[MAX_STARS];
     
   private final ArrayList<Leaf> shuffledLeaves;
     
-  public Starlight(LX lx) {
+  public PatternStarlight(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
     addParameter("variance", this.variance);
@@ -299,8 +314,12 @@ public class Starlight extends TenerePattern {
     
     void run(double deltaMs) {
       int c = LXColor.gray(this.amplitude * flicker.get(this.accum / this.period));
+      int maxLeaves = shuffledLeaves.size();
       for (int i = 0; i < LEAVES_PER_STAR; ++i) {
-        setColor(shuffledLeaves.get(num * LEAVES_PER_STAR + i), c);
+        int leafIndex = num * LEAVES_PER_STAR + i;
+        if (leafIndex < maxLeaves) {
+          setColor(shuffledLeaves.get(leafIndex), c);
+        }
       }
       this.accum += deltaMs;
       if (this.accum > this.period) {
@@ -311,12 +330,18 @@ public class Starlight extends TenerePattern {
 
 }
 
-public class Waves extends TenerePattern {
+public class PatternWaves extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
 
   final int NUM_LAYERS = 3;
+  
+  final float AMP_DAMPING_V = 1.5;
+  final float AMP_DAMPING_A = 2.5;
+  
+  final float LEN_DAMPING_V = 1.5;
+  final float LEN_DAMPING_A = 1.5;
 
   public final CompoundParameter rate = (CompoundParameter)
     new CompoundParameter("Rate", 6000, 48000, 2000)
@@ -324,13 +349,13 @@ public class Waves extends TenerePattern {
     .setExponent(.3);
 
   public final CompoundParameter size =
-    new CompoundParameter("Size", 4*FEET, 28*FEET)
+    new CompoundParameter("Size", 4*FEET, 6*INCHES, 28*FEET)
     .setDescription("Width of the wave");
     
   public final CompoundParameter amp1 =
     new CompoundParameter("Amp1", .5, 2, .2)
     .setDescription("First modulation size");
-    
+        
   public final CompoundParameter amp2 =
     new CompoundParameter("Amp2", 1.4, 2, .2)
     .setDescription("Second modulation size");
@@ -353,10 +378,20 @@ public class Waves extends TenerePattern {
     
   private final LXModulator phase =
     startModulator(new SawLFO(0, TWO_PI, rate));
+    
+  private final LXModulator amp1Damp = startModulator(new DampedParameter(this.amp1, AMP_DAMPING_V, AMP_DAMPING_A));
+  private final LXModulator amp2Damp = startModulator(new DampedParameter(this.amp2, AMP_DAMPING_V, AMP_DAMPING_A));
+  private final LXModulator amp3Damp = startModulator(new DampedParameter(this.amp3, AMP_DAMPING_V, AMP_DAMPING_A));
+  
+  private final LXModulator len1Damp = startModulator(new DampedParameter(this.len1, LEN_DAMPING_V, LEN_DAMPING_A));
+  private final LXModulator len2Damp = startModulator(new DampedParameter(this.len2, LEN_DAMPING_V, LEN_DAMPING_A));
+  private final LXModulator len3Damp = startModulator(new DampedParameter(this.len3, LEN_DAMPING_V, LEN_DAMPING_A));  
+
+  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 20*FEET, 40*FEET));
 
   private final double[] bins = new double[512];
 
-  public Waves(LX lx) {
+  public PatternWaves(LX lx) {
     super(lx);
     addParameter("rate", this.rate);
     addParameter("size", this.size);
@@ -370,14 +405,14 @@ public class Waves extends TenerePattern {
 
   public void run(double deltaMs) {
     double phaseValue = phase.getValue();
-    float amp1 = this.amp1.getValuef();
-    float amp2 = this.amp2.getValuef();
-    float amp3 = this.amp3.getValuef();
-    float len1 = this.len1.getValuef();
-    float len2 = this.len2.getValuef();
-    float len3 = this.len3.getValuef();
+    float amp1 = this.amp1Damp.getValuef();
+    float amp2 = this.amp2Damp.getValuef();
+    float amp3 = this.amp3Damp.getValuef();
+    float len1 = this.len1Damp.getValuef();
+    float len2 = this.len2Damp.getValuef();
+    float len3 = this.len3Damp.getValuef();    
+    float falloff = 100 / this.sizeDamp.getValuef();
     
-    float falloff = 100 / size.getValuef();
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
       println(bins[i] + "-"+i);
@@ -385,7 +420,7 @@ public class Waves extends TenerePattern {
     for (Leaf leaf : tree.leaves) {
       int idx = Math.round((bins.length-1) * (len1 * leaf.point.xn)) % bins.length;
       int idx2 = Math.round((bins.length-1) * (len2 * (.2 + leaf.point.xn))) % bins.length;
-      int idx3 = Math.round((bins.length-1) * (len2 * (1.7 - leaf.point.xn))) % bins.length; 
+      int idx3 = Math.round((bins.length-1) * (len3 * (1.7 - leaf.point.xn))) % bins.length; 
       
       float y1 = (float) bins[idx];
       float y2 = (float) bins[idx2];
@@ -401,7 +436,7 @@ public class Waves extends TenerePattern {
   }
 }
 
-public class Vortex extends TenerePattern {
+public class PatternVortex extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
@@ -440,7 +475,7 @@ public class Vortex extends TenerePattern {
     new SinLFO(47000, 91000, 53000).randomBasis()
     ));
 
-  public Vortex(LX lx) {
+  public PatternVortex(LX lx) {
     super(lx);
     addParameter(vortexBase);
     addParameter(vortexMod);
@@ -472,159 +507,251 @@ public class Vortex extends TenerePattern {
   }
 }
 
-public class Rotors extends TenerePattern {
-  public String getAuthor() {
-    return "Mark C. Slee";
-  }
-
-  private final SawLFO aziumuth = new SawLFO(0, PI, startModulator(
-    new SinLFO(11000, 29000, 33000)
-    ));
-
-  private final SawLFO aziumuth2 = new SawLFO(PI, 0, startModulator(
-    new SinLFO(23000, 49000, 53000)
-    ));
-
-  private final SinLFO falloff = new SinLFO(200, 900, startModulator(
-    new SinLFO(5000, 17000, 12398)
-    ));
-
-  private final SinLFO falloff2 = new SinLFO(250, 800, startModulator(
-    new SinLFO(6000, 11000, 19880)
-    ));
-
-  public Rotors(LX lx) {
-    super(lx);
-    startModulator(aziumuth);
-    startModulator(aziumuth2);
-    startModulator(falloff);
-    startModulator(falloff2);
-  }
-
-  public void run(double deltaMs) {
-    float aziumuth = this.aziumuth.getValuef();
-    float aziumuth2 = this.aziumuth2.getValuef();
-    float falloff = this.falloff.getValuef();
-    float falloff2 = this.falloff2.getValuef();
-    for (Leaf leaf : tree.leaves) {
-      float yn = (1 - .8 * (leaf.y - model.yMin) / model.yRange);
-      float fv = .3 * falloff * yn;
-      float fv2 = .3 * falloff2 * yn;
-      float b = max(
-        100 - fv * LXUtils.wrapdistf(leaf.point.azimuth, aziumuth, PI), 
-        100 - fv2 * LXUtils.wrapdistf(leaf.point.azimuth, aziumuth2, PI)
-        );
-      b = max(30, b);
-      float s = constrain(50 + b/2, 0, 100);
-      setColor(leaf, palette.getColor(leaf.point, s, b));
-    }
-  }
-}
-
-public class DiamondRain extends TenerePattern {
-  public String getAuthor() {
-    return "Mark C. Slee";
-  }
-
-  private final static int NUM_DROPS = 24; 
-
-  public DiamondRain(LX lx) {
-    super(lx);
-    for (int i = 0; i < NUM_DROPS; ++i) {
-      addLayer(new Drop(lx));
-    }
-  }
-
-  public void run(double deltaMs) {
-    setColors(#000000);
-  }
-
-  private class Drop extends LXLayer {
-
-    private final float MAX_LENGTH = 14*FEET;
-
-    private final SawLFO yPos = new SawLFO(model.yMax + MAX_LENGTH, model.yMin - MAX_LENGTH, 4000 + Math.random() * 3000);
-    private float azimuth;
-    private float azimuthFalloff;
-    private float yFalloff;
-
-    Drop(LX lx) {
-      super(lx);
-      startModulator(yPos.randomBasis());
-      init();
-    }
-
-    private void init() {
-      this.yPos.setPeriod(2500 + Math.random() * 11000);
-      azimuth = (float) Math.random() * TWO_PI;
-      azimuthFalloff = 140 + 340 * (float) Math.random();
-      yFalloff = 100 / (2*FEET + 12*FEET * (float) Math.random());
-    }
-
-    public void run(double deltaMs) {
-      float yPos = this.yPos.getValuef();
-      if (this.yPos.loop()) {
-        init();
-      }
-      for (Leaf leaf : tree.leaves) {
-        float yDist = abs(leaf.y - yPos);
-        float azimuthDist = abs(leaf.point.azimuth - azimuth); 
-        float b = 100 - yFalloff*yDist - azimuthFalloff*azimuthDist;
-        if (b > 0) {
-          addColor(leaf, palette.getColor(leaf.point, b));
-        }
-      }
-    }
-  }
-}
-
-public class Azimuth extends TenerePattern {
+public class PatternAxisPlanes extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter azim = new CompoundParameter("Azimuth", 0, TWO_PI);  
-
-  public Azimuth(LX lx) {
+  public final CompoundParameter xSpeed = new CompoundParameter("XSpd", 11000, 21000, 5000).setDescription("Speed of motion on X-axis");
+  public final CompoundParameter ySpeed = new CompoundParameter("YSpd", 13000, 21000, 5000).setDescription("Speed of motion on Y-axis");
+  public final CompoundParameter zSpeed = new CompoundParameter("ZSpd", 17000, 21000, 5000).setDescription("Speed of motion on Z-axis");
+  
+  public final CompoundParameter xSize = new CompoundParameter("XSize", .1, .05, .3).setDescription("Size of X scanner");
+  public final CompoundParameter ySize = new CompoundParameter("YSize", .1, .05, .3).setDescription("Size of Y scanner");
+  public final CompoundParameter zSize = new CompoundParameter("ZSize", .1, .05, .3).setDescription("Size of Z scanner");
+  
+  private final LXModulator xPos = startModulator(new SinLFO(0, 1, this.xSpeed).randomBasis());
+  private final LXModulator yPos = startModulator(new SinLFO(0, 1, this.ySpeed).randomBasis());
+  private final LXModulator zPos = startModulator(new SinLFO(0, 1, this.zSpeed).randomBasis());
+  
+  public PatternAxisPlanes(LX lx) {
     super(lx);
-    addParameter("azim", this.azim);
+    addParameter("xSpeed", this.xSpeed);
+    addParameter("ySpeed", this.ySpeed);
+    addParameter("zSpeed", this.zSpeed);
+    addParameter("xSize", this.xSize);
+    addParameter("ySize", this.ySize);
+    addParameter("zSize", this.zSize);
   }
-
+  
   public void run(double deltaMs) {
-    float azim = this.azim.getValuef();
-    for (Branch b : tree.branches) {
-      setColor(b, LX.hsb(0, 0, max(0, 100 - 400 * LXUtils.wrapdistf(b.azimuth, azim, TWO_PI))));
+    float xPos = this.xPos.getValuef();
+    float yPos = this.yPos.getValuef();
+    float zPos = this.zPos.getValuef();
+    float xFalloff = 100 / this.xSize.getValuef();
+    float yFalloff = 100 / this.ySize.getValuef();
+    float zFalloff = 100 / this.zSize.getValuef();
+    
+    for (Leaf leaf : model.leaves) {
+      float b = max(max(
+        100 - xFalloff * abs(leaf.point.xn - xPos),
+        100 - yFalloff * abs(leaf.point.yn - yPos)),
+        100 - zFalloff * abs(leaf.point.zn - zPos)
+      );
+      setColor(leaf, LXColor.gray(max(0, b)));
     }
   }
 }
 
-public class AxisTest extends LXPattern {
- 
-  public final CompoundParameter xPos = new CompoundParameter("X", 0);
-  public final CompoundParameter yPos = new CompoundParameter("Y", 0);
-  public final CompoundParameter zPos = new CompoundParameter("Z", 0);
-
-  public AxisTest(LX lx) {
-    super(lx);
-    addParameter("xPos", xPos);
-    addParameter("yPos", yPos);
-    addParameter("zPos", zPos);
+public class PatternAudioMeter extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
   }
-
+  
+  public final CompoundParameter mode =
+    new CompoundParameter("Mode", 0)
+    .setDescription("Sets the mode of the equalizer");
+    
+  public final CompoundParameter size =
+    new CompoundParameter("Size", .2, .1, .4)
+    .setDescription("Sets the size of the display");
+  
+  public PatternAudioMeter(LX lx) {
+    super(lx);
+    addParameter("mode", this.mode);
+    addParameter("size", this.size);
+  }
+  
   public void run(double deltaMs) {
-    float x = this.xPos.getValuef();
-    float y = this.yPos.getValuef();
-    float z = this.zPos.getValuef();
-    for (LXPoint p : model.points) {
-      float d = abs(p.xn - x);
-      d = min(d, abs(p.yn - y));
-      d = min(d, abs(p.zn - z));
-      colors[p.index] = palette.getColor(p, max(0, 100 - 1000*d));
+    float meter = lx.engine.audio.meter.getValuef();
+    float mode = this.mode.getValuef();
+    float falloff = 100 / this.size.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float leafPos = 2 * abs(leaf.point.yn - .5);
+      float b1 = constrain(50 - falloff * (leafPos - meter), 0, 100);
+      float b2 = constrain(50 - falloff * abs(leafPos - meter), 0, 100);
+      setColor(leaf, LXColor.gray(lerp(b1, b2, mode)));
+    }
+  } 
+}
+
+public abstract class AudioWaves extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", 256, 1024, 64)
+    .setDescription("Speed of the audio waves");
+  
+  private static final int BUFFER_SIZE = 2048;
+  protected float[] history = new float[BUFFER_SIZE];
+  protected int cursor = 0;
+
+  public AudioWaves(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+  }
+  
+  public void run(double deltaMs) {
+    float speed = this.speed.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float d = abs(leaf.point.yn - .5);
+      int offset = round(d * d * speed);
+      setColor(leaf, LXColor.gray(100 * this.history[(this.cursor + offset) % this.history.length]));
+    }
+    
+    // Add to history
+    if (--this.cursor < 0) {
+      this.cursor = this.history.length - 1;
+    }
+    this.history[this.cursor] = getLevel();
+  }
+  
+  protected abstract float getLevel();
+  
+}
+
+public class PatternAudioWaves extends AudioWaves {
+        
+  public final BooleanParameter manual =
+    new BooleanParameter("Manual", false)
+    .setDescription("When true, uses the manual parameter");
+    
+  public final CompoundParameter level =
+    new CompoundParameter("Level", 0)
+    .setDescription("Manual input level");
+    
+  public PatternAudioWaves(LX lx) {
+    super(lx);
+    addParameter("manual", this.manual);
+    addParameter("level", this.level);
+  }
+  
+  protected float getLevel() {
+    return this.manual.isOn() ? this.level.getValuef() : this.lx.engine.audio.meter.getValuef();
+  }
+  
+} 
+
+public class PatternSirens extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter base =
+    new CompoundParameter("Base", 20, 0, 60)
+    .setDescription("Base brightness level");
+  
+  public final CompoundParameter speed1 = new CompoundParameter("Spd1", 9000, 19000, 5000).setDescription("Speed of siren 1");
+  public final CompoundParameter speed2 = new CompoundParameter("Spd2", 9000, 19000, 5000).setDescription("Speed of siren 2");
+  public final CompoundParameter speed3 = new CompoundParameter("Spd3", 9000, 19000, 5000).setDescription("Speed of siren 3");
+  public final CompoundParameter speed4 = new CompoundParameter("Spd4", 9000, 19000, 5000).setDescription("Speed of siren 4");
+  
+  public final CompoundParameter size1 = new CompoundParameter("Sz1", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 1");
+  public final CompoundParameter size2 = new CompoundParameter("Sz2", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 2");
+  public final CompoundParameter size3 = new CompoundParameter("Sz3", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 3");
+  public final CompoundParameter size4 = new CompoundParameter("Sz4", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 4");
+  
+  public final LXModulator azim1 = startModulator(new SawLFO(0, TWO_PI, this.speed1).randomBasis());
+  public final LXModulator azim2 = startModulator(new SawLFO(TWO_PI, 0, this.speed2).randomBasis());
+  public final LXModulator azim3 = startModulator(new SawLFO(0, TWO_PI, this.speed3).randomBasis());
+  public final LXModulator azim4 = startModulator(new SawLFO(TWO_PI, 0, this.speed2).randomBasis());
+  
+  public PatternSirens(LX lx) {
+    super(lx);
+    addParameter("speed1", this.speed1);
+    addParameter("speed2", this.speed2);
+    addParameter("speed3", this.speed3);
+    addParameter("speed4", this.speed4);
+    addParameter("size1", this.size1);
+    addParameter("size2", this.size2);
+    addParameter("size3", this.size3);
+    addParameter("size4", this.size4);
+  }
+  
+  public void run(double deltaMs) {
+    float azim1 = this.azim1.getValuef();
+    float azim2 = this.azim2.getValuef();
+    float azim3 = this.azim3.getValuef();
+    float azim4 = this.azim3.getValuef();
+    float falloff1 = 100 / this.size1.getValuef();
+    float falloff2 = 100 / this.size2.getValuef();
+    float falloff3 = 100 / this.size3.getValuef();
+    float falloff4 = 100 / this.size4.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float azim = leaf.point.azimuth;
+      float dist = max(max(max(
+        100 - falloff1 * LXUtils.wrapdistf(azim, azim1, TWO_PI),
+        100 - falloff2 * LXUtils.wrapdistf(azim, azim2, TWO_PI)),
+        100 - falloff3 * LXUtils.wrapdistf(azim, azim3, TWO_PI)),
+        100 - falloff4 * LXUtils.wrapdistf(azim, azim4, TWO_PI)
+      );
+      setColor(leaf, LXColor.gray(max(0, dist)));
     }
   }
 }
 
-public class Swarm extends TenerePattern {
+public class PatternSlideshow extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private final String[] PATHS = {
+    "main_1200.jpg",
+    "The Great Heads-X2proc.jpg"
+  };
+  
+  private final PImage[] images;
+  
+  private final SawLFO imageIndex;
+  
+  public final CompoundParameter rate = new CompoundParameter("Rate", 3000, 6000, 500);
+  
+  public PatternSlideshow(LX lx) {
+    super(lx);
+    this.images = new PImage[PATHS.length];
+    for (int i = 0; i < this.images.length; ++i) {
+      this.images[i] = loadImage(PATHS[i]);
+      this.images[i].loadPixels();
+    }
+    addParameter("rate", this.rate);
+    this.imageIndex = new SawLFO(0, this.images.length, rate);
+    startModulator(this.imageIndex);
+  }
+  
+  public void run(double deltaMs) {
+    float imageIndex = this.imageIndex.getValuef();
+    int imageFloor = (int) Math.floor(imageIndex); 
+    PImage image1 = this.images[imageFloor % this.images.length];
+    PImage image2 = this.images[(imageFloor + 1) % this.images.length];
+    float imageLerp = imageIndex - imageFloor;
+    
+    for (Leaf leaf : model.leaves) {
+      int c1 = image1.get(
+        (int) (leaf.point.xn * (image1.width-1)),
+        (int) ((1-leaf.point.yn) * (image1.height-1))
+      );
+      int c2 = image2.get(
+        (int) (leaf.point.xn * (image2.width-1)),
+        (int) ((1-leaf.point.yn) * (image2.height-1))
+      );
+      setColor(leaf, LXColor.lerp(c1, c2, imageLerp));
+    }
+  }
+}
+
+public class PatternSwarm extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
@@ -664,7 +791,7 @@ public class Swarm extends TenerePattern {
     startModulator(new SinLFO(9000, 17000, 33000).randomBasis())
     ).randomBasis());
 
-  public Swarm(LX lx) {
+  public PatternSwarm(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
     addParameter("base", this.base);
@@ -696,63 +823,6 @@ public class Swarm extends TenerePattern {
         float b = max(floor, 100 - falloff * LXUtils.wrapdistf(leaf.orientation.index, pos, LeafAssemblage.LEAVES.length));
         setColor(leaf, LXColor.gray(b));
       }
-    }
-  }
-}
-
-public class Sizzle extends TenerePattern {
-  public String getAuthor() {
-    return "Mark C. Slee";
-  }
-  
-  private static final int NUM_WAVES = 13;
-  private static final int NUM_SIZES = 19;
-
-  public LXModulator[] wave = new LXModulator[NUM_WAVES];
-  public LXModulator[] size = new LXModulator[NUM_SIZES];
-
-  public int[][][] precompute = new int[NUM_WAVES][NUM_SIZES][Leaf.NUM_LEDS];
-
-  public final CompoundParameter base =
-    new CompoundParameter("Base", 3, 1, Leaf.NUM_LEDS)
-    .setDescription("Base size of the leaf sizzle");
-    
-  public final CompoundParameter max =
-    new CompoundParameter("Max", Leaf.NUM_LEDS, 1, Leaf.NUM_LEDS)
-    .setDescription("Max size of the leaf sizzle");    
-
-  public Sizzle(LX lx) {
-    super(lx);
-    addParameter("base", this.base);
-    addParameter("max", this.max);
-    for (int i = 0; i < wave.length; ++i) {
-      int start = (i % 2 == 0) ? 0 : Leaf.NUM_LEDS;
-      this.wave[i] = startModulator(new SawLFO(start, Leaf.NUM_LEDS-start, 1000*i).randomBasis());
-    }
-    for (int i = 0; i < size.length; ++i) {
-      this.size[i] = startModulator(new SinLFO(this.base, max, 7000 + 1000*i).randomBasis());
-    }
-  }
-
-  public void run(double deltaMs) {
-    for (int w = 0; w < NUM_WAVES; ++w) {
-      float wave = this.wave[w].getValuef();
-      for (int s = 0; s < NUM_SIZES; ++s) {
-        float falloff = 100 / this.size[s].getValuef();
-        for (int p = 0; p < Leaf.NUM_LEDS; ++p) {
-          this.precompute[w][s][p] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(p, wave, Leaf.NUM_LEDS)));
-        }
-      }
-    }
-    
-    int li = 0;
-    for (Leaf leaf : tree.leaves) {
-      int wi = li % NUM_WAVES;
-      int si = li % NUM_SIZES;
-      for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
-        colors[leaf.point.index + i] = this.precompute[wi][si][i];
-      }
-      ++li;
     }
   }
 }
@@ -853,5 +923,147 @@ public class sphericalWave extends LXPattern {
        setColor(leaf, leafColor);
     
     }  
+  }
+}
+
+public abstract class ThreadedPattern extends TenerePattern {
+    
+  private static final int DEFAULT_NUM_THREADS = 8;
+  
+  private double deltaMs;  
+  private final WorkerThread[] threads; 
+  
+  public ThreadedPattern(LX lx) {
+    super(lx);
+    
+    // Create threads
+    int numThreads = getNumThreads();
+    this.threads = new WorkerThread[numThreads];
+    for (int i = 0; i < numThreads; ++i) {
+      this.threads[i] = new WorkerThread(getClass().getName() + "-Thread" + i);
+    }
+    
+    // Distribute branches over the threads
+    allocateBranches();
+    
+    // Start the threads
+    for (WorkerThread thread : this.threads) {
+      thread.start();
+    }
+  }
+  
+  // Override this if you want a different number of worker threads
+  public int getNumThreads() {
+    return DEFAULT_NUM_THREADS;
+  }
+  
+  // Your subclass may want to override this method to allocate
+  // branches in a different manner
+  public void allocateBranches() {
+    int i = 0;
+    for (Branch branch : model.branches) {
+      this.threads[i % this.threads.length].branches.add(branch);
+      ++i;
+    }
+  }
+    
+  public void run(double deltaMs) {
+    // Store frame's deltaMs for threads
+    this.deltaMs = deltaMs;
+    
+    // Notify every thread that it has work to do
+    for (WorkerThread thread : this.threads) {
+      synchronized (thread) {
+        thread.hasWork = true;
+        thread.notify();
+      }
+    }
+    
+    // Wait for all the sub-threads to complete
+    for (WorkerThread thread : this.threads) {
+      synchronized (thread) {
+        while (!thread.workDone) {
+          try {
+            thread.wait();
+          } catch (InterruptedException ix) {
+            ix.printStackTrace();
+          }
+        }
+        thread.workDone = false;
+      }
+    }
+    
+    // The colors array should be fully updated now,
+    // each worker thread will have updated its own portion
+  }
+  
+  // Your subclass should extend this method, and compute the colors only for the
+  // branches specified, taking care to note that you are running in a unique
+  // thread context and should not be depending upon or modifying global state that
+  // would affect how *other* branches are rendered!
+  abstract void runThread(List<Branch> branches, double deltaMs); /* {
+    for (Branch branch : branches) {
+      // Per-branch computation, e.g.
+      for (Leaf leaf : branch.leaves) {
+        // Per-leaf computation, e.g.
+        setColor(leaf, computedColor);
+      }
+    }
+  } */
+  
+  // Implementation details of the individual worker threads
+  class WorkerThread extends Thread {
+    
+    final List<Branch> branches = new ArrayList<Branch>();
+    boolean hasWork = false;
+    boolean workDone = false;
+    
+    WorkerThread(String name) {
+      super(name);
+    }
+    
+    public void run() {
+      while (!isInterrupted()) {
+        // Wait until we have work to do...
+        synchronized (this) {
+          try {
+            while (!this.hasWork) {
+              wait();
+            }
+          } catch (InterruptedException ix) {
+            // Channel is finished
+            break;
+          }
+          this.hasWork = false;
+        }
+        
+        // Do our work
+        runThread(this.branches, deltaMs);
+        
+        // Signal to the main thread that we are done
+        synchronized (this) {
+          this.workDone = true;
+          notify();
+        }
+      }
+    }
+  }
+}
+
+public class TestThreadedPattern extends ThreadedPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public TestThreadedPattern(LX lx) {
+    super(lx);
+  }
+  
+  public void runThread(List<Branch> branches, double deltaMs) {
+    for (Branch branch : branches) {
+      for (Leaf leaf : branch.leaves) {
+        setColor(leaf, #ff0000);
+      }
+    }
   }
 }

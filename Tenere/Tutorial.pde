@@ -77,7 +77,7 @@ public class Tutorial extends LXPattern {
   }
 }
 
-public class Plane extends LXPattern {
+public class TutorialPlane extends LXPattern {
   
   public final CompoundParameter yPos = (CompoundParameter)
     new CompoundParameter("YPos", model.cy, model.yMin, model.yMax)
@@ -87,7 +87,7 @@ public class Plane extends LXPattern {
     new CompoundParameter("Size", 8*FT, 1*FT, 20*FT)
     .setDescription("Size of the plane");
   
-  public Plane(LX lx) {
+  public TutorialPlane(LX lx) {
     super(lx);
     addParameter("yPos", this.yPos);
     addParameter("size", this.size);
@@ -98,7 +98,62 @@ public class Plane extends LXPattern {
     float yPos = this.yPos.getValuef();
     for (Leaf leaf : tree.leaves) {
       float b = 100 - falloff * abs(leaf.y - yPos); 
-      setColor(leaf, (b > 0) ? palette.getColor(leaf.point, b) : #000000);
+      setColor(leaf, LXColor.gray(max(0, 100)));
+    }
+  }
+}
+
+public class TestAssemblageOrder extends TenerePattern {
+  
+  public final DiscreteParameter index = new DiscreteParameter("Index", 0, 15); 
+  
+  private int[] mask = new int[15];
+  
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public TestAssemblageOrder(LX lx) {
+    super(lx);
+    addParameter("index", this.index);
+  }
+  
+  public void run(double deltaMs) {
+    int index = this.index.getValuei();
+    for (int i = 0; i < mask.length; ++i) {
+      this.mask[i] = (i == index) ? #ffffff : #000000;
+    }
+    for (LeafAssemblage assemblage : model.assemblages) {
+      int li = 0;
+      for (Leaf leaf : assemblage.leaves) {
+        setColor(leaf, this.mask[li++]);
+      }
+    }
+  }
+}
+
+public class TestAxis extends LXPattern {
+ 
+  public final CompoundParameter xPos = new CompoundParameter("X", 0);
+  public final CompoundParameter yPos = new CompoundParameter("Y", 0);
+  public final CompoundParameter zPos = new CompoundParameter("Z", 0);
+
+  public TestAxis(LX lx) {
+    super(lx);
+    addParameter("xPos", xPos);
+    addParameter("yPos", yPos);
+    addParameter("zPos", zPos);
+  }
+
+  public void run(double deltaMs) {
+    float x = this.xPos.getValuef();
+    float y = this.yPos.getValuef();
+    float z = this.zPos.getValuef();
+    for (LXPoint p : model.points) {
+      float d = abs(p.xn - x);
+      d = min(d, abs(p.yn - y));
+      d = min(d, abs(p.zn - z));
+      colors[p.index] = palette.getColor(p, max(0, 100 - 1000*d));
     }
   }
 }

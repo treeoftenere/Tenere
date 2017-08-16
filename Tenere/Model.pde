@@ -6,6 +6,62 @@ Tree buildTree() {
   return new Tree(modelMode);
 }
 
+public static class StellarBranchConfig {
+  final String ip;
+  final LXMatrix[] channels = new LXMatrix[Branch.NUM_ASSEMBLAGES]; 
+  
+  public StellarBranchConfig(String ip) {
+    this.ip = ip;
+    for (int i = 0; i < channels.length; ++i) {
+      channels[i] = null;
+    }
+  }
+}
+
+public static class StellarFixtureConfig {
+  
+  static final String CHANNEL_ZERO = "Leafs Chanel Zero";
+  static final String CHANNEL_FOUR = "Leafs Chanel Four";
+  static final int NO_FIXTURE_ID = -1;
+  
+  // TODO(mcslee): determine accurately what this is!
+  static final float ASSEMBLAGE_Y_OFFSET = 4*INCHES;
+  
+  final String ip;
+  final LXMatrix matrix;
+  final int fixtureId;
+  final int nextFixtureId;
+  final int channel;
+  
+  public StellarFixtureConfig(JSONObject fixture, String fixtureType) {
+    this.ip = fixture.getString("IP", null);
+    this.fixtureId = fixture.getInt("id", NO_FIXTURE_ID);
+    this.nextFixtureId = fixture.getInt("child", NO_FIXTURE_ID);
+    this.channel = fixtureType.equals(CHANNEL_ZERO) ? 0 : 4;
+    
+    // Load matrix values
+    JSONArray matrixArr = fixture.getJSONArray("Matrix");
+    float[] m = new float[16];
+    for (int mi = 0; mi < m.length; ++mi) {
+      m[mi] = matrixArr.getFloat(mi);
+    }
+    
+    // Construct matrix converted into LX space
+    this.matrix = new LXMatrix()
+    .scaleX(-1)
+    .scale(INCHES_PER_METER * INCHES)
+    .multiply(
+      // NOTE: stellar indexes matrix vertically
+      m[0], m[4], m[8],  m[12],
+      m[1], m[5], m[9],  m[13],
+      m[2], m[6], m[10], m[14],
+      m[3], m[7], m[11], m[15]
+    )
+    .scale(METERS_PER_INCH / INCHES)
+    .translate(0, ASSEMBLAGE_Y_OFFSET, 0);
+  }
+}
+
 public static class Tree extends LXModel {
   
   public enum ModelMode {
@@ -54,35 +110,66 @@ public static class Tree extends LXModel {
     
     Fixture(ModelMode mode) {
       if (mode == ModelMode.STELLAR_IMPORT) {
-        // JSONObject leafAssemblage = applet.loadJSONObject("stellar_fixture_tree_branch.json");
-        JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);
+                
+        // Load up the Stellar export file
+        JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);        
         JSONArray fixtures = assemblages.getJSONArray("Fixtures");
+        
+        // Load up all of the fixtures and index them by ID
+        Map<Integer, StellarFixtureConfig> fixtureMap = new HashMap<Integer, StellarFixtureConfig>();
         for (int fi = 0; fi < fixtures.size(); ++fi) {
-          JSONObject branch = fixtures.getJSONObject(fi);
-          if (!branch.getString("FixtureType").equals("Tree branch")) {
+          JSONObject fixtureObj = fixtures.getJSONObject(fi);
+          String fixtureType = fixtureObj.getString("FixtureType");
+          if (!fixtureType.equals(StellarFixtureConfig.CHANNEL_ZERO) && !fixtureType.equals(StellarFixtureConfig.CHANNEL_FOUR)) {
+            println("Skipping unknown Stellar Fixture type: " + fixtureType);
             continue;
           }
-          
-          JSONArray matrixArr = branch.getJSONArray("Matrix");
-          float[] m = new float[16];
-          for (int mi = 0; mi < m.length; ++mi) {
-            m[mi] = matrixArr.getFloat(mi);
-          }
-          
-          LXMatrix matrix = new LXMatrix();
-          matrix.scaleX(-1);
-          matrix.scale(INCHES_PER_METER * INCHES);
-          matrix.multiply(
-            m[0], m[4], m[8],  m[12],
-            m[1], m[5], m[9],  m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]
-          );
-          matrix.scale(METERS_PER_INCH / INCHES);
-          matrix.translate(0, LeafAssemblage.LENGTH / 2, 0);
-
-          addAssemblage(new LXTransform(matrix));
+          // Make a fixture object, add to the list
+          StellarFixtureConfig fixture = new StellarFixtureConfig(fixtureObj, fixtureType);
+          fixtureMap.put(fixture.fixtureId, fixture);
         }
+        
+        // Now, take a pass and construct a map of branches
+        Map<String, StellarBranchConfig> branchMap = new HashMap<String, StellarBranchConfig>();
+        for (StellarFixtureConfig fixture : fixtureMap.values()) {
+          if (fixture.ip != null) {
+            // Find the branch for this IP address
+            StellarBranchConfig branch = branchMap.get(fixture.ip);
+            if (branch == null) {
+              // First time we've seen it, construct one
+              branch = new StellarBranchConfig(fixture.ip);
+              branchMap.put(fixture.ip, branch);
+            }
+            // Load the base channel for this branch
+            int channel = fixture.channel;
+            branch.channels[channel] = fixture.matrix;
+            
+            // Traverse next fixture ID for other fixtures in this chain and
+            // assemble them up into branches
+            int nextFixtureId = fixture.nextFixtureId;
+            while (nextFixtureId != StellarFixtureConfig.NO_FIXTURE_ID) {
+              StellarFixtureConfig nextFixture = fixtureMap.get(nextFixtureId);
+              if (nextFixture == null) {
+                println("No fixture found for NextFixtureId: " + nextFixtureId);
+                break;
+              }
+              if (++channel >= branch.channels.length) {
+                println("Too many channels were found in fixture chain: " + branch.ip);
+                break;
+              }
+              branch.channels[channel] = nextFixture.matrix;
+              nextFixtureId = nextFixture.nextFixtureId;
+            }
+          }
+        }
+
+        // Okay, we've built up the whole set of branch controllers and we have
+        // them organized by their IP addresses, now we finally add them to the model
+        for (StellarBranchConfig branchConfig : branchMap.values()) {
+          addBranch(branchConfig);
+        }
+        
+        println("Stellar import done.");
         
       } else if (mode == ModelMode.UNIFORM_BRANCHES) {
         for (int ai = 0; ai < 14; ++ai) {
@@ -98,7 +185,7 @@ public static class Tree extends LXModel {
         }
       } else {
         // Lowest layer of major limbs
-        addLimb(0.0*FT, 0.1 * TWO_PI/6, Limb.Size.FULL); 
+        addLimb(0.0*FT, 0.1 * TWO_PI/6, Limb.Size.FULL);
         addLimb(1.0*FT, 1.2 * TWO_PI/6, Limb.Size.FULL);
         addLimb(3.0*FT, 1.9 * TWO_PI/6, Limb.Size.FULL);
         addLimb(1.7*FT, 2.1 * TWO_PI/6, Limb.Size.FULL);
@@ -118,7 +205,6 @@ public static class Tree extends LXModel {
         // A couple small top limbs
         // addLimb(7*FT, .3 * TWO_PI/6, Limb.Size.SMALL);
         // addLimb(7*FT, 3.1 * TWO_PI/6, Limb.Size.SMALL);
-        
       }
     }
     
@@ -132,12 +218,16 @@ public static class Tree extends LXModel {
     }
     
     private void addAssemblage(LXTransform t) {
-      addAssemblage(new LeafAssemblage(t));
+      addAssemblage(new LeafAssemblage(0, t));
     }
     
     private void addAssemblage(LeafAssemblage assemblage) {
       this.assemblages.add(assemblage);
       addPoints(assemblage);
+    }
+    
+    private void addBranch(StellarBranchConfig branchConfig) {
+      addBranch(new Branch(branchConfig));
     }
     
     private void addBranch(Branch.Orientation orientation) {
@@ -278,6 +368,7 @@ public static class Limb extends LXModel {
  */
 public static class Branch extends LXModel {
   public static final int NUM_ASSEMBLAGES = 8;
+  public static final int NUM_LEDS = NUM_ASSEMBLAGES * LeafAssemblage.NUM_LEDS;
   public static final float LENGTH = 6*FEET;
   public static final float WIDTH = 7*FEET;
   
@@ -307,6 +398,9 @@ public static class Branch extends LXModel {
   
   // Orientation of this branch
   public final Orientation orientation;
+  
+  // IP address of this branch, if known
+  public final String ip;
     
   public final List<LeafAssemblage> assemblages;
   public final List<Leaf> leaves;
@@ -356,6 +450,26 @@ public static class Branch extends LXModel {
     this(getTransform(orientation), orientation);
   }
   
+  public Branch(StellarBranchConfig branchConfig) {
+    super(new Fixture(branchConfig));
+    this.ip = branchConfig.ip;
+    this.orientation = null;
+    Fixture f = (Fixture) this.fixtures.get(0);
+    this.assemblages = Collections.unmodifiableList(f.assemblages);
+    List<Leaf> leaves = new ArrayList<Leaf>();
+    for (LeafAssemblage assemblage : this.assemblages) {
+      for (Leaf leaf : assemblage.leaves) {
+        leaves.add(leaf);
+      }
+    }
+    this.leaves = Collections.unmodifiableList(leaves);
+    this.x = this.leaves.get(0).x;
+    this.y = this.leaves.get(0).y;
+    this.z = this.leaves.get(0).z;
+    this.azimuth = atan2(this.z, this.x);
+    this.elevation = atan2(this.y, dist(0, 0, this.x, this.z));  
+  }
+  
   public Branch(LXTransform t) {
     // TODO(mcslee): compute azim/elev/tilt from matrix?
     this(t, new Orientation(t.x(), t.y(), t.z(), 0, 0, 0));
@@ -363,6 +477,7 @@ public static class Branch extends LXModel {
   
   public Branch(LXTransform t, Orientation orientation) {
     super(new Fixture(t));
+    this.ip = null;
     this.orientation = orientation;
     this.x = t.x();
     this.y = t.y();
@@ -384,13 +499,25 @@ public static class Branch extends LXModel {
     
     private final List<LeafAssemblage> assemblages = new ArrayList<LeafAssemblage>();
     
+    Fixture(StellarBranchConfig branchConfig) {
+      for (int i = 0; i < branchConfig.channels.length; ++i) {
+        LXMatrix matrix = branchConfig.channels[i];
+        if (matrix != null) {
+          LeafAssemblage assemblage = new LeafAssemblage(i, new LXTransform(matrix));
+          this.assemblages.add(assemblage);
+          addPoints(assemblage);
+        }
+      }
+    }
+    
     Fixture(LXTransform t) {
+      int channel = 0;
       for (LeafAssemblage.Orientation assemblage : ASSEMBLAGES) {
         t.push();
         t.translate(assemblage.x, assemblage.y, 0);
         t.rotateZ(assemblage.theta);
         t.rotateY(assemblage.tilt);
-        LeafAssemblage leafAssemblage = new LeafAssemblage(t, assemblage);
+        LeafAssemblage leafAssemblage = new LeafAssemblage(channel++, t, assemblage);
         this.assemblages.add(leafAssemblage);
         addPoints(leafAssemblage);
         t.pop();
@@ -405,9 +532,10 @@ public static class Branch extends LXModel {
 public static class LeafAssemblage extends LXModel {
   
   public static final int NUM_LEAVES = 15;
+  public static final int NUM_LEDS = NUM_LEAVES * Leaf.NUM_LEDS;
   
-  public static final float LENGTH = 28*IN;
-  public static final float WIDTH = 28*IN;
+  public static final float LENGTH = 26*IN;
+  public static final float WIDTH = 24*IN;
 
   // Orientation of a leaf assemblage, relative to parent branch
   public static class Orientation {
@@ -441,14 +569,14 @@ public static class LeafAssemblage extends LXModel {
   // is the leaf pointing "up", HALF_PI is pointing to the left,
   // -HALF_PI is pointing to the right, etc.
   public static final Leaf.Orientation[] LEAVES = {    
-    new Leaf.Orientation(0,  6.4*IN,  8.8*IN, -HALF_PI - QUARTER_PI), // A
-    new Leaf.Orientation(1,  6.9*IN, 10.0*IN, -HALF_PI), // B
-    new Leaf.Orientation(2, 10.4*IN, 14.7*IN, -HALF_PI - .318), // C
-    new Leaf.Orientation(3, 10.0*IN, 16.1*IN, -.900), // D
-    new Leaf.Orientation(4,  1.2*IN, 13.9*IN, -1.08), // E
-    new Leaf.Orientation(5,  3.5*IN, 22.2*IN, -HALF_PI - .2), // F
-    new Leaf.Orientation(6,  2.9*IN, 23.3*IN, -.828), // G
-    new Leaf.Orientation(7,  0.0*IN, 23.9*IN, 0), // H
+    new Leaf.Orientation(0,  4.5*IN, -1.7*IN, -HALF_PI - QUARTER_PI), // A
+    new Leaf.Orientation(1,  5.5*IN,    0*IN, -HALF_PI), // B
+    new Leaf.Orientation(2,  2.0*IN,  3.5*IN, -HALF_PI + QUARTER_PI), // C
+    new Leaf.Orientation(3,  3.5*IN,  7.5*IN, -HALF_PI), // D
+    new Leaf.Orientation(4,  4.0*IN, 11.2*IN, -HALF_PI), // E
+    new Leaf.Orientation(5,  3.0*IN,  9.5*IN, -HALF_PI + QUARTER_PI), // F
+    new Leaf.Orientation(6,  3.5*IN, 12.7*IN, -HALF_PI + QUARTER_PI), // G
+    new Leaf.Orientation(7,  0.0*IN, 13.5*IN, 0), // H
     null, // I
     null, // J
     null, // K
@@ -473,14 +601,16 @@ public static class LeafAssemblage extends LXModel {
   
   public final Orientation orientation;
   public final List<Leaf> leaves;
+  public final int channel;
   
-  public LeafAssemblage(LXTransform t) {
-    this(t, new Orientation(0, 0, 0));
+  public LeafAssemblage(int channel, LXTransform t) {
+    this(channel, t, new Orientation(0, 0, 0));
   }
   
-  public LeafAssemblage(LXTransform t, Orientation orientation) {
+  public LeafAssemblage(int channel, LXTransform t, Orientation orientation) {
     super(new Fixture(t));
     Fixture f = (Fixture) this.fixtures.get(0);
+    this.channel = channel;
     this.leaves = Collections.unmodifiableList(f.leaves);
     this.orientation = orientation;
   }
@@ -490,16 +620,20 @@ public static class LeafAssemblage extends LXModel {
     private final List<Leaf> leaves = new ArrayList<Leaf>();
     
     Fixture(LXTransform t) {
+      t.push();
+      // TODO(mcslee): do we want this?
+      t.translate(0, 5*INCHES, 0);
       for (int i = 0; i < NUM_LEAVES; ++i) {
         Leaf.Orientation leafOrientation = LEAVES[i];
         t.push();
-        t.translate(leafOrientation.x, leafOrientation.y, 0);
+        t.translate(leafOrientation.x, leafOrientation.y, (i % 3) * (.1*INCHES));
         t.rotateZ(leafOrientation.theta);
         Leaf leaf = new Leaf(t, leafOrientation);
         this.leaves.add(leaf);
         addPoints(leaf);
         t.pop();
-      } 
+      }
+      t.pop();
     }
   }
 }
@@ -510,8 +644,9 @@ public static class LeafAssemblage extends LXModel {
  */
 public static class Leaf extends LXModel {
   public static final int NUM_LEDS = 7;
-  public static final float LED_SPACING = 1*IN;
-  public static final float WIDTH = 5*IN; 
+  public static final float LED_OFFSET = .75*IN;
+  public static final float LED_SPACING = 1.3*IN;
+  public static final float WIDTH = 4.75*IN; 
   public static final float LENGTH = 6.5*IN;
   
   // Orientation of a leaf relative to leaf assemblage
@@ -582,15 +717,15 @@ public static class Leaf extends LXModel {
   private static class Fixture extends LXAbstractFixture {
     Fixture(LXTransform t, Orientation orientation) {
       t.push();
-      t.translate(.25*INCHES, LED_SPACING, 0);
+      t.translate(.1*INCHES, LED_OFFSET, 0);
       addPoint(new LXPoint(t));
       t.translate(0, LED_SPACING, 0);
       addPoint(new LXPoint(t));
       t.translate(0, LED_SPACING, 0);
       addPoint(new LXPoint(t));
-      t.translate(-.25*INCHES, LED_SPACING, 0);
+      t.translate(-.1*INCHES, LED_SPACING, 0);
       addPoint(new LXPoint(t));
-      t.translate(-.25*INCHES, -LED_SPACING, 0);
+      t.translate(-.1*INCHES, -LED_SPACING, 0);
       addPoint(new LXPoint(t));
       t.translate(0, -LED_SPACING, 0);
       addPoint(new LXPoint(t));

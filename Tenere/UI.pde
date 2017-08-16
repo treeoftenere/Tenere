@@ -157,7 +157,9 @@ public class UITreeStructure extends UI3dComponent {
       addChild(new UILimb(limb));
     }
     for (Branch branch : tree.branches) {
-      addChild(new UIBranch(branch));
+      if (branch.orientation != null) {
+        addChild(new UIBranch(branch));
+      }
     }
   }
  
@@ -685,7 +687,7 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
 
 public class UIOutputControls extends UICollapsibleSection {
   public UIOutputControls(final LXStudio.UI ui) {
-    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 140);
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 200);
     setTitle("OUTPUT");
         
     List<OutputItem> items = new ArrayList<OutputItem>();
@@ -704,6 +706,19 @@ public class UIOutputControls extends UICollapsibleSection {
     
     public OutputItem(OPCDatagram datagram) {
       this.datagram = datagram;
+      datagram.error.addListener(new LXParameterListener() {
+        public void onParameterChanged(LXParameter p) {
+          redraw();
+        }
+      });
+    }
+        
+    public boolean isActive() {
+      return this.datagram.error.isOn();
+    }
+    
+    public int getActiveColor(UI ui) {
+      return ui.theme.getAttentionColor();
     }
         
     public boolean isChecked() {
@@ -720,7 +735,22 @@ public class UIOutputControls extends UICollapsibleSection {
     }
         
     public String getLabel() {
-      return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
+      return String.format("%s / %d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
     }
+  }
+}
+public class UIBoardTest extends UICollapsibleSection {
+  public UIBoardTest(final LXStudio.UI ui, LX lx) {
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 60);
+    setTitle("BOARD TEST");
+    
+    new UIIntegerBox(0, 0, getContentWidth(), 16)
+    .setParameter(boardNumber)
+    .addToContainer(this);
+    
+    new UIButton(0, 20, getContentWidth(), 16)
+    .setParameter(lx.engine.output.enabled)
+    .setLabel("Output On")
+    .addToContainer(this);
   }
 }
