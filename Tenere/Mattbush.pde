@@ -8,7 +8,7 @@ public class Lattice extends LXPattern {
     new CompoundParameter("Y factor")
     .setDescription("How much Y is taken into account");
 
-  public final CompoundParameter manhattanCoeffiecient =
+  public final CompoundParameter manhattanCoefficient =
     new CompoundParameter("Manh coeff")
     .setDescription("How much to use Manhattan vs Euclidean distance");
 
@@ -19,6 +19,7 @@ public class Lattice extends LXPattern {
     super(lx);
     addParameter(rippleRadius);
     addParameter(yFactor);
+    addParameter(manhattanCoefficient);
   }
   
   private double _calculateDistance(Leaf leaf) {
@@ -28,7 +29,7 @@ public class Lattice extends LXPattern {
     
     double manhattanDistance = x + y + z;
     double euclideanDistance = Math.sqrt(x * x + y * y + z * z);
-    return LXUtils.lerp(euclideanDistance, manhattanDistance, this.manhattanCoefficient.getValue();
+    return LXUtils.lerp(euclideanDistance, manhattanDistance, manhattanCoefficient.getValue());
   }
 
   public void run(double deltaMs) {
