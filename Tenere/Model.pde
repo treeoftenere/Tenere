@@ -368,6 +368,7 @@ public static class Limb extends LXModel {
  */
 public static class Branch extends LXModel {
   public static final int NUM_ASSEMBLAGES = 8;
+  public static final int NUM_LEAVES = NUM_ASSEMBLAGES * LeafAssemblage.NUM_LEAVES;
   public static final int NUM_LEDS = NUM_ASSEMBLAGES * LeafAssemblage.NUM_LEDS;
   public static final float LENGTH = 6*FEET;
   public static final float WIDTH = 7*FEET;
