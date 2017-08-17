@@ -128,7 +128,7 @@ public class NoteAssemblages extends TenerePattern {
   }
 }
 
-public class NoteWaves extends AudioWaves {
+public class NoteWaves extends WavePattern {
   
   private final ADSR adsr = new ADSR();
   private final CompoundParameter attack = adsr.attack;

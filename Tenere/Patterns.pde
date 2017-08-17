@@ -387,7 +387,7 @@ public class PatternWaves extends TenerePattern {
   private final LXModulator len2Damp = startModulator(new DampedParameter(this.len2, LEN_DAMPING_V, LEN_DAMPING_A));
   private final LXModulator len3Damp = startModulator(new DampedParameter(this.len3, LEN_DAMPING_V, LEN_DAMPING_A));  
 
-  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 20*FEET, 40*FEET));
+  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 40*FEET, 80*FEET));
 
   private final double[] bins = new double[512];
 
@@ -442,17 +442,17 @@ public class PatternVortex extends TenerePattern {
   
   private final SinLFO xPos = new SinLFO(model.xMin, model.xMax, startModulator(
     new SinLFO(29000, 59000, 51000).randomBasis()
-    ));
+  ));
 
   private final SinLFO yPos = new SinLFO(model.yMin, model.yMax, startModulator(
     new SinLFO(35000, 44000, 57000).randomBasis()
-    ));
+  ));
 
   public final CompoundParameter vortexBase = new CompoundParameter("Base", 
     12*INCHES, 
     1*INCHES, 
     140*INCHES
-    );
+  );
 
   public final CompoundParameter vortexMod = new CompoundParameter("Mod", 0, 120*INCHES);
 
@@ -584,44 +584,88 @@ public class PatternAudioMeter extends TenerePattern {
   } 
 }
 
-public abstract class AudioWaves extends TenerePattern {
+public abstract class BufferPattern extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter speed =
+  public final CompoundParameter speedRaw =
     new CompoundParameter("Speed", 256, 1024, 64)
     .setDescription("Speed of the audio waves");
   
+  public final LXModulator speed = startModulator(new DampedParameter(speedRaw, 256, 512));
+  
   private static final int BUFFER_SIZE = 2048;
-  protected float[] history = new float[BUFFER_SIZE];
+  protected int[] history = new int[BUFFER_SIZE];
   protected int cursor = 0;
 
-  public AudioWaves(LX lx) {
+  public BufferPattern(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
+    for (int i = 0; i < this.history.length; ++i) {
+      this.history[i] = #000000;
+    }
   }
   
-  public void run(double deltaMs) {
-    float speed = this.speed.getValuef();
-    for (Leaf leaf : model.leaves) {
-      float d = abs(leaf.point.yn - .5);
-      int offset = round(d * d * speed);
-      setColor(leaf, LXColor.gray(100 * this.history[(this.cursor + offset) % this.history.length]));
-    }
-    
+  public final void run(double deltaMs) {
     // Add to history
     if (--this.cursor < 0) {
       this.cursor = this.history.length - 1;
     }
-    this.history[this.cursor] = getLevel();
+    this.history[this.cursor] = getColor();
+    onRun(deltaMs);
   }
   
-  protected abstract float getLevel();
+  protected int getColor() {
+    return LXColor.gray(100 * getLevel());
+  }
+  
+  protected float getLevel() {
+    return 0;
+  }
+  
+  abstract void onRun(double deltaMs); 
+}
+
+public abstract class WavePattern extends BufferPattern {
+  
+  public static final int NUM_MODES = 5; 
+  private final float[] dm = new float[NUM_MODES];
+  
+  public final CompoundParameter mode =
+    new CompoundParameter("Mode", 0, NUM_MODES - 1)
+    .setDescription("Mode of the wave motion");
+  
+  private final LXModulator modeDamped = startModulator(new DampedParameter(this.mode, 1, 8)); 
+  
+  protected WavePattern(LX lx) {
+    super(lx);
+    addParameter("mode", this.mode);
+  }
+    
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float mode = this.modeDamped.getValuef();
+    float lerp = mode % 1;
+    int floor = (int) (mode - lerp);
+    for (Leaf leaf : model.leaves) {
+      dm[0] = abs(leaf.point.yn - .5);
+      dm[1] = .5 * abs(leaf.point.xn - .5) + .5 * abs(leaf.point.yn - .5);
+      dm[2] = abs(leaf.point.xn - .5);
+      dm[3] = leaf.point.yn;
+      dm[4] = 1 - leaf.point.yn;
+      
+      int offset1 = round(dm[floor] * dm[floor] * speed);
+      int offset2 = round(dm[(floor + 1) % dm.length] * dm[(floor + 1) % dm.length] * speed);
+      int c1 = this.history[(this.cursor + offset1) % this.history.length];
+      int c2 = this.history[(this.cursor + offset2) % this.history.length];
+      setColor(leaf, LXColor.lerp(c1, c2, lerp));
+    }
+  }
   
 }
 
-public class PatternAudioWaves extends AudioWaves {
+public class PatternAudioWaves extends WavePattern {
         
   public final BooleanParameter manual =
     new BooleanParameter("Manual", false)
