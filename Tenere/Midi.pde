@@ -37,8 +37,9 @@ public class NoteAssemblages extends TenerePattern {
   private final CompoundParameter velocityBrightness = new CompoundParameter("Vel>Brt", .5)
     .setDescription("Sets the amount of modulation from note velocity to brightness");
   
-  public static final int NUM_NOTE_LAYERS = 24;
+  public static final int NUM_NOTE_LAYERS = 30;
   private final NoteLayer[] notes = new NoteLayer[NUM_NOTE_LAYERS];
+  private boolean damperDown = false;
   
   public NoteAssemblages(LX lx) {
     super(lx);
@@ -65,6 +66,7 @@ public class NoteAssemblages extends TenerePattern {
     private NormalizedParameter level = new NormalizedParameter("Level", 1); 
     private final ADSREnvelope envelope = new ADSREnvelope("Env", 0, level, attack, decay, sustain, release);  
     private final List<LXFixture> fixtures = new ArrayList<LXFixture>();
+    private boolean damper = false;
     
     NoteLayer(LX lx) {
       super(lx);
@@ -87,16 +89,46 @@ public class NoteAssemblages extends TenerePattern {
   public void noteOnReceived(MidiNoteOn note) {
     NoteLayer noteLayer = this.notes[note.getPitch() % NUM_NOTE_LAYERS];
     noteLayer.level.setValue(lerp(1, note.getVelocity() / 127., this.velocityBrightness.getNormalizedf()));
-    noteLayer.envelope.engage.setValue(true);
+    noteLayer.envelope.attack();
+    noteLayer.damper = false;
   }
   
   @Override
   public void noteOffReceived(MidiNote note) {
-    this.notes[note.getPitch() % NUM_NOTE_LAYERS].envelope.engage.setValue(false);
+    if (this.damperDown) {
+      this.notes[note.getPitch() % NUM_NOTE_LAYERS].damper = true;
+    } else {
+      this.notes[note.getPitch() % NUM_NOTE_LAYERS].envelope.release();
+    }
+  }
+  
+  @Override
+  public void controlChangeReceived(MidiControlChange cc) {
+    if (cc.getCC() == MidiControlChange.DAMPER_PEDAL) {
+      if (cc.getValue() > 0) {
+        if (!this.damperDown) {
+          this.damperDown = true;
+          for (NoteLayer note : this.notes) {
+            if (note.envelope.engage.isOn()) {
+              note.damper = true;
+            }
+          }
+        }
+      } else {
+        if (this.damperDown) {
+          this.damperDown = false;
+          for (NoteLayer note : this.notes) {
+            if (note.damper) {
+              note.envelope.engage.setValue(false);
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-public class NoteWaves extends AudioWaves {
+public class NoteWaves extends WavePattern {
   
   private final ADSR adsr = new ADSR();
   private final CompoundParameter attack = adsr.attack;
@@ -112,6 +144,8 @@ public class NoteWaves extends AudioWaves {
   private final ADSREnvelope envelope = new ADSREnvelope("Envelope", 0, this.level, this.attack, this.decay, this.sustain, this.release);
   
   private int notesDown = 0;
+  private int damperNotes = 0;
+  private boolean damperDown = false;
   
   public NoteWaves(LX lx) {
     super(lx);
@@ -137,8 +171,32 @@ public class NoteWaves extends AudioWaves {
   
   @Override
   public void noteOffReceived(MidiNote note) {
-    if (--this.notesDown == 0) {
-      this.envelope.release();
+    if (this.damperDown) {
+      ++this.damperNotes;
+    } else {
+      if (--this.notesDown == 0) {
+        this.envelope.release();
+      }
+    }
+  }
+    
+  @Override
+  public void controlChangeReceived(MidiControlChange cc) {
+    if (cc.getCC() == MidiControlChange.DAMPER_PEDAL) {
+      if (cc.getValue() > 0) {
+        if (!this.damperDown) {
+          this.damperDown = true;
+        }
+      } else {
+        if (this.damperDown) {
+          this.damperDown = false;
+          this.notesDown -= this.damperNotes;
+          this.damperNotes = 0;
+          if (this.notesDown == 0) {
+            this.envelope.release();
+          }
+        }
+      }
     }
   }
 }

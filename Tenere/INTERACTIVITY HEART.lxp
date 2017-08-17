@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502855076195,
+  "timestamp": 1502929048602,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -66,14 +66,14 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 2,
         "patterns": [
           {
             "id": 6953,
             "class": "Tenere$HeartLoops",
             "parameters": {
               "label": "HeartLoops",
-              "baseSaturation": 40.0,
+              "baseSaturation": 26.800000295042988,
               "decay": 2979.999989271164
             },
             "modulation": {
@@ -87,13 +87,181 @@
             "class": "Tenere$HeartPride",
             "parameters": {
               "label": "HeartPride",
-              "baseSaturation": 40.0,
-              "baseBrightness": 40.0,
-              "decay": 2500.0
+              "baseSaturation": 30.000000670552254,
+              "baseBrightness": 25.800000429153442,
+              "decay": 2500.0,
+              "blend": 0.10000000149011612,
+              "xSlope": 0.0,
+              "zSlope": 0.0
             },
             "modulation": {
-              "modulators": [],
-              "modulations": [],
+              "modulators": [
+                {
+                  "id": 7076,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "XSlope",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 182.58822631835938,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -16714497,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 57665.163828770885,
+                    "skew": 0.0,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.0
+                  }
+                },
+                {
+                  "id": 7078,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "ZSlope",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 357.1764831542969,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -65524,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 44929.424380784505,
+                    "skew": 0.0,
+                    "shape": 0.0,
+                    "phase": 0.20999999530613422,
+                    "exp": 0.0
+                  }
+                }
+              ],
+              "modulations": [
+                {
+                  "source": {
+                    "id": 7076
+                  },
+                  "target": {
+                    "componentId": 6996,
+                    "parameterPath": "xSlope"
+                  },
+                  "id": 7077,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 1,
+                    "Range": 0.019999994784593578
+                  }
+                },
+                {
+                  "source": {
+                    "id": 7078
+                  },
+                  "target": {
+                    "componentId": 6996,
+                    "parameterPath": "zSlope"
+                  },
+                  "id": 7079,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 1,
+                    "Range": 0.030000004693865767
+                  }
+                }
+              ],
+              "triggers": []
+            }
+          },
+          {
+            "id": 7163,
+            "class": "Tenere$HeartRings",
+            "parameters": {
+              "label": "HeartRings",
+              "speed": 774.3999955654144,
+              "mode": 0.0,
+              "decay": 737.4999891035259,
+              "base": 7.200000733137131,
+              "pulse": 1279.9999937415123
+            },
+            "modulation": {
+              "modulators": [
+                {
+                  "id": 7255,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "Pulse",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 105.88235473632812,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -12779776,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 25898.93311376134,
+                    "skew": 0.0,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.0
+                  }
+                },
+                {
+                  "id": 7257,
+                  "class": "heronarts.lx.modulator.VariableLFO",
+                  "parameters": {
+                    "label": "Base",
+                    "running": true,
+                    "trigger": false,
+                    "color/hue": 201.1764678955078,
+                    "color/brightness": 100.0,
+                    "color/saturation": 100.0,
+                    "color": -16734721,
+                    "loop": true,
+                    "wave": 0,
+                    "period": 23444.0380439152,
+                    "skew": 0.0,
+                    "shape": 0.0,
+                    "phase": 0.0,
+                    "exp": 0.0
+                  }
+                }
+              ],
+              "modulations": [
+                {
+                  "source": {
+                    "id": 7255
+                  },
+                  "target": {
+                    "componentId": 7163,
+                    "parameterPath": "pulse"
+                  },
+                  "id": 7256,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 0,
+                    "Range": -0.7199999876320362
+                  }
+                },
+                {
+                  "source": {
+                    "id": 7257
+                  },
+                  "target": {
+                    "componentId": 7163,
+                    "parameterPath": "base"
+                  },
+                  "id": 7258,
+                  "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "parameters": {
+                    "label": "",
+                    "Polarity": 0,
+                    "Range": 0.20999999530613422
+                  }
+                }
+              ],
               "triggers": []
             }
           }
@@ -330,7 +498,7 @@
         "leavesVisible": false,
         "structureVisible": true,
         "controlsExpanded": false,
-        "sensorsExpanded": false,
+        "sensorsExpanded": true,
         "sourcesExpanded": false,
         "outputExpanded": false
       }
@@ -384,9 +552,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 5118.606138708371,
-        "theta": 0.2767993950843779,
-        "phi": 0.023467064976692237
+        "radius": 6116.441138529124,
+        "theta": 0.2947993950843784,
+        "phi": 0.017467064976692263
       }
     }
   }

@@ -1,9 +1,13 @@
+static final int[] HEART_COLORS = {
+  350, 20, 80, 220, 280,
+};
+
 /**
  * This Tenere-specific component takes input from sensors via OSC messages and
  * exposes them to the UI as LX parameters.
  */
 public class Sensors extends LXModulatorComponent implements LXOscListener {
-
+  
   private static final int NUM_MUSES = 3;
   private static final int MUSE_BASE_PORT = 7810;
   
@@ -24,7 +28,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     this.lx = lx;
     sources.add(new Source());
     for (int i = 0; i < NUM_VIRTUAL_SENSORS; ++i) {
-      addSubcomponent(sensor[i] = new Sensor(lx, SENSOR_LABELS[i]));
+      addSubcomponent(sensor[i] = new Sensor(lx, i, SENSOR_LABELS[i]));
     }
     for (int i = 0; i < NUM_MUSES; ++i) {
       registerSourcePort(MUSE_BASE_PORT + i);
@@ -205,6 +209,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
   
   public class Sensor extends LXModulatorComponent {
     
+    public final int index;
     public final Input input = new Input();
     
     public final BooleanParameter heartBeat = input.heartBeat;
@@ -219,8 +224,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final DiscreteParameter source = new DiscreteParameter("Source", sources.toArray(new Source[]{}))
       .setDescription("Which source input this sensor uses");  
 
-    public Sensor(LX lx, String label) {
+    public Sensor(LX lx, int index, String label) {
       super(lx, label);
+      this.index = index;
       addParameter("enabled", this.enabled);
       addParameter("source", this.source);
       addParameter("heartBeat", this.heartBeat);

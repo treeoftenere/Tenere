@@ -387,7 +387,7 @@ public class PatternWaves extends TenerePattern {
   private final LXModulator len2Damp = startModulator(new DampedParameter(this.len2, LEN_DAMPING_V, LEN_DAMPING_A));
   private final LXModulator len3Damp = startModulator(new DampedParameter(this.len3, LEN_DAMPING_V, LEN_DAMPING_A));  
 
-  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 20*FEET, 40*FEET));
+  private final LXModulator sizeDamp = startModulator(new DampedParameter(this.size, 40*FEET, 80*FEET));
 
   private final double[] bins = new double[512];
 
@@ -441,68 +441,78 @@ public class PatternVortex extends TenerePattern {
     return "Mark C. Slee";
   }
   
-  private final SinLFO xPos = new SinLFO(model.xMin, model.xMax, startModulator(
-    new SinLFO(29000, 59000, 51000).randomBasis()
-    ));
-
-  private final SinLFO yPos = new SinLFO(model.yMin, model.yMax, startModulator(
-    new SinLFO(35000, 44000, 57000).randomBasis()
-    ));
-
-  public final CompoundParameter vortexBase = new CompoundParameter("Base", 
-    12*INCHES, 
-    1*INCHES, 
-    140*INCHES
-    );
-
-  public final CompoundParameter vortexMod = new CompoundParameter("Mod", 0, 120*INCHES);
-
-  private final SinLFO vortexSize = new SinLFO(0, vortexMod, 19000);
-
-  private final SawLFO pos = new SawLFO(0, 1, startModulator(
-    new SinLFO(1000, 9000, 17000)
-    ));
-
-  private final SinLFO xSlope = new SinLFO(-1, 1, startModulator(
-    new SinLFO(78000, 104000, 17000).randomBasis()
-    ));
-
-  private final SinLFO ySlope = new SinLFO(-1, 1, startModulator(
-    new SinLFO(37000, 79000, 51000).randomBasis()
-    ));
-
-  private final SinLFO zSlope = new SinLFO(-.2, .2, startModulator(
-    new SinLFO(47000, 91000, 53000).randomBasis()
-    ));
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 2000, 9000, 300)
+    .setExponent(.5)
+    .setDescription("Speed of vortex motion");
+  
+  public final CompoundParameter size =
+    new CompoundParameter("Size",  4*FEET, 1*FEET, 10*FEET)
+    .setDescription("Size of vortex");
+  
+  public final CompoundParameter xPos = (CompoundParameter)
+    new CompoundParameter("XPos", model.cx, model.xMin, model.xMax)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("X-position of vortex center");
+    
+  public final CompoundParameter yPos = (CompoundParameter)
+    new CompoundParameter("YPos", model.cy, model.yMin, model.yMax)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("Y-position of vortex center");
+    
+  public final CompoundParameter xSlope = (CompoundParameter)
+    new CompoundParameter("XSlp", .2, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("X-slope of vortex center");
+    
+  public final CompoundParameter ySlope = (CompoundParameter)
+    new CompoundParameter("YSlp", .5, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("Y-slope of vortex center");
+    
+  public final CompoundParameter zSlope = (CompoundParameter)
+    new CompoundParameter("ZSlp", .3, -1, 1)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
+    .setDescription("Z-slope of vortex center");
+  
+  private final LXModulator pos = startModulator(new SawLFO(1, 0, this.speed));
+  
+  private final LXModulator sizeDamped = startModulator(new DampedParameter(this.size, 5*FEET, 8*FEET));
+  private final LXModulator xPosDamped = startModulator(new DampedParameter(this.xPos, model.xRange, 3*model.xRange));
+  private final LXModulator yPosDamped = startModulator(new DampedParameter(this.yPos, model.yRange, 3*model.yRange));
+  private final LXModulator xSlopeDamped = startModulator(new DampedParameter(this.xSlope, 3, 6));
+  private final LXModulator ySlopeDamped = startModulator(new DampedParameter(this.ySlope, 3, 6));
+  private final LXModulator zSlopeDamped = startModulator(new DampedParameter(this.zSlope, 3, 6));
 
   public PatternVortex(LX lx) {
     super(lx);
-    addParameter(vortexBase);
-    addParameter(vortexMod);
-    startModulator(xPos.randomBasis());
-    startModulator(yPos.randomBasis());
-    startModulator(pos);
-    startModulator(vortexSize);
-    startModulator(xSlope);
-    startModulator(ySlope);
-    startModulator(zSlope);
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    addParameter("xPos", this.xPos);
+    addParameter("yPos", this.yPos);
+    addParameter("xSlope", this.xSlope);
+    addParameter("ySlope", this.ySlope);
+    addParameter("zSlope", this.zSlope);
   }
 
   public void run(double deltaMs) {
-    final float xPos = this.xPos.getValuef();
-    final float yPos = this.yPos.getValuef();
+    final float xPos = this.xPosDamped.getValuef();
+    final float yPos = this.yPosDamped.getValuef();
+    final float size = this.sizeDamped.getValuef();
     final float pos = this.pos.getValuef();
-    final float vortexSize = this.vortexBase.getValuef() + this.vortexSize.getValuef();
-    final float xSlope = this.xSlope.getValuef();
-    final float ySlope = this.ySlope.getValuef();
-    final float zSlope = this.zSlope.getValuef();
+    
+    final float xSlope = this.xSlopeDamped.getValuef();
+    final float ySlope = this.ySlopeDamped.getValuef();
+    final float zSlope = this.zSlopeDamped.getValuef();
 
+    float dMult = 2 / size;
     for (Leaf leaf : tree.leaves) {
-      float radix = abs((xSlope*abs(leaf.x-model.cx) + ySlope*abs(leaf.y-model.cy) + zSlope*abs(leaf.z-model.cz)) % vortexSize);
+      float radix = abs((xSlope*abs(leaf.x-model.cx) + ySlope*abs(leaf.y-model.cy) + zSlope*abs(leaf.z-model.cz)));
       float dist = dist(leaf.x, leaf.y, xPos, yPos); 
-      float size = max(20*INCHES, 2*vortexSize - .5*dist);
-      float b = 100 - (100 / size) * LXUtils.wrapdistf(radix, pos * vortexSize, vortexSize);
-      setColor(leaf, (b > 0) ? LXColor.gray(b) : #000000);
+      //float falloff = 100 / max(20*INCHES, 2*size - .5*dist);
+      //float b = 100 - falloff * LXUtils.wrapdistf(radix, pos * size, size);
+      float b = abs(((dist + radix + pos * size) % size) * dMult - 1);
+      setColor(leaf, (b > 0) ? LXColor.gray(b*b*100) : #000000);
     }
   }
 }
@@ -585,44 +595,140 @@ public class PatternAudioMeter extends TenerePattern {
   } 
 }
 
-public abstract class AudioWaves extends TenerePattern {
+public abstract class BufferPattern extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter speed =
+  public final CompoundParameter speedRaw =
     new CompoundParameter("Speed", 256, 1024, 64)
     .setDescription("Speed of the audio waves");
   
+  public final LXModulator speed = startModulator(new DampedParameter(speedRaw, 256, 512));
+  
   private static final int BUFFER_SIZE = 2048;
-  protected float[] history = new float[BUFFER_SIZE];
+  protected int[] history = new int[BUFFER_SIZE];
   protected int cursor = 0;
 
-  public AudioWaves(LX lx) {
+  public BufferPattern(LX lx) {
     super(lx);
-    addParameter("speed", this.speed);
+    addParameter("speed", this.speedRaw);
+    for (int i = 0; i < this.history.length; ++i) {
+      this.history[i] = #000000;
+    }
   }
   
-  public void run(double deltaMs) {
-    float speed = this.speed.getValuef();
-    for (Leaf leaf : model.leaves) {
-      float d = abs(leaf.point.yn - .5);
-      int offset = round(d * d * speed);
-      setColor(leaf, LXColor.gray(100 * this.history[(this.cursor + offset) % this.history.length]));
-    }
-    
+  public final void run(double deltaMs) {
     // Add to history
     if (--this.cursor < 0) {
       this.cursor = this.history.length - 1;
     }
-    this.history[this.cursor] = getLevel();
+    this.history[this.cursor] = getColor();
+    onRun(deltaMs);
   }
   
-  protected abstract float getLevel();
+  protected int getColor() {
+    return LXColor.gray(100 * getLevel());
+  }
+  
+  protected float getLevel() {
+    return 0;
+  }
+  
+  abstract void onRun(double deltaMs); 
+}
+
+public class PatternMelt extends BufferPattern {
+  
+  private final float[] multipliers = new float[32];
+  
+  public final CompoundParameter level =
+    new CompoundParameter("Level", 0)
+    .setDescription("Level of the melting effect");
+  
+  public final BooleanParameter auto =
+    new BooleanParameter("Auto", true)
+    .setDescription("Automatically make content");
+  
+  private LXModulator rot = startModulator(new SawLFO(0, 1, 39000)); 
+  private LXModulator autoLevel = startModulator(new TriangleLFO(-2, 1, startModulator(new SinLFO(3000, 7000, 19000))));
+  
+  public PatternMelt(LX lx) {
+    super(lx);
+    addParameter("level", this.level);
+    addParameter("auto", this.auto);
+    for (int i = 0; i < this.multipliers.length; ++i) {
+      float r = random(.6, 1);
+      this.multipliers[i] = r * r * r;
+    }
+  }
+  
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float rot = this.rot.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float az = leaf.point.azimuth;
+      float maz = (az / TWO_PI + rot) * this.multipliers.length;
+      float lerp = maz % 1;
+      int floor = (int) (maz - lerp);
+      float m = lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp);      
+      float d = abs(1 - leaf.point.yn);
+      int offset = round(d * speed * m);
+      setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
+    }
+  }
+  
+  public float getLevel() {
+    if (this.auto.isOn()) {
+      float autoLevel = this.autoLevel.getValuef();
+      if (autoLevel > 0) {
+        return pow(autoLevel, .5);
+      }
+      return 0;
+    }
+    return this.level.getValuef();
+  }
+}
+
+public abstract class WavePattern extends BufferPattern {
+  
+  public static final int NUM_MODES = 5; 
+  private final float[] dm = new float[NUM_MODES];
+  
+  public final CompoundParameter mode =
+    new CompoundParameter("Mode", 0, NUM_MODES - 1)
+    .setDescription("Mode of the wave motion");
+  
+  private final LXModulator modeDamped = startModulator(new DampedParameter(this.mode, 1, 8)); 
+  
+  protected WavePattern(LX lx) {
+    super(lx);
+    addParameter("mode", this.mode);
+  }
+    
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float mode = this.modeDamped.getValuef();
+    float lerp = mode % 1;
+    int floor = (int) (mode - lerp);
+    for (Leaf leaf : model.leaves) {
+      dm[0] = abs(leaf.point.yn - .5);
+      dm[1] = .5 * abs(leaf.point.xn - .5) + .5 * abs(leaf.point.yn - .5);
+      dm[2] = abs(leaf.point.xn - .5);
+      dm[3] = leaf.point.yn;
+      dm[4] = 1 - leaf.point.yn;
+      
+      int offset1 = round(dm[floor] * dm[floor] * speed);
+      int offset2 = round(dm[(floor + 1) % dm.length] * dm[(floor + 1) % dm.length] * speed);
+      int c1 = this.history[(this.cursor + offset1) % this.history.length];
+      int c2 = this.history[(this.cursor + offset2) % this.history.length];
+      setColor(leaf, LXColor.lerp(c1, c2, lerp));
+    }
+  }
   
 }
 
-public class PatternAudioWaves extends AudioWaves {
+public class PatternAudioWaves extends WavePattern {
         
   public final BooleanParameter manual =
     new BooleanParameter("Manual", false)
