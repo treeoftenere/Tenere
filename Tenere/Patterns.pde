@@ -637,6 +637,58 @@ public abstract class BufferPattern extends TenerePattern {
   abstract void onRun(double deltaMs); 
 }
 
+public class PatternMelt extends BufferPattern {
+  
+  private final float[] multipliers = new float[32];
+  
+  public final CompoundParameter level =
+    new CompoundParameter("Level", 0)
+    .setDescription("Level of the melting effect");
+  
+  public final BooleanParameter auto =
+    new BooleanParameter("Auto", true)
+    .setDescription("Automatically make content");
+  
+  private LXModulator rot = startModulator(new SawLFO(0, 1, 39000)); 
+  private LXModulator autoLevel = startModulator(new TriangleLFO(-2, 1, startModulator(new SinLFO(3000, 7000, 19000))));
+  
+  public PatternMelt(LX lx) {
+    super(lx);
+    addParameter("level", this.level);
+    addParameter("auto", this.auto);
+    for (int i = 0; i < this.multipliers.length; ++i) {
+      float r = random(.6, 1);
+      this.multipliers[i] = r * r * r;
+    }
+  }
+  
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float rot = this.rot.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float az = leaf.point.azimuth;
+      float maz = (az / TWO_PI + rot) * this.multipliers.length;
+      float lerp = maz % 1;
+      int floor = (int) (maz - lerp);
+      float m = lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp);      
+      float d = abs(1 - leaf.point.yn);
+      int offset = round(d * speed * m);
+      setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
+    }
+  }
+  
+  public float getLevel() {
+    if (this.auto.isOn()) {
+      float autoLevel = this.autoLevel.getValuef();
+      if (autoLevel > 0) {
+        return (autoLevel < .5) ? (.5 * pow(2*autoLevel, 2)) : (.5 + .5 * pow(2*(autoLevel-.5), .5));
+      }
+      return 0;
+    }
+    return this.level.getValuef();
+  }
+}
+
 public abstract class WavePattern extends BufferPattern {
   
   public static final int NUM_MODES = 5; 
