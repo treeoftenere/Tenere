@@ -35,8 +35,8 @@ public static class StellarFixtureConfig {
   
   public StellarFixtureConfig(JSONObject fixture, String fixtureType) {
     this.ip = fixture.getString("IP", null);
-    this.fixtureId = fixture.getInt("FixtureId", NO_FIXTURE_ID);
-    this.nextFixtureId = fixture.getInt("NextFixtureId", NO_FIXTURE_ID);
+    this.fixtureId = fixture.getInt("id", NO_FIXTURE_ID);
+    this.nextFixtureId = fixture.getInt("child", NO_FIXTURE_ID);
     this.channel = fixtureType.equals(CHANNEL_ZERO) ? 0 : 4;
     
     // Load matrix values

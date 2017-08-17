@@ -7,7 +7,7 @@
 // Choose one of these line to specify the model mode!
 Tree.ModelMode modelMode = Tree.ModelMode.MAJOR_LIMBS;
 // Tree.ModelMode modelMode = Tree.ModelMode.STELLAR_IMPORT;
-final static String STELLAR_FILE = "sleeexportTenereBuild.json";
+final static String STELLAR_FILE = "TenereExportTestMondayWithID.json";
 
 // Special board testing mode
 final static boolean BOARD_TEST_MODE = false;
@@ -57,7 +57,7 @@ void setup() {
       public void initialize(LXStudio lx, LXStudio.UI ui) {
         // Register a couple top-level effects
         lx.registerEffect(BlurEffect.class);
-        //lx.registerEffect(DesaturationEffect.class);        
+        lx.registerEffect(StrobeEffect.class);        
 
         // Register the settings component
         lx.engine.registerComponent("tenereSettings", new Settings(lx, ui));
@@ -72,19 +72,15 @@ void setup() {
         try {          
 
           // Update appropriately for testing!
-          //final String[] OPC_ADDRESS = new String[] {
-          //  "192.168.1.4",
-          //  "192.168.1.9",
-          //  "192.168.1.12",
-          //  "192.168.1.59",
-          //  "192.168.1.131",
-          //  "192.168.1.134"
-          //};
+          final String[] OPC_ADDRESS = new String[] {
+            "192.168.1.42",
+            "192.168.1.254",
+          };
           
-          final String[] OPC_ADDRESS = new String[150];
-          for (int i = 0; i < OPC_ADDRESS.length; ++i) {
-            OPC_ADDRESS[i] = String.format("192.168.1.%d", (4 + i));
-          }
+          //final String[] OPC_ADDRESS = new String[150];
+          //for (int i = 0; i < OPC_ADDRESS.length; ++i) {
+          //  OPC_ADDRESS[i] = String.format("192.168.1.%d", (4 + i));
+          //}
           
           final int OPC_PORT = 1337;
 
