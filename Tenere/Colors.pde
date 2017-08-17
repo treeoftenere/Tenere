@@ -110,8 +110,9 @@ public class ColorGradientAssemblage extends TenerePattern {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter spread =
-    new CompoundParameter("Spread", 0, 360)
+  public final CompoundParameter spread = (CompoundParameter)
+    new CompoundParameter("Spread", 0, -360, 360)
+    .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Amount of hue spread across the assemblage");
 
   public final CompoundParameter speed = (CompoundParameter)
