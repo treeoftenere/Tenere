@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502935266348,
+  "timestamp": 1503004003675,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -66,23 +66,8 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 19,
         "patterns": [
-          {
-            "id": 8023,
-            "class": "Tenere$PatternMelt",
-            "parameters": {
-              "label": "PatternMelt",
-              "speed": 822.3999873399734,
-              "level": 0.0,
-              "auto": true
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
           {
             "id": 4756,
             "class": "Tenere$PatternSolid",
@@ -91,6 +76,35 @@
               "h": 0.0,
               "s": 0.0,
               "b": 100.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9438,
+            "class": "Tenere$PatternChess",
+            "parameters": {
+              "label": "PatternChess",
+              "speed": 24790.057230564664,
+              "numSpots": 4.000000011175871
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 8371,
+            "class": "Tenere$PatternLighthouse",
+            "parameters": {
+              "label": "PatternLighthouse",
+              "speed": 16411.399936309455,
+              "size": 1.452986626918799,
+              "slope": 0.0
             },
             "modulation": {
               "modulators": [],
@@ -509,6 +523,51 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 9794,
+            "class": "Tenere$PatternMeltDown",
+            "parameters": {
+              "label": "PatternMeltDown",
+              "speed": 256.0,
+              "level": 0.0,
+              "auto": true
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9800,
+            "class": "Tenere$PatternMeltOut",
+            "parameters": {
+              "label": "PatternMeltOut",
+              "speed": 256.0,
+              "level": 0.0,
+              "auto": true
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9806,
+            "class": "Tenere$PatternMeltUp",
+            "parameters": {
+              "label": "PatternMeltUp",
+              "speed": 731.9632978948339,
+              "level": 0.0,
+              "auto": true
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -597,6 +656,18 @@
         "patternIndex": 0,
         "patterns": [
           {
+            "id": 5693,
+            "class": "Tenere$TextureNone",
+            "parameters": {
+              "label": "TextureNone"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
             "id": 8006,
             "class": "Tenere$TextureInOut",
             "parameters": {
@@ -650,18 +721,6 @@
               "modulations": [],
               "triggers": []
             }
-          },
-          {
-            "id": 5693,
-            "class": "Tenere$TextureNone",
-            "parameters": {
-              "label": "TextureNone"
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
           }
         ]
       },
@@ -686,7 +745,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 5,
         "patterns": [
           {
             "id": 3290,
@@ -751,6 +810,21 @@
               "speed": 0.5,
               "slope": 1.951999977707863,
               "amount": 4
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 8722,
+            "class": "Tenere$ColorLighthouse",
+            "parameters": {
+              "label": "ColorLighthouse",
+              "speed": 14685.252505544297,
+              "spread": 104.39999766647816,
+              "slope": 0.0
             },
             "modulation": {
               "modulators": [],
@@ -826,22 +900,22 @@
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
-          "Band-1": 0.0,
-          "Band-2": 0.01970914591203088,
-          "Band-3": 0.12437930265277142,
-          "Band-4": 0.24996799533293046,
-          "Band-5": 0.43077906440073765,
-          "Band-6": 0.4724736949529571,
-          "Band-7": 0.2310180785494943,
-          "Band-8": 0.24766177622757057,
-          "Band-9": 0.213809755873691,
-          "Band-10": 0.22194184948514062,
-          "Band-11": 0.4220614845152767,
-          "Band-12": 0.42789487236354184,
-          "Band-13": 0.6120607136234733,
-          "Band-14": 0.6254041999865854,
-          "Band-15": 0.5051689956748495,
-          "Band-16": 0.17134718787308234
+          "Band-1": 0.1269337911965588,
+          "Band-2": 0.3064933855838232,
+          "Band-3": 0.4173929597230954,
+          "Band-4": 0.5337070622144884,
+          "Band-5": 0.4993540602365797,
+          "Band-6": 0.5126577048946368,
+          "Band-7": 0.3740732338741579,
+          "Band-8": 0.17753819244421076,
+          "Band-9": 0.2242275834668893,
+          "Band-10": 0.1288962532173067,
+          "Band-11": 0.058359686025043156,
+          "Band-12": 0.2836433099866187,
+          "Band-13": 0.45487941027896395,
+          "Band-14": 0.22251428470462353,
+          "Band-15": 0.12492650630945823,
+          "Band-16": 0.0
         }
       },
       "input": {
@@ -987,10 +1061,10 @@
         ]
       },
       "tenereSettings": {
-        "pointsVisible": true,
-        "leavesVisible": false,
+        "pointsVisible": false,
+        "leavesVisible": true,
         "structureVisible": true,
-        "controlsExpanded": true,
+        "controlsExpanded": false,
         "sensorsExpanded": false,
         "sourcesExpanded": false,
         "outputExpanded": false
@@ -1056,9 +1130,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 5134.336307300188,
-        "theta": 0.2197993950843779,
-        "phi": 0.038467064976692236
+        "radius": 5773.372615711881,
+        "theta": 0.12379939508437796,
+        "phi": -0.003532935023307944
       }
     }
   }
