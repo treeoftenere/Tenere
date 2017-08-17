@@ -681,7 +681,7 @@ public class PatternMelt extends BufferPattern {
     if (this.auto.isOn()) {
       float autoLevel = this.autoLevel.getValuef();
       if (autoLevel > 0) {
-        return (autoLevel < .5) ? (.5 * pow(2*autoLevel, 2)) : (.5 + .5 * pow(2*(autoLevel-.5), .5));
+        return pow(autoLevel, .5);
       }
       return 0;
     }
