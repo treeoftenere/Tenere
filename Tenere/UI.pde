@@ -157,7 +157,9 @@ public class UITreeStructure extends UI3dComponent {
       addChild(new UILimb(limb));
     }
     for (Branch branch : tree.branches) {
-      addChild(new UIBranch(branch));
+      if (branch.orientation != null) {
+        addChild(new UIBranch(branch));
+      }
     }
   }
  
@@ -489,7 +491,7 @@ abstract class UIInput extends UI2dContainer {
   
   protected boolean expanded = false;
   
-  private final UISensorInput uiInput;
+  protected final UISensorInput uiInput;
   
   UIInput(UI ui, Sensors.Input input, float x, float y, float w) {
     super(x, y, w, COLLAPSED_HEIGHT);
@@ -545,7 +547,9 @@ public class UISensors extends UICollapsibleSection {
   class UISensor extends UIInput {
     UISensor(UI ui, final Sensors.Sensor sensor, float x, float y, float w) {
       super(ui, sensor.input, x, y, w);
-            
+
+      this.uiInput.heartMeter.setMeterColor(LXColor.hsb(HEART_COLORS[sensor.index], 80, 80));
+
       new UILabel(PADDING, 2*PADDING, 16, 16)
       .setLabel(sensor.getLabel())
       .setTextAlignment(PConstants.CENTER, PConstants.TOP)
@@ -600,6 +604,8 @@ class UISensorInput extends UI2dContainer {
   static final int METER_MARGIN = 2;
   static final int METER_HEIGHT = 10;
   
+  final UIParameterMeter heartMeter;
+  
   UISensorInput(UI ui, final Sensors.Input input, float x, float y, float w) {
     super(x, y, w, HEIGHT);
     y = 0;
@@ -609,7 +615,7 @@ class UISensorInput extends UI2dContainer {
         input.heartBeat.setValue(true);
       }
     }.addToContainer(this);
-    new UIParameterMeter(ui, input.heartLevel, METER_X, y, getContentWidth() - METER_X, 18).addToContainer(this);
+    this.heartMeter = (UIParameterMeter) new UIParameterMeter(ui, input.heartLevel, METER_X, y, getContentWidth() - METER_X, 18).addToContainer(this);
     y += 18 + METER_MARGIN;
     
     new UIImage(loadImage("brain.png"), 0, y).addToContainer(this);
@@ -637,11 +643,13 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
   
   private float level;
   private final LXNormalizedParameter parameter; 
+  private int meterColor;
   
   public UIParameterMeter(UI ui, final LXNormalizedParameter parameter, float x, float y, float w, float h) {
     super(x, y, w, h);
     setBackgroundColor(ui.theme.getControlBackgroundColor());
     setBorderColor(ui.theme.getControlBorderColor());
+    this.meterColor = ui.theme.getPrimaryColor();
     this.parameter = parameter;
     this.level = parameter.getNormalizedf();
     addLoopTask(new LXLoopTask() {
@@ -653,6 +661,11 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
         }
       }
     });
+  }
+  
+  public UIParameterMeter setMeterColor(int meterColor) {
+    this.meterColor = meterColor;
+    return this;
   }
   
   private void mouseValue(MouseEvent mouseEvent, float mx) {
@@ -670,7 +683,7 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
   
   public void onDraw(UI ui, PGraphics pg) {
     pg.noStroke();
-    pg.fill(ui.theme.getPrimaryColor());
+    pg.fill(this.meterColor);
     pg.rect(0, 0, getWidth() * this.level, getHeight());
   }
   
@@ -685,7 +698,7 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
 
 public class UIOutputControls extends UICollapsibleSection {
   public UIOutputControls(final LXStudio.UI ui) {
-    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 140);
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 200);
     setTitle("OUTPUT");
         
     List<OutputItem> items = new ArrayList<OutputItem>();
@@ -704,6 +717,19 @@ public class UIOutputControls extends UICollapsibleSection {
     
     public OutputItem(OPCDatagram datagram) {
       this.datagram = datagram;
+      datagram.error.addListener(new LXParameterListener() {
+        public void onParameterChanged(LXParameter p) {
+          redraw();
+        }
+      });
+    }
+        
+    public boolean isActive() {
+      return this.datagram.error.isOn();
+    }
+    
+    public int getActiveColor(UI ui) {
+      return ui.theme.getAttentionColor();
     }
         
     public boolean isChecked() {
@@ -720,7 +746,22 @@ public class UIOutputControls extends UICollapsibleSection {
     }
         
     public String getLabel() {
-      return String.format("%s/%d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
+      return String.format("%s / %d-%d", this.datagram.getAddress().getHostAddress(), this.datagram.getChannel(), this.datagram.getChannel()+3);
     }
+  }
+}
+public class UIBoardTest extends UICollapsibleSection {
+  public UIBoardTest(final LXStudio.UI ui, LX lx) {
+    super(ui, 0, 0, ui.leftPane.global.getContentWidth(), 60);
+    setTitle("BOARD TEST");
+    
+    new UIIntegerBox(0, 0, getContentWidth(), 16)
+    .setParameter(boardNumber)
+    .addToContainer(this);
+    
+    new UIButton(0, 20, getContentWidth(), 16)
+    .setParameter(lx.engine.output.enabled)
+    .setLabel("Output On")
+    .addToContainer(this);
   }
 }

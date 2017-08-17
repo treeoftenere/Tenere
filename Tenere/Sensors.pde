@@ -1,9 +1,13 @@
+static final int[] HEART_COLORS = {
+  350, 20, 80, 220, 280,
+};
+
 /**
  * This Tenere-specific component takes input from sensors via OSC messages and
  * exposes them to the UI as LX parameters.
  */
 public class Sensors extends LXModulatorComponent implements LXOscListener {
-
+  
   private static final int NUM_MUSES = 3;
   private static final int MUSE_BASE_PORT = 7810;
   
@@ -24,7 +28,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     this.lx = lx;
     sources.add(new Source());
     for (int i = 0; i < NUM_VIRTUAL_SENSORS; ++i) {
-      addSubcomponent(sensor[i] = new Sensor(lx, SENSOR_LABELS[i]));
+      addSubcomponent(sensor[i] = new Sensor(lx, i, SENSOR_LABELS[i]));
     }
     for (int i = 0; i < NUM_MUSES; ++i) {
       registerSourcePort(MUSE_BASE_PORT + i);
@@ -156,6 +160,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
 
   public class Source extends Input implements LXOscListener {
     
+    private long lastBeatMillis = 0;
+    private boolean waitingForBeatFloor = false;
+    
     final boolean isNull;
     final String label;
     
@@ -202,6 +209,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
   
   public class Sensor extends LXModulatorComponent {
     
+    public final int index;
     public final Input input = new Input();
     
     public final BooleanParameter heartBeat = input.heartBeat;
@@ -216,8 +224,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final DiscreteParameter source = new DiscreteParameter("Source", sources.toArray(new Source[]{}))
       .setDescription("Which source input this sensor uses");  
 
-    public Sensor(LX lx, String label) {
+    public Sensor(LX lx, int index, String label) {
       super(lx, label);
+      this.index = index;
       addParameter("enabled", this.enabled);
       addParameter("source", this.source);
       addParameter("heartBeat", this.heartBeat);
@@ -252,6 +261,11 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
   private static final float ACC_SCALE = 500;
   private static final float GYRO_OFFSET = 0.5;
   private static final float GYRO_SCALE = 500;
+  
+  private static final float BEAT_THRESHOLD = 800;
+  private static final float BEAT_FLOOR = 500;
+  private static final float BEAT_LIMIT_MS = 300;
+  private static final float BEAT_RESET_MS = 5000;
 
   public void oscMessage(OscMessage message) {
     String addressPattern = message.getAddressPattern().getValue();
@@ -287,9 +301,19 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     } else if (path.equals("/muse/acc")) {
       source.set(Input.ACC, message, ACC_SCALE, ACC_OFFSET);
     } else if (path.equals("/grove/pulsesensor")) {
-      if (message.getFloat(0) > 800) {
-        // println("Heartbeat triggered!!!!    " + message.getFloat(0));
-        source.set(Input.HEART, message);
+      float pulseLevel = message.getFloat(0);
+      long now = System.currentTimeMillis();
+      long elapsed = now - source.lastBeatMillis;
+      if (source.waitingForBeatFloor) {
+        if (pulseLevel < BEAT_FLOOR || elapsed > BEAT_RESET_MS) {
+          source.waitingForBeatFloor = false;
+        }
+      } else {
+        if (pulseLevel > BEAT_THRESHOLD && elapsed > BEAT_LIMIT_MS) {
+          source.set(Input.HEART, message);
+          source.lastBeatMillis = now;
+          source.waitingForBeatFloor = true;          
+        }
       }
     } else if (path.equals("/grove/analog")) {
       //println("Analog0: " + message.getFloat(0) + "  Analog1: " + message.getFloat(1) + "  Analog2: " + message.getFloat(2));
