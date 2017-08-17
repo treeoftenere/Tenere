@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503005256280,
+  "timestamp": 1503006338553,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -84,12 +84,58 @@
             }
           },
           {
-            "id": 10180,
-            "class": "Tenere$PatternBranchSnakes",
+            "id": 10554,
+            "class": "Tenere$PatternSnakes",
             "parameters": {
-              "label": "PatternBranchSnakes",
-              "speed": 3466.8098602291666,
-              "size": 73.4999986924231
+              "label": "PatternSnakes",
+              "speed": 7000.0,
+              "modSpeed": 5850.855565701824,
+              "size": 52.79999949038029
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9806,
+            "class": "Tenere$PatternMeltUp",
+            "parameters": {
+              "label": "PatternMeltUp",
+              "speed": 793.208238468578,
+              "level": 0.0,
+              "auto": true
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9794,
+            "class": "Tenere$PatternMeltDown",
+            "parameters": {
+              "label": "PatternMeltDown",
+              "speed": 568.8659753506563,
+              "level": 0.0,
+              "auto": true
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 9800,
+            "class": "Tenere$PatternMeltOut",
+            "parameters": {
+              "label": "PatternMeltOut",
+              "speed": 815.6550978592334,
+              "level": 0.0,
+              "auto": true
             },
             "modulation": {
               "modulators": [],
@@ -537,51 +583,6 @@
               "modulations": [],
               "triggers": []
             }
-          },
-          {
-            "id": 9794,
-            "class": "Tenere$PatternMeltDown",
-            "parameters": {
-              "label": "PatternMeltDown",
-              "speed": 256.0,
-              "level": 0.0,
-              "auto": true
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 9800,
-            "class": "Tenere$PatternMeltOut",
-            "parameters": {
-              "label": "PatternMeltOut",
-              "speed": 256.0,
-              "level": 0.0,
-              "auto": true
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 9806,
-            "class": "Tenere$PatternMeltUp",
-            "parameters": {
-              "label": "PatternMeltUp",
-              "speed": 731.9632978948339,
-              "level": 0.0,
-              "auto": true
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
           }
         ]
       },
@@ -667,13 +668,25 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 1,
         "patterns": [
           {
             "id": 5693,
             "class": "Tenere$TextureNone",
             "parameters": {
               "label": "TextureNone"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 11402,
+            "class": "Tenere$TextureCrawl",
+            "parameters": {
+              "label": "TextureCrawl"
             },
             "modulation": {
               "modulators": [],
@@ -914,22 +927,22 @@
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
-          "Band-1": 0.11824890840051716,
-          "Band-2": 0.297402715266452,
-          "Band-3": 0.40845115875433113,
-          "Band-4": 0.5330593738877702,
-          "Band-5": 0.47851591297513363,
-          "Band-6": 0.27171114690234943,
-          "Band-7": 0.24975619815834504,
-          "Band-8": 0.254543395347274,
-          "Band-9": 0.22190771201840243,
-          "Band-10": 0.13296617623014362,
-          "Band-11": 0.24008040503129247,
-          "Band-12": 0.36477702786252586,
-          "Band-13": 0.5359577128489194,
-          "Band-14": 0.4185965499405828,
-          "Band-15": 0.46786271946929603,
-          "Band-16": 0.28087056590543846
+          "Band-1": 0.0,
+          "Band-2": 0.12586789402791898,
+          "Band-3": 0.2947225804903233,
+          "Band-4": 0.43733926634612375,
+          "Band-5": 0.41826594220528224,
+          "Band-6": 0.25225403619588616,
+          "Band-7": 0.31214295310230455,
+          "Band-8": 0.49562682169524264,
+          "Band-9": 0.4734282210557116,
+          "Band-10": 0.0967333113907427,
+          "Band-11": 0.25255257423802724,
+          "Band-12": 0.41659210958707316,
+          "Band-13": 0.6561291275101844,
+          "Band-14": 0.573690942258944,
+          "Band-15": 0.45773477705420484,
+          "Band-16": 0.30416879710565614
         }
       },
       "input": {
@@ -1075,10 +1088,10 @@
         ]
       },
       "tenereSettings": {
-        "pointsVisible": false,
-        "leavesVisible": true,
+        "pointsVisible": true,
+        "leavesVisible": false,
         "structureVisible": true,
-        "controlsExpanded": false,
+        "controlsExpanded": true,
         "sensorsExpanded": false,
         "sourcesExpanded": false,
         "outputExpanded": false
@@ -1144,9 +1157,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 4297.274563794183,
-        "theta": 0.16879939508437808,
-        "phi": 0.0054670649766920465
+        "radius": 4698.176809840667,
+        "theta": 0.23179939508437813,
+        "phi": 0.05646706497669202
       }
     }
   }
