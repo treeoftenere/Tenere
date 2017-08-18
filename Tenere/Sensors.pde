@@ -7,7 +7,7 @@ static final int[] HEART_COLORS = {
  * exposes them to the UI as LX parameters.
  */
 public class Sensors extends LXModulatorComponent implements LXOscListener {
-  
+
   private static final int NUM_MUSES = 3;
   private static final int MUSE_BASE_PORT = 7810;
   
@@ -100,12 +100,18 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
       new NormalizedParameter("Gyro 2", 0).setDescription("Gyro input from Muse axis 2"),
     };
     
+    public final NormalizedParameter[] orientation = new NormalizedParameter[] {
+      new NormalizedParameter("Pitch", 0).setDescription("Pitch from Muse"),
+      new NormalizedParameter("Roll", 0).setDescription("Roll from Muse"),
+    };
+
     public final static int HEART = 0;
     public final static int EEG = 1;
     public final static int ACC = 2;
     public final static int GYRO = 3;
+    public final static int ORIENTATION = 4;
     
-    private final Object[] fields = { heartBeat, eeg, acc, gyro };
+    private final Object[] fields = { heartBeat, eeg, acc, gyro, orientation };
     
     protected Input() {
       this.heartBeat.addListener(new LXParameterListener() {
@@ -152,7 +158,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
         }
       }
     }
-    
+
     public void loop(double deltaMs) {
       this.heartLevel.loop(deltaMs);
     }
@@ -162,7 +168,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     
     private long lastBeatMillis = 0;
     private boolean waitingForBeatFloor = false;
-    
+
     final boolean isNull;
     final String label;
     
@@ -217,6 +223,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final NormalizedParameter[] eeg = input.eeg;
     public final NormalizedParameter[] acc = input.acc;
     public final NormalizedParameter[] gyro = input.gyro;
+    public final NormalizedParameter[] orientation = input.orientation;
     
     public final BooleanParameter enabled = new BooleanParameter("Enabled", true)
       .setDescription("Whether the sensor is enabled");
@@ -239,6 +246,9 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
       }
       for (int i = 0; i < this.gyro.length; ++i) {
         addParameter("gyro" + i, this.gyro[i]);
+      }
+      for (int i = 0; i < this.orientation.length; ++i) {
+        addParameter("orientation" + i, this.orientation[i]);
       }
     }
     
@@ -300,6 +310,14 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
       source.set(Input.GYRO, message, GYRO_SCALE, GYRO_OFFSET);
     } else if (path.equals("/muse/acc")) {
       source.set(Input.ACC, message, ACC_SCALE, ACC_OFFSET);
+      // Compute and send/set orientation
+      float accX = message.getFloat(0); float accY = message.getFloat(1); float accZ = message.getFloat(2);
+      float musePitch = (float) Math.atan2(-accX, Math.sqrt(accY * accY + accZ * accZ));   // Normalized [-PI, PI] -> [0, 1]
+      float museRoll = (float) Math.atan2(accY, accZ);                                     // Normalized [-PI, PI] -> [0, 1]
+      OscMessage fakeMsg = new OscMessage("/muse/orientation");
+      fakeMsg.add(musePitch);
+      fakeMsg.add(museRoll);
+      source.set(Input.ORIENTATION, fakeMsg, 2.0f * PI, 0.5f);
     } else if (path.equals("/grove/pulsesensor")) {
       float pulseLevel = message.getFloat(0);
       long now = System.currentTimeMillis();
@@ -312,7 +330,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
         if (pulseLevel > BEAT_THRESHOLD && elapsed > BEAT_LIMIT_MS) {
           source.set(Input.HEART, message);
           source.lastBeatMillis = now;
-          source.waitingForBeatFloor = true;          
+          source.waitingForBeatFloor = true;
         }
       }
     } else if (path.equals("/grove/analog")) {
