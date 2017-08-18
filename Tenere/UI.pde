@@ -598,7 +598,7 @@ public class UISources extends UICollapsibleSection {
 
 class UISensorInput extends UI2dContainer {
   
-  static final int HEIGHT = 138;
+  static final int HEIGHT = 162;
   
   static final int METER_X = 20;
   static final int METER_MARGIN = 2;
@@ -636,6 +636,12 @@ class UISensorInput extends UI2dContainer {
       y += METER_HEIGHT + METER_MARGIN;
     }
     
+    new UIImage(loadImage("acc.png"), 0, y).addToContainer(this);
+    for (NormalizedParameter p : input.orientation) {
+      new UIParameterMeter(ui, p, METER_X, y, getContentWidth() - METER_X, METER_HEIGHT).addToContainer(this);
+      y += METER_HEIGHT + METER_MARGIN;
+    }
+
   }
 }
   
