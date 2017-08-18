@@ -228,7 +228,7 @@ public class Sensors extends LXModulatorComponent implements LXOscListener {
     public final BooleanParameter enabled = new BooleanParameter("Enabled", true)
       .setDescription("Whether the sensor is enabled");
     
-    public final DiscreteParameter source = new DiscreteParameter("Source", sources.toArray(new Source[]{}))
+    public final ObjectParameter<Source> source = new ObjectParameter<Source>("Source", sources.toArray(new Source[]{}))
       .setDescription("Which source input this sensor uses");  
 
     public Sensor(LX lx, int index, String label) {
