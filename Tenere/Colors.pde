@@ -62,9 +62,10 @@ public class ColorGradientTree extends TenerePattern {
     .setPolarity(LXParameter.Polarity.BIPOLAR)
     .setDescription("Slope of gradient on Z-axis");    
   
-  private final LXModulator spreadX = startModulator(new DampedParameter(palette.spreadX, 720, 720));
-  private final LXModulator spreadY = startModulator(new DampedParameter(palette.spreadY, 720, 720));
-  private final LXModulator spreadZ = startModulator(new DampedParameter(palette.spreadZ, 720, 720));
+  private final LXModulator spread = startModulator(new DampedParameter(palette.spread, 720, 720));
+  private final LXModulator spreadX = startModulator(new DampedParameter(palette.spreadX, 2, 2));
+  private final LXModulator spreadY = startModulator(new DampedParameter(palette.spreadY, 2, 2));
+  private final LXModulator spreadZ = startModulator(new DampedParameter(palette.spreadZ, 2, 2));
   private final LXModulator offsetX = startModulator(new DampedParameter(palette.offsetX, 5, 5));
   private final LXModulator offsetY = startModulator(new DampedParameter(palette.offsetY, 5, 5));
   private final LXModulator offsetZ = startModulator(new DampedParameter(palette.offsetZ, 5, 5));
@@ -78,9 +79,10 @@ public class ColorGradientTree extends TenerePattern {
   public void run(double deltaMs) {
     float hue = palette.getHuef();
     float sat = palette.getSaturationf();
-    float spreadX = this.spreadX.getValuef();
-    float spreadY = this.spreadY.getValuef();
-    float spreadZ = this.spreadZ.getValuef();
+    float spread = this.spread.getValuef();
+    float spreadX = spread * this.spreadX.getValuef();
+    float spreadY = spread * this.spreadY.getValuef();
+    float spreadZ = spread * this.spreadZ.getValuef();
     float offsetX = this.offsetX.getValuef();
     float offsetY = this.offsetY.getValuef();
     float offsetZ = this.offsetZ.getValuef();
@@ -110,32 +112,27 @@ public class ColorGradientAssemblage extends TenerePattern {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter spread = (CompoundParameter)
-    new CompoundParameter("Spread", 0, -360, 360)
-    .setPolarity(LXParameter.Polarity.BIPOLAR)
-    .setDescription("Amount of hue spread across the assemblage");
-
   public final CompoundParameter speed = (CompoundParameter)
     new CompoundParameter("Speed", 8000, 15000, 1000)
     .setExponent(.5)
     .setDescription("Speed of hue motion thru the assemblage");
+    
+  private final LXModulator spread = startModulator(new DampedParameter(palette.spread, 360, 540));
   
   private final int[] rawGradient = new int[LeafAssemblage.NUM_LEAVES];
   private final int[] assemblageGradient = new int[LeafAssemblage.NUM_LEAVES]; 
   
   public final LXModulator offset = startModulator(new SawLFO(0, LeafAssemblage.NUM_LEAVES, speed));
-  public final LXModulator spreadDamped = startModulator(new DampedParameter(this.spread, 360, 540));
     
   public ColorGradientAssemblage(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
-    addParameter("spread", this.spread);
-  }
+  }  
   
   public void run(double deltaMs) {
     float hue = palette.getHuef();
     float sat = palette.getSaturationf();
-    float spread = this.spreadDamped.getValuef() / LeafAssemblage.NUM_LEAVES;
+    float spread = this.spread.getValuef() / LeafAssemblage.NUM_LEAVES;
     float offset = this.offset.getValuef();
     float offsetLerp = offset % 1;
     int offsetFloor = (int) offset;
@@ -203,6 +200,30 @@ public class ColorRain extends TenerePattern {
     }
   }
 }
+
+public class ColorGreenLeaves extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter range = new CompoundParameter("Range", 30, 15, 45);
+  
+  public ColorGreenLeaves(LX lx) {
+    super(lx);
+    addParameter("range", this.range);
+  }
+  
+  public void run(double deltaMs) {
+    float sat = palette.getSaturationf();
+    int li = 0;
+    int range = (int) this.range.getValuef();
+    for (Leaf leaf : tree.leaves) {
+      setColor(leaf, LXColor.hsb(140 - li % range, sat, 100));
+      ++li;
+    }
+  }
+}
+
 
 public class ColorAutumn extends TenerePattern {
   public String getAuthor() {

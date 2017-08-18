@@ -74,7 +74,7 @@ void setup() {
           // Update appropriately for testing!
           final String[] OPC_ADDRESS = new String[] {
             "192.168.1.42",
-            "192.168.1.254",
+            // "192.168.1.254",
           };
           
           //final String[] OPC_ADDRESS = new String[150];

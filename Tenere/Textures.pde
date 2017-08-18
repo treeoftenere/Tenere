@@ -179,7 +179,7 @@ public class TextureCrawl extends TexturePattern {
   public TextureCrawl(LX lx) {
     super(lx);
     for (int i = 0; i < NUM_MASKS; ++i) {
-      this.pos[i] = startModulator(new SawLFO(0, Leaf.NUM_LEDS, startModulator(new SinLFO(3000, 11000, 19000).randomBasis())));
+      this.pos[i] = startModulator(new SawLFO(0, Leaf.NUM_LEDS, startModulator(new SinLFO(2000, 7000, 19000).randomBasis())));
       this.size[i] = startModulator(new TriangleLFO(-3, 2*Leaf.NUM_LEDS, 19000).randomBasis());
     }
   }
