@@ -491,7 +491,7 @@ abstract class UIInput extends UI2dContainer {
   
   protected boolean expanded = false;
   
-  private final UISensorInput uiInput;
+  protected final UISensorInput uiInput;
   
   UIInput(UI ui, Sensors.Input input, float x, float y, float w) {
     super(x, y, w, COLLAPSED_HEIGHT);
@@ -547,7 +547,9 @@ public class UISensors extends UICollapsibleSection {
   class UISensor extends UIInput {
     UISensor(UI ui, final Sensors.Sensor sensor, float x, float y, float w) {
       super(ui, sensor.input, x, y, w);
-            
+
+      this.uiInput.heartMeter.setMeterColor(LXColor.hsb(HEART_COLORS[sensor.index], 80, 80));
+
       new UILabel(PADDING, 2*PADDING, 16, 16)
       .setLabel(sensor.getLabel())
       .setTextAlignment(PConstants.CENTER, PConstants.TOP)
@@ -596,11 +598,13 @@ public class UISources extends UICollapsibleSection {
 
 class UISensorInput extends UI2dContainer {
   
-  static final int HEIGHT = 138;
+  static final int HEIGHT = 162;
   
   static final int METER_X = 20;
   static final int METER_MARGIN = 2;
   static final int METER_HEIGHT = 10;
+  
+  final UIParameterMeter heartMeter;
   
   UISensorInput(UI ui, final Sensors.Input input, float x, float y, float w) {
     super(x, y, w, HEIGHT);
@@ -611,7 +615,7 @@ class UISensorInput extends UI2dContainer {
         input.heartBeat.setValue(true);
       }
     }.addToContainer(this);
-    new UIParameterMeter(ui, input.heartLevel, METER_X, y, getContentWidth() - METER_X, 18).addToContainer(this);
+    this.heartMeter = (UIParameterMeter) new UIParameterMeter(ui, input.heartLevel, METER_X, y, getContentWidth() - METER_X, 18).addToContainer(this);
     y += 18 + METER_MARGIN;
     
     new UIImage(loadImage("brain.png"), 0, y).addToContainer(this);
@@ -632,6 +636,12 @@ class UISensorInput extends UI2dContainer {
       y += METER_HEIGHT + METER_MARGIN;
     }
     
+    new UIImage(loadImage("acc.png"), 0, y).addToContainer(this);
+    for (NormalizedParameter p : input.orientation) {
+      new UIParameterMeter(ui, p, METER_X, y, getContentWidth() - METER_X, METER_HEIGHT).addToContainer(this);
+      y += METER_HEIGHT + METER_MARGIN;
+    }
+
   }
 }
   
@@ -639,11 +649,13 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
   
   private float level;
   private final LXNormalizedParameter parameter; 
+  private int meterColor;
   
   public UIParameterMeter(UI ui, final LXNormalizedParameter parameter, float x, float y, float w, float h) {
     super(x, y, w, h);
     setBackgroundColor(ui.theme.getControlBackgroundColor());
     setBorderColor(ui.theme.getControlBorderColor());
+    this.meterColor = ui.theme.getPrimaryColor();
     this.parameter = parameter;
     this.level = parameter.getNormalizedf();
     addLoopTask(new LXLoopTask() {
@@ -655,6 +667,11 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
         }
       }
     });
+  }
+  
+  public UIParameterMeter setMeterColor(int meterColor) {
+    this.meterColor = meterColor;
+    return this;
   }
   
   private void mouseValue(MouseEvent mouseEvent, float mx) {
@@ -672,7 +689,7 @@ class UIParameterMeter extends UI2dComponent implements UIModulationSource {
   
   public void onDraw(UI ui, PGraphics pg) {
     pg.noStroke();
-    pg.fill(ui.theme.getPrimaryColor());
+    pg.fill(this.meterColor);
     pg.rect(0, 0, getWidth() * this.level, getHeight());
   }
   

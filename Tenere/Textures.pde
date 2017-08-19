@@ -75,6 +75,52 @@ public class TextureLoop extends TexturePattern {
   }
 }
 
+public class TextureInOut extends TexturePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 1000, 5000, 200)
+    .setExponent(.5)
+    .setDescription("Speed of the motion");
+    
+  public final CompoundParameter size = (CompoundParameter)
+    new CompoundParameter("Size", 2, 1, 4)
+    .setDescription("Size of the streak");
+  
+  private final LXModulator[] leaves = new LXModulator[LeafAssemblage.NUM_LEAVES]; 
+  private final int[] assemblageMask = new int[LeafAssemblage.NUM_LEDS];
+  
+  public TextureInOut(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    for (int i = 0; i < this.leaves.length; ++i) {
+      final int ii = i;
+      this.leaves[i] = startModulator(new SinLFO(0, (Leaf.NUM_LEDS-1)/2., new FunctionalParameter() {
+        public double getValue() {
+          return speed.getValue() * (1 + .05 * ii); 
+        }
+      }).randomBasis());
+    }
+  }
+  
+  public void run(double deltaMs) {
+    int ai = 0;
+    float falloff = 100 / this.size.getValuef();
+    for (LXModulator leaf : this.leaves) {
+      float pos = leaf.getValuef();
+      for (int i = 0; i < Leaf.NUM_LEDS; ++i) {
+        float d = abs(i - (LeafAssemblage.NUM_LEDS-1)/2.);       
+        float b = max(0, 100 - falloff * abs(i - pos)); 
+        this.assemblageMask[ai++] = LXColor.gray(b); 
+      }
+    }
+    setAssemblageMask(this.assemblageMask);
+  }
+}
+
 public class TextureSparkle extends TexturePattern {
   public String getAuthor() {
     return "Mark C. Slee";
@@ -118,6 +164,45 @@ public class TextureSparkle extends TexturePattern {
     setAssemblageMask(this.assemblageMask);
   }
 }
+
+public class TextureCrawl extends TexturePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private static final int NUM_MASKS = 24;
+  private final int[][] mask = new int[NUM_MASKS][Leaf.NUM_LEDS];
+  
+  private final LXModulator[] pos = new LXModulator[NUM_MASKS];
+  private final LXModulator[] size = new LXModulator[NUM_MASKS];
+  
+  public TextureCrawl(LX lx) {
+    super(lx);
+    for (int i = 0; i < NUM_MASKS; ++i) {
+      this.pos[i] = startModulator(new SawLFO(0, Leaf.NUM_LEDS, startModulator(new SinLFO(2000, 7000, 19000).randomBasis())));
+      this.size[i] = startModulator(new TriangleLFO(-3, 2*Leaf.NUM_LEDS, 19000).randomBasis());
+    }
+  }
+ 
+  public void run(double deltaMs) {
+    for (int i = 0; i < NUM_MASKS; ++i) {
+      float pos = this.pos[i].getValuef();
+      float falloff = 100 / max(1, this.size[i].getValuef()); 
+      for (int j = 0; j < Leaf.NUM_LEDS; ++j) {
+        this.mask[i][j] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(j, pos, Leaf.NUM_LEDS)));
+      }
+    }
+    int li = 0;
+    for (Leaf leaf : model.leaves) {
+      int[] mask = this.mask[li++ % NUM_MASKS];
+      int i = 0;
+      for (LXPoint p : leaf.points) {
+        colors[p.index] = mask[i++];
+      }
+    }
+  }
+}
+
 
 public class TextureWave extends TexturePattern {
   public String getAuthor() {
