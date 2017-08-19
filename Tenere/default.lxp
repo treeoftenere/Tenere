@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503139050586,
+  "timestamp": 1503142755752,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -66,7 +66,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 16,
+        "patternIndex": 17,
         "patterns": [
           {
             "id": 8023,
@@ -522,6 +522,18 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 8748,
+            "class": "Tenere$TheFourSeasons",
+            "parameters": {
+              "label": "TheFourSeasons"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -888,16 +900,16 @@
           "slope": 4.5,
           "Band-1": 0.0,
           "Band-2": 0.0,
-          "Band-3": 0.11075380985972738,
-          "Band-4": 0.28247496098575353,
-          "Band-5": 0.315433404733267,
-          "Band-6": 0.34421644504269455,
-          "Band-7": 0.31500501480800025,
-          "Band-8": 0.3089659560052982,
-          "Band-9": 0.339328723151192,
-          "Band-10": 0.42289128860243475,
-          "Band-11": 0.21742189079043928,
-          "Band-12": 0.1313099968510807,
+          "Band-3": 0.037465417678564816,
+          "Band-4": 0.1603787950422657,
+          "Band-5": 0.09693937679006914,
+          "Band-6": 0.0,
+          "Band-7": 0.0,
+          "Band-8": 0.0,
+          "Band-9": 0.0,
+          "Band-10": 0.0,
+          "Band-11": 0.0,
+          "Band-12": 0.0,
           "Band-13": 0.0,
           "Band-14": 0.0,
           "Band-15": 0.0,
