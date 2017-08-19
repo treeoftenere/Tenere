@@ -11,6 +11,7 @@ final static String STELLAR_FILE = "TenereExportTestMondayWithID.json";
 
 // Special board testing mode
 final static boolean BOARD_TEST_MODE = false;
+final static boolean SUBNET_TEST_MODE = false;
 
 // Helpful global constants
 final static float INCHES = 5;
@@ -72,18 +73,22 @@ void setup() {
         try {          
 
           // Update appropriately for testing!
-          final String[] OPC_ADDRESS = new String[] {
-            "192.168.1.42",
-            // "192.168.1.254",
-          };
-          
-          //final String[] OPC_ADDRESS = new String[150];
-          //for (int i = 0; i < OPC_ADDRESS.length; ++i) {
-          //  OPC_ADDRESS[i] = String.format("192.168.1.%d", (4 + i));
-          //}
-          
           final int OPC_PORT = 1337;
-
+          final String[] OPC_ADDRESS;
+          if (SUBNET_TEST_MODE) {
+            println("FULL SUBNET TEST MODE: Outputing sequentially to all IP addresses 192.168.1.1-192.168.1.240");
+            OPC_ADDRESS = new String[240];
+            for (int i = 0; i < OPC_ADDRESS.length; ++i) {
+              OPC_ADDRESS[i] = String.format("192.168.1.%d", i);
+            }
+          } else {
+            OPC_ADDRESS = new String[] {
+              "192.168.1.42",
+              // "192.168.1.254",
+            };
+          }          
+          
+          // NOTE: the leaves aren't ordered exactly sequentially, this fixes that
           final int[] LEAF_ORDER = {
             0, 1, 3, 5, 2, 4, 6, 7, 8, 10, 12, 9, 11, 13, 14
           };
@@ -114,7 +119,6 @@ void setup() {
             if (ip == null) {
               ip = OPC_ADDRESS[branchNum++];
             }
-
             // Use manual IP in board test mode 
             if (BOARD_TEST_MODE) {
               ip = "192.168.1." + boardNumber.getValuei();
@@ -126,10 +130,15 @@ void setup() {
                         
             // Are we out of manual addresses?
             if (branchNum >= OPC_ADDRESS.length) {
-              break;
+              if (SUBNET_TEST_MODE) {
+                // Just keep outputting the last branch!
+                --branchNum;
+              } else {
+                break;
+              }
             }
             
-            // Only add one set of datagrams if in board test mode!
+            // Only one set of datagrams if in board test mode! We're testing a single IP in that case
             if (BOARD_TEST_MODE) {
               break;
             }
