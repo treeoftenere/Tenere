@@ -600,13 +600,14 @@ public abstract class BufferPattern extends TenerePattern {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter speedRaw =
-    new CompoundParameter("Speed", 256, 1024, 64)
-    .setDescription("Speed of the audio waves");
+  public final CompoundParameter speedRaw = (CompoundParameter)
+    new CompoundParameter("Speed", 256, 2048, 64)
+    .setExponent(.5)
+    .setDescription("Speed of the wave propagation");
   
   public final LXModulator speed = startModulator(new DampedParameter(speedRaw, 256, 512));
   
-  private static final int BUFFER_SIZE = 2048;
+  private static final int BUFFER_SIZE = 4096;
   protected int[] history = new int[BUFFER_SIZE];
   protected int cursor = 0;
 
@@ -638,7 +639,91 @@ public abstract class BufferPattern extends TenerePattern {
   abstract void onRun(double deltaMs); 
 }
 
-public class PatternMelt extends BufferPattern {
+public abstract class SpinningPattern extends TenerePattern {
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 17000, 25000, 5000)
+    .setExponent(2)
+    .setDescription("Speed of lighthouse motion");
+        
+  protected final LXModulator azimuth = startModulator(new SawLFO(0, TWO_PI, speed));
+    
+  public SpinningPattern(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+  }
+}
+
+public class PatternChess extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter numSpots = (CompoundParameter)
+    new CompoundParameter("Spots", 4, 2, 8)
+    .setDescription("Number of spots");
+  
+  private final LXModulator numSpotsDamped = startModulator(new DampedParameter(numSpots, 12, 20, 6));
+  
+  public PatternChess(LX lx) {
+    super(lx);
+    addParameter("numSpots", this.numSpots);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    float numSpots = this.numSpotsDamped.getValuef(); 
+    for (LeafAssemblage assemblage : model.assemblages) {
+      LXPoint p = assemblage.points[0];
+      float az = p.azimuth + azimuth;
+      if (az > TWO_PI) {
+        az -= TWO_PI;
+      }
+      float d = LXUtils.wrapdistf(az, 0, TWO_PI);
+      d = abs(d - PI) / PI;
+      int add = ((int) (numSpots * p.yn)) % 2;
+      float basis = (numSpots * d + .5 * add) % 1;
+      float d2 = 2*abs(.5 - basis);
+      setColor(assemblage, LXColor.gray(100 * (1-d2)*(1-d2)));
+    }
+  }
+}
+
+public class PatternLighthouse extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+      
+  public final CompoundParameter size = (CompoundParameter)
+    new CompoundParameter("Size", HALF_PI, PI/8, TWO_PI)
+    .setDescription("Size of lighthouse arc");
+
+  public final CompoundParameter slope = (CompoundParameter)
+    new CompoundParameter("Slope", 0, -1, 1)
+    .setDescription("Slope of gradient");
+ 
+  private final LXModulator sizeDamped = startModulator(new DampedParameter(this.size, 3*PI, 4*PI, TWO_PI));
+  private final LXModulator slopeDamped = startModulator(new DampedParameter(this.slope, 2, 4, 2));
+  
+  public PatternLighthouse(LX lx) {
+    super(lx);
+    addParameter("size", this.size);
+    addParameter("slope", this.slope);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    float falloff = 100 / this.sizeDamped.getValuef();
+    float slope = PI * this.slopeDamped.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float az = (TWO_PI + leaf.point.azimuth + abs(leaf.point.yn - .5) * slope) % TWO_PI;
+      float b = max(0, 100 - falloff * LXUtils.wrapdistf(az, azimuth, TWO_PI));
+      setColor(leaf, LXColor.gray(b));
+    }
+  }
+}
+
+public abstract class PatternMelt extends BufferPattern {
   
   private final float[] multipliers = new float[32];
   
@@ -651,7 +736,7 @@ public class PatternMelt extends BufferPattern {
     .setDescription("Automatically make content");
   
   private LXModulator rot = startModulator(new SawLFO(0, 1, 39000)); 
-  private LXModulator autoLevel = startModulator(new TriangleLFO(-2, 1, startModulator(new SinLFO(3000, 7000, 19000))));
+  private LXModulator autoLevel = startModulator(new TriangleLFO(-.5, 1, startModulator(new SinLFO(3000, 7000, 19000))));
   
   public PatternMelt(LX lx) {
     super(lx);
@@ -672,11 +757,13 @@ public class PatternMelt extends BufferPattern {
       float lerp = maz % 1;
       int floor = (int) (maz - lerp);
       float m = lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp);      
-      float d = abs(1 - leaf.point.yn);
+      float d = getDist(leaf);
       int offset = round(d * speed * m);
       setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
     }
   }
+  
+  protected abstract float getDist(Leaf leaf);
   
   public float getLevel() {
     if (this.auto.isOn()) {
@@ -689,6 +776,38 @@ public class PatternMelt extends BufferPattern {
     return this.level.getValuef();
   }
 }
+
+public class PatternMeltDown extends PatternMelt {
+  public PatternMeltDown(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return 1 - leaf.point.yn;
+  }
+}
+
+public class PatternMeltUp extends PatternMelt {
+  public PatternMeltUp(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return leaf.point.yn;
+  }
+  
+}
+
+public class PatternMeltOut extends PatternMelt {
+  public PatternMeltOut(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return 2*abs(leaf.point.yn - .5);
+  }
+}
+
 
 public abstract class WavePattern extends BufferPattern {
   
@@ -804,6 +923,66 @@ public class PatternSirens extends TenerePattern {
         100 - falloff4 * LXUtils.wrapdistf(azim, azim4, TWO_PI)
       );
       setColor(leaf, LXColor.gray(max(0, dist)));
+    }
+  }
+}
+
+public class PatternSnakes extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private static final int NUM_SNAKES = 24;
+  private final LXModulator snakes[] = new LXModulator[NUM_SNAKES];
+  private final LXModulator sizes[] = new LXModulator[NUM_SNAKES];
+  
+  private final int[][] mask = new int[NUM_SNAKES][Branch.NUM_LEAVES];
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 7000, 19000, 2000)
+    .setExponent(.5)
+    .setDescription("Speed of snakes moving");
+    
+  public final CompoundParameter modSpeed = (CompoundParameter)
+    new CompoundParameter("ModSpeed", 7000, 19000, 2000)
+    .setExponent(.5)
+    .setDescription("Speed of snake length modulation");    
+    
+  public final CompoundParameter size =
+    new CompoundParameter("Size", 15, 10, 100)
+    .setDescription("Size of longest snake");    
+      
+  public PatternSnakes(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("modSpeed", this.modSpeed);
+    addParameter("size", this.size);
+    for (int i = 0; i < NUM_SNAKES; ++i) {
+      final int ii = i;
+      this.snakes[i] = startModulator(new SawLFO(0, Branch.NUM_LEAVES, speed).randomBasis());
+      this.sizes[i] = startModulator(new SinLFO(4, this.size, new FunctionalParameter() {
+        public double getValue() {
+          return modSpeed.getValue() + ii*100;
+        }
+      }).randomBasis());
+    }
+  }
+  
+  public void run(double deltaMs) {
+    for (int i = 0; i < NUM_SNAKES; ++i) {
+      float snake = this.snakes[i].getValuef();
+      float falloff = 100 / this.sizes[i].getValuef();
+      for (int j = 0; j < Branch.NUM_LEAVES; ++j) {
+        this.mask[i][j] = LXColor.gray(max(0, 100 - falloff * LXUtils.wrapdistf(j, snake, Branch.NUM_LEAVES)));
+      }
+    }
+    int bi = 0;
+    for (Branch branch : model.branches) {
+      int[] mask = this.mask[bi++ % NUM_SNAKES];
+      int li = 0;
+      for (Leaf leaf : branch.leaves) {
+        setColor(leaf, mask[li++]);
+      }
     }
   }
 }
