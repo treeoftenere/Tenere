@@ -9,12 +9,14 @@ public class TheFourSeasons extends LXPattern {
   int dayOfTheSeason;
   int summerDays = 100;
   int autumnDays = 1800;
-  int winterDays = 4000;
+  int winterDays = 7000;
+  int snowingDays = 1100;
   int springDays = 1000;
   int blossumTime = 100;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
   int startupPause = 20;
+  double _deltaMs; 
   
   ArrayList<PseudoLeaf> pseudoLeaves;
   int pseudoLeafDiameter = 80;
@@ -72,8 +74,10 @@ public class TheFourSeasons extends LXPattern {
   }
     
   public void run(double deltaMs) {
+    _deltaMs = deltaMs;
     AdvanceTime();
     ActionSeason(); 
+    
   }
   
   public void onActive() 
@@ -175,10 +179,7 @@ public class TheFourSeasons extends LXPattern {
   
   void Startup()
   {
-    //starting blank so the effect of leaves growing works nicely. 
-    for (LXPoint p : model.points) {
-      colors[p.index] =  #000000;
-    }
+    ClearColors();
   }
   
   //SEASON ACTION 
@@ -194,11 +195,9 @@ public class TheFourSeasons extends LXPattern {
   
   void Winter()
   { 
-    if(dayOfTheSeason < 1200) {SnowFall();}
+    if(dayOfTheSeason < snowingDays) {SnowFall();}
     else {SpringMelt();}
   }
-  
-  
   
   void Spring()
   {
@@ -288,15 +287,15 @@ public class TheFourSeasons extends LXPattern {
         }
      }
      
-  void LerpIntoSummer()
-  {
-      ClearColors();
-      for(PseudoLeaf pleaf : pseudoLeaves)
-      {
-           pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.greenColor,(float)dayOfTheSeason/100f);
-           IlluminateNearby(pleaf);
-      }
-  }
+    void LerpIntoSummer()
+    {
+        ClearColors();
+        for(PseudoLeaf pleaf : pseudoLeaves)
+        {
+             pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.greenColor,(float)dayOfTheSeason/100f);
+             IlluminateNearby(pleaf);
+        }
+    }
 
      void SnowFall()
      {
@@ -304,12 +303,15 @@ public class TheFourSeasons extends LXPattern {
          ClearColors();
        
          //Set flakes to fall
-          if(dayOfTheSeason < 1000 ) 
+          if(dayOfTheSeason < snowingDays ) 
          {
             SetLowestToSnowing();
+            
+            if(dayOfTheSeason > snowingDays/2) //hurry up
+            {SetLowestToSnowing();}
          }
          //all the flakes
-         else if(dayOfTheSeason == 1000 ) //set all to falling
+         else if(dayOfTheSeason == snowingDays) //set all to falling
          {
            for(PseudoLeaf pleaf : pseudoLeaves)
            {
@@ -343,9 +345,9 @@ public class TheFourSeasons extends LXPattern {
         }
      }
      
-     void SpringMelt()
+     void SpringMelt() //<>//
      {
-      ClearColors(); //<>//
+      ClearColors();
       //set lowest 3 to melting. 
       SetLowestToMelting();
       SetLowestToMelting();
@@ -357,9 +359,9 @@ public class TheFourSeasons extends LXPattern {
           if(pleaf.status == SeasonsHelpers.LeafStatus.MELTING) //melt to blue
            {
              pleaf.leafColor = LXColor.lerp(pleaf.leafColor, LXColor.rgb(40,40,128), 0.2);
-             pleaf.meltTime++; 
+             pleaf.meltTime++;  //<>//
              if(pleaf.meltTime > 20){
-             pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //<>//
+             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
            }
              
          }
@@ -367,7 +369,7 @@ public class TheFourSeasons extends LXPattern {
            //ANIMATE FALLING droplets
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
            {
-             pleaf.velocity +=  0.1 + (pleaf.velocity*1.02); //TODO make this more fluid
+             pleaf.velocity +=  (9.8 * (_deltaMs/1))/100; //caluclate acceleration
              pleaf.y = pleaf.y - pleaf.velocity;
              
              if(pleaf.y <= pleaf.wy - 4000)//completed fall
@@ -406,9 +408,9 @@ public class TheFourSeasons extends LXPattern {
          counter= 0;
         for(PseudoLeaf pleaf : pseudoLeaves)
          {
-           if(lowestindex == counter)
+           if(lowestindex == counter) //<>//
            {
-             pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //<>//
+             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
              break;
            }
            counter++;

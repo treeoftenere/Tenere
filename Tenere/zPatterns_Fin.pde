@@ -73,18 +73,7 @@ public static class Plasma extends LXPattern {
 
       //ready to populate this color!
       colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
-      
-      //DEV Display variables helper
-      //if(framecount % 30 == 0)
-      //{
-      //  float distance =  pointAsVector.dist(circle);
-      //  print("movement="); print(movement);
-      //  print(" RateLfo="); println(RateLfo.getValue());
-        
-      //  println();
-      //}
-     
-     
+
     }
     
    movement =+ ((float)RateLfo.getValue() / 1000); //advance the animation through time. 
@@ -102,80 +91,7 @@ public static class Plasma extends LXPattern {
       );
   }
 
-  void PrintModelGeometory()
-  {
-      println("Model Geometory");
-      print("Averages ax, ay, az: ");      print(model.ax);   print(","); print(model.ay);   print(","); println(model.az);
-      print("Cerntres cx, cy, cz: ");      print(model.cx);   print(","); print(model.cy);   print(","); println(model.cz);
-      print("Maximums xMax, yMax zMax: "); print(model.xMax); print(","); print(model.yMax); print(","); println(model.zMax);
-      print("Minimums xMin, yMin zMin: "); print(model.xMin); print(","); print(model.yMin); print(","); println(model.zMin);
-  }
 
-}
-
-
-
-public class ItemLocationsTest extends LXPattern {
-  
-  
-   int i = 0;
-   
-     public final CompoundParameter branch =
-    new CompoundParameter("branch", 0, 0, 60)
-    .setDescription("branch number");
-   
-    public final CompoundParameter ass =
-    new CompoundParameter("ass", 0, 0, 7)
-    .setDescription("assemblage number");
-   
-    public final CompoundParameter leaf =
-    new CompoundParameter("leaf", 0, 0, 14)
-    .setDescription("leaf number");
-   
-   
-  public ItemLocationsTest(LX lx) {
-    
-   super(lx);
-    
-   addParameter("branch", branch);
-   addParameter("ass", ass);
-   addParameter("leaf", leaf);
-   
-  }
-  
-  public void run(double deltaMs) {
-    
-    for (Branch b : tree.branches) {
-    }
-    
-    //clear colors
-   for (LXPoint p : model.points) {
-     colors[p.index] = #000000;
-   }
-   
-   
-   int branchNumber = (int)branch.getValue();
-   int assNumber = (int)ass.getValue();
-   int leafNumber = (int)leaf.getValue();
-
-    //show a given branch as red
-    Branch targetBranch = tree.branches.get(branchNumber);
-    for (LeafAssemblage targetAss : targetBranch.assemblages) {
-    for (Leaf targetLeaf : targetAss.leaves) {
-      colors[targetLeaf.point.index] = #ff0000;
-    }
-    
-    //show a given assemblage as green
-    LeafAssemblage assx = targetBranch.assemblages.get(assNumber);
-    for (Leaf targetLeaf : assx.leaves) {
-      colors[targetLeaf.point.index] = #00ff00;
-    }
-    
-    //show a given leaf as blue
-    Leaf lx = assx.leaves.get(leafNumber);
-    colors[lx.point.index] = #0000ff;
-    }
-  }
 }
 
 
@@ -235,29 +151,3 @@ public class ItemLocationsTest extends LXPattern {
   }//end plasma generator
 
   
-  
-  
-  
-  
-  // REFERENCE
-  
-/*
-LIMBS = NUM_LIMBS = 12;
-BRANCHES = 
-ASSEMBLAGES = 
-LEAVES = 
-
-Each Limb has ? Branches
-Each branch has 8 LeafAssemblages [branch.assemblage]
-Each LeafAssemblage has 15 Leaves
-Each Leaf has 7 NUM_LEDS (not yet implemented in code June 5th)
-
-Model Geometory
-Averages ax, ay, az: -34.620586,678.9678,73.70307
-Cerntres cx, cy, cz: -18.998901,601.6301,17.694458
-Maximums xMax, yMax zMax: 1127.384,1275.5334,1166.446
-Minimums xMin, yMin zMin: -1165.382,-72.27326,-1131.0573
-
-
-
-*/
