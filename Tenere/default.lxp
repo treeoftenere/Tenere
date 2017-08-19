@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1502935266348,
+  "timestamp": 1503139050586,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -11,10 +11,10 @@
       "scene-3": false,
       "scene-4": false,
       "scene-5": false,
-      "crossfader": 0.49606299212598426,
+      "crossfader": 0.0,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
-      "focusedChannel": 2,
+      "focusedChannel": 0,
       "cueA": false,
       "cueB": false,
       "multithreaded": true,
@@ -57,23 +57,23 @@
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 58.0,
-          "fader": 1.0,
+          "fader": 0.9857143070548773,
           "crossfadeGroup": 0,
-          "blendMode": 0,
+          "blendMode": 4,
           "transitionEnabled": true,
-          "transitionTimeSecs": 5.0,
+          "transitionTimeSecs": 1.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 16,
         "patterns": [
           {
             "id": 8023,
             "class": "Tenere$PatternMelt",
             "parameters": {
               "label": "PatternMelt",
-              "speed": 822.3999873399734,
+              "speed": 1024.0,
               "level": 0.0,
               "auto": true
             },
@@ -509,6 +509,19 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 8383,
+            "class": "Tenere$Plasma",
+            "parameters": {
+              "label": "Plasma",
+              "Size": 0.4689999926313758
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -518,15 +531,15 @@
         "parameters": {
           "label": "Note",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
-          "midiMonitor": true,
+          "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
           "fader": 1.0,
           "crossfadeGroup": 0,
-          "blendMode": 0,
+          "blendMode": 4,
           "transitionEnabled": false,
           "transitionTimeSecs": 5.0,
           "transitionBlendMode": 0
@@ -579,22 +592,22 @@
         "parameters": {
           "label": "Texturize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
-          "fader": 1.0,
+          "fader": 0.0,
           "crossfadeGroup": 0,
-          "blendMode": 1,
+          "blendMode": 4,
           "transitionEnabled": true,
           "transitionTimeSecs": 1.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 7,
         "patterns": [
           {
             "id": 8006,
@@ -662,6 +675,53 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 8371,
+            "class": "Tenere$ColorSwirl",
+            "parameters": {
+              "label": "ColorSwirl",
+              "speed": 0.5,
+              "slope": 1.0,
+              "amount": 3
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 8373,
+            "class": "Tenere$NoteWaves",
+            "parameters": {
+              "label": "NoteWaves",
+              "speed": 256.0,
+              "mode": 1.1599999889731407,
+              "attack": 50.0,
+              "decay": 500.0,
+              "sustain": 0.5,
+              "release": 500.0,
+              "velocityBrightness": 0.5
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 8378,
+            "class": "Tenere$Plasma",
+            "parameters": {
+              "label": "Plasma",
+              "Size": 0.800000011920929
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -671,15 +731,15 @@
         "parameters": {
           "label": "Colorize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 81.0,
-          "fader": 1.0,
+          "fader": 0.0,
           "crossfadeGroup": 0,
-          "blendMode": 1,
+          "blendMode": 4,
           "transitionEnabled": true,
           "transitionTimeSecs": 5.0,
           "transitionBlendMode": 0
@@ -827,21 +887,21 @@
           "release": 587.1049740012817,
           "slope": 4.5,
           "Band-1": 0.0,
-          "Band-2": 0.01970914591203088,
-          "Band-3": 0.12437930265277142,
-          "Band-4": 0.24996799533293046,
-          "Band-5": 0.43077906440073765,
-          "Band-6": 0.4724736949529571,
-          "Band-7": 0.2310180785494943,
-          "Band-8": 0.24766177622757057,
-          "Band-9": 0.213809755873691,
-          "Band-10": 0.22194184948514062,
-          "Band-11": 0.4220614845152767,
-          "Band-12": 0.42789487236354184,
-          "Band-13": 0.6120607136234733,
-          "Band-14": 0.6254041999865854,
-          "Band-15": 0.5051689956748495,
-          "Band-16": 0.17134718787308234
+          "Band-2": 0.0,
+          "Band-3": 0.11075380985972738,
+          "Band-4": 0.28247496098575353,
+          "Band-5": 0.315433404733267,
+          "Band-6": 0.34421644504269455,
+          "Band-7": 0.31500501480800025,
+          "Band-8": 0.3089659560052982,
+          "Band-9": 0.339328723151192,
+          "Band-10": 0.42289128860243475,
+          "Band-11": 0.21742189079043928,
+          "Band-12": 0.1313099968510807,
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
         }
       },
       "input": {
