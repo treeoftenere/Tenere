@@ -9,7 +9,7 @@ public class TheFourSeasons extends LXPattern {
   int dayOfTheSeason;
   int summerDays = 100;
   int autumnDays = 1800;
-  int winterDays = 3000;
+  int winterDays = 4000;
   int springDays = 1000;
   int blossumTime = 100;
   int currentDayOfSpring = 0;
@@ -323,7 +323,7 @@ public class TheFourSeasons extends LXPattern {
        //itterate over all the leaves, if close illumiate
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
-           //ANIMATE FALLING LEAVES //<>//
+           //ANIMATE FALLING LEAVES
            if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
            {
              pleaf.y -= 10; //TODO make this more fluid
@@ -351,7 +351,7 @@ public class TheFourSeasons extends LXPattern {
       SetLowestToMelting();
       SetLowestToMelting();
       
-          //itterate over all the leaves, if close illumiate
+       //animate the snow flakes
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
           if(pleaf.status == SeasonsHelpers.LeafStatus.MELTING) //melt to blue
@@ -359,7 +359,7 @@ public class TheFourSeasons extends LXPattern {
              pleaf.leafColor = LXColor.lerp(pleaf.leafColor, LXColor.rgb(40,40,128), 0.2);
              pleaf.meltTime++; 
              if(pleaf.meltTime > 20){
-             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //<>//
            }
              
          }
@@ -367,16 +367,16 @@ public class TheFourSeasons extends LXPattern {
            //ANIMATE FALLING droplets
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
            {
-             pleaf.velocity +=  1 + (pleaf.velocity*1.02); //TODO make this more fluid
+             pleaf.velocity +=  0.1 + (pleaf.velocity*1.02); //TODO make this more fluid
              pleaf.y = pleaf.y - pleaf.velocity;
              
              if(pleaf.y <= pleaf.wy - 4000)//completed fall
              {
-               pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
+               pleaf.status = SeasonsHelpers.LeafStatus.MELTED; //fall completed, do nothing.
              }
            }
            //rest untill spring melt
-           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
+           else if(pleaf.status == SeasonsHelpers.LeafStatus.MELTED)
            {
              // zzzzzZZZzzZzzZZzZz do nothing
            }
@@ -408,7 +408,7 @@ public class TheFourSeasons extends LXPattern {
          {
            if(lowestindex == counter)
            {
-             pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
+             pleaf.status = SeasonsHelpers.LeafStatus.FALLING; //<>//
              break;
            }
            counter++;
@@ -583,7 +583,7 @@ public class PseudoLeaf
 public static class SeasonsHelpers
 {
  enum Seasons {SUMMER, AUTUMN, WINTER, SPRING, STARTUP}
- enum LeafStatus {GROWING, BROWNING, FALLING, FALLEN, WINTERWAITING, MELTING}
+ enum LeafStatus {GROWING, BROWNING, FALLING, FALLEN, WINTERWAITING, MELTING,MELTED}
 
    
 }
