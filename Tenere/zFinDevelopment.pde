@@ -9,7 +9,7 @@ public class TheFourSeasons extends LXPattern {
   int dayOfTheSeason;
   int summerDays = 100;
   int autumnDays = 1800;
-  int winterDays = 2000;
+  int winterDays = 3000;
   int springDays = 1000;
   int blossumTime = 100;
   int currentDayOfSpring = 0;
@@ -345,7 +345,7 @@ public class TheFourSeasons extends LXPattern {
      
      void SpringMelt()
      {
-      ClearColors();
+      ClearColors(); //<>//
       //set lowest 3 to melting. 
       SetLowestToMelting();
       SetLowestToMelting();
@@ -365,12 +365,12 @@ public class TheFourSeasons extends LXPattern {
          }
            
            //ANIMATE FALLING droplets
-           if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
+           else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLING) //move snowflake
            {
-             pleaf.velocity +=  1 + (pleaf.velocity*1.05); //TODO make this more fluid
+             pleaf.velocity +=  1 + (pleaf.velocity*1.02); //TODO make this more fluid
              pleaf.y = pleaf.y - pleaf.velocity;
              
-             if(pleaf.y <= pleaf.wy - 2000)//completed fall
+             if(pleaf.y <= pleaf.wy - 4000)//completed fall
              {
                pleaf.status = SeasonsHelpers.LeafStatus.FALLEN; //fall completed, do nothing.
              }
