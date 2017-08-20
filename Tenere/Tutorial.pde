@@ -98,7 +98,7 @@ public class TutorialPlane extends LXPattern {
     float yPos = this.yPos.getValuef();
     for (Leaf leaf : tree.leaves) {
       float b = 100 - falloff * abs(leaf.y - yPos); 
-      setColor(leaf, LXColor.gray(max(0, 100)));
+      setColor(leaf, LXColor.gray(max(0, b)));
     }
   }
 }
