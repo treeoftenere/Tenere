@@ -12,6 +12,7 @@ final static String STELLAR_FILE = "TenereExportTestMondayWithID.json";
 // Special board testing mode
 final static boolean BOARD_TEST_MODE = false;
 final static boolean SUBNET_TEST_MODE = false;
+final static boolean SINGLE_BRANCH_MODE = false;
 
 // Helpful global constants
 final static float INCHES = 5;
