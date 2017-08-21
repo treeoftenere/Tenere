@@ -223,7 +223,8 @@ public static class Plasma extends LXPattern {
   
   public TheFourSeasons(LX lx) {
     super(lx);
-   InitializePseudoLeaves();
+   //InitializePseudoLeaves();
+   InitializeWinter();
   }
     
   public void run(double deltaMs) {
@@ -235,7 +236,7 @@ public static class Plasma extends LXPattern {
   
   public void onActive() 
   {
-    season = SeasonsHelpers.Seasons.STARTUP;
+    season = SeasonsHelpers.Seasons.WINTER;
     dayOfTheSeason =0;
   }
   
@@ -292,21 +293,7 @@ public static class Plasma extends LXPattern {
     }
   }
   
-  void InitializeWinter()
-  {
-    InitializePseudoLeaves();
-    
-    for(PseudoLeaf l : pseudoLeaves)
-    {
-      l.wx = l.x;
-      l.wy = l.y;
-      l.wz = l.z;
-      l.y = l.y + model.yMax+100; //up high, ready for snowfall
-      l.leafColor = LX.rgb(150,150,150); //snow colour
-     l.size = pseudoLeafDiameter;
-     l.status = SeasonsHelpers.LeafStatus.WINTERWAITING;
-    }
-  }
+
   
   void ActionSeason()
   {
@@ -413,6 +400,23 @@ public static class Plasma extends LXPattern {
        }
      }
      
+       void InitializeWinter()
+  {
+    InitializePseudoLeaves();
+    
+    for(PseudoLeaf l : pseudoLeaves)
+    {
+      l.wx = l.x;
+      l.wy = l.y;
+      l.wz = l.z;
+      l.y = l.y + model.yMax+100; //up high, ready for snowfall
+      l.leafColor = LX.rgb(150,150,150); //snow colour
+     l.size = pseudoLeafDiameter;
+     l.status = SeasonsHelpers.LeafStatus.WINTERWAITING;
+     l.leafColor = l.snowColor;
+    }
+  }
+     
      void GrowLeaves()
      {
        for(PseudoLeaf pleaf : pseudoLeaves)
@@ -493,7 +497,7 @@ public static class Plasma extends LXPattern {
            {
              // zzzzzZZZzzZzzZZzZz do nothing
            }
-           
+            
             IlluminateNearby(pleaf,0);
         }
      }
@@ -511,7 +515,7 @@ public static class Plasma extends LXPattern {
        {
           if(pleaf.status == SeasonsHelpers.LeafStatus.MELTING) //melt to blue
            {
-             pleaf.leafColor = LXColor.lerp(pleaf.leafColor, LXColor.rgb(40,40,128), 0.2);
+             pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.waterColor, 0.2);
              pleaf.meltTime++;  //<>//
              if(pleaf.meltTime > 20){
              pleaf.status = SeasonsHelpers.LeafStatus.FALLING;
@@ -725,6 +729,8 @@ public class PseudoLeaf
   int brownTime = 0;
   int browningColor;
   int greenColor;
+  int snowColor;
+  int waterColor;
   float velocity = 0;
   int meltTime = 0;
   
@@ -740,6 +746,9 @@ public class PseudoLeaf
     greenColor = _green;
     browningColor = _browningColour;
     meltTime = 0;
+    int bright = (int)random(170, 220);
+    snowColor = LX.rgb(bright-40,bright,bright+20);
+    waterColor= LX.rgb((int)random(10,20),(int)random(100, 126),148);
   }
 
 }
