@@ -1,99 +1,112 @@
 import com.thomasdiewald.pixelflow.java.DwPixelFlow;
 import com.thomasdiewald.pixelflow.java.fluid.DwFluid2D;
 import processing.opengl.PGraphics2D;
+import org.apache.commons.math3.special.BesselJ;
 
 
-// public class SoundSplines extends LXPattern {
-//   // by Alexander Green 
-//   public int NUM_PARTICLES = 10; 
-//   public final String author = "Alexander F. Green"; 
-//   ArrayList<LXVector> positions = new ArrayList<LXVector>();
-//   private PImage moss = loadImage("../data/MossyTrees.jpg");
+public class SoundSplines extends LXPattern {
+  // by Alexander Green 
+  public int NUM_PARTICLES = 10; 
+
+  public BesselJ besselOne = new BesselJ(2);
+  public final String author = "Alexander F. Green"; 
+  ArrayList<LXVector> positions = new ArrayList<LXVector>();
+  private PImage moss = loadImage("../data/MossyTrees.jpg");
 
   
-//   final int FRAME_WIDTH = 60;
-//   public GraphicMeter eq = null;
-//   private float[] bass = new float[FRAME_WIDTH];
-//   private float[] treble = new float[FRAME_WIDTH];
+  final int FRAME_WIDTH = 60;
+  public GraphicMeter eq = null;
+  private float[] bass = new float[FRAME_WIDTH];
+  private float[] mids = new float[FRAME_WIDTH];
+  private float[] treble = new float[FRAME_WIDTH];
     
-//   private int index = 0; 
-//   public SinLFO xPos = new SinLFO(model.xMax, model.xMin, 5000);
-//   public SinLFO zPos = new SinLFO(model.zMin, model.zMax, 5000);
-//   public final CompoundParameter radius =
-//     new CompoundParameter("Size", 1*FEET, 0*FEET, 10*FEET)
-//     .setDescription("Radius of the circle");
+  private int index = 0; 
+  public SinLFO xPos = new SinLFO(model.xMax, model.xMin, 5000);
+  public SinLFO zPos = new SinLFO(model.zMin, model.zMax, 5000);
+  public final CompoundParameter radius =
+    new CompoundParameter("Size", 1*FEET, 0*FEET, 10*FEET)
+    .setDescription("Radius of the circle");
     
-//   public final CompoundParameter rate =
-//     new CompoundParameter("Rate", 6000, 18000)
-//     .setDescription("Rate of the of the motion");
+  public final CompoundParameter rate =
+    new CompoundParameter("Rate", 6000, 18000)
+    .setDescription("Rate of the of the motion");
   
-//   public final CompoundParameter xPosP =
-//     new CompoundParameter("xPosP", model.xMin, model.xMax)
-//     .setDescription("Radius of the circle");
+  public final CompoundParameter xPosP =
+    new CompoundParameter("xPosP", model.xMin, model.xMax)
+    .setDescription("Radius of the circle");
     
-//   public final CompoundParameter yPosP =
-//     new CompoundParameter("yPosP", model.yMin, model.yMax)
-//     .setDescription("Rate of the of the motion");
+  public final CompoundParameter yPosP =
+    new CompoundParameter("yPosP", model.yMin, model.yMax)
+    .setDescription("Rate of the of the motion");
   
-//   public final CompoundParameter zPosP =
-//     new CompoundParameter("zPosP", model.zMin, model.zMax)
-//     .setDescription("Rate of the of the motion");
+  public final CompoundParameter zPosP =
+    new CompoundParameter("zPosP", model.zMin, model.zMax)
+    .setDescription("Rate of the of the motion");
   
-//   private final SawLFO phase = new SawLFO(0, TWO_PI, rate);
+  private final SawLFO phase = new SawLFO(0, TWO_PI, rate);
   
-//   public SoundSplines(LX lx) {
-//     super(lx);
-//     for (int i = 0; i < FRAME_WIDTH; ++i) {
-//       bass[i] = 0;
-//       treble[i] = 0;
-//     }
-//     for (int j = 0; j < NUM_PARTICLES; j++) {
-//       positions.add(new LXVector(0,0,0));
-//     }
-//     startModulator(xPos);
-//     startModulator(zPos);
-//     xPos.setBasis(.25);
-//     startModulator(phase);
-//     addParameter(radius);
-//     addParameter(rate);
-//     addParameter(xPosP);
-//     addParameter(yPosP);
-//     addParameter(zPosP);
-//   }
+  public SoundSplines(LX lx) {
+    super(lx);
+    for (int i = 0; i < FRAME_WIDTH; ++i) {
+      bass[i] = 0;
+      mids[i] = 0; 
+      treble[i] = 0;
+    }
+    for (int j = 0; j < NUM_PARTICLES; j++) {
+      positions.add(new LXVector(0,0,0));
+    }
+    startModulator(xPos);
+    startModulator(zPos);
+    xPos.setBasis(.25);
+    startModulator(phase);
+    addParameter(radius);
+    addParameter(rate);
+    addParameter(xPosP);
+    addParameter(yPosP);
+    addParameter(zPosP);
+  }
     
-//   public void onActive() {
-//      if (eq == null) {
-//       eq = new GraphicMeter(lx.engine.audio.getInput()); 
-//       // eq.slope.setValue(6);
-//       // eq.gain.setValue(12);
-//       // eq.range.setValue(36);
-//       // eq.release.setValue(500);
-//       // addParameter(eq.gain);
-//       // addParameter(eq.range);
-//       // addParameter(eq.attack);
-//       // addParameter(eq.release);
-//       // addParameter(eq.slope);
-//       addModulator(eq).start();
-//     }
-//   }
-//   int counter = 0; 
+  public void onActive() {
+     if (eq == null) {
+      eq = new GraphicMeter(lx.engine.audio.getInput()); 
+      // eq.slope.setValue(6);
+      // eq.gain.setValue(12);
+      // eq.range.setValue(36);
+      // eq.release.setValue(500);
+      // addParameter(eq.gain);
+      // addParameter(eq.range);
+      // addParameter(eq.attack);
+      // addParameter(eq.release);
+      // addParameter(eq.slope);
+      addModulator(eq).start();
+    }
+  }
+  int counter = 0; 
 
-//   public void run(double deltaMs) {
-//     setColors(#000000);
-//      counter++; 
-//     //position.set(500*cos((float)counter/100), model.cy,500*sin((float)counter/100));
-//     //position.set(xPos.getValuef(), model.cy, zPos.getValuef());
-//     positions.get(0).set(xPosP.getValuef(),yPosP.getValuef(), zPosP.getValuef());
-//     for (Leaf leaf : tree.leaves) {
-//       float dist = abs(positions.get(0).dist(leaf.coords[0]));
+  public void run(double deltaMs) {
+    setColors(#000000);
 
-//       if (dist < radius.getValuef()) {
-//         setColor(leaf, moss.get(leaf.point.index%100, leaf.point.index%50));
-//       }
+     counter++; 
 
-//     }
-//   }
-// }
+    // bessel
+    //position.set(500*cos((float)counter/100), model.cy,500*sin((float)counter/100));
+    //position.set(xPos.getValuef(), model.cy, zPos.getValuef());
+    //positions.get(0).set(xPosP.getValuef(),yPosP.getValuef(), zPosP.getValuef());
+    for (Leaf leaf:tree.leaves) {
+      //float dist = abs(positions.get(0).dist(leaf.coords[0]));
+      float besselVal = (float)besselOne.value(abs((float)leaf.x/model.xMax + (float)deltaMs/200)); 
+      besselVal = besselVal*model.xMax; 
+      float dist = abs((besselVal - leaf.x));
+      if (dist < radius.getValuef()) {
+        setColor(leaf, moss.get(leaf.point.index%100, leaf.point.index%50));
+      }
+      // if (dist < radius.getValuef()) {
+      //   setColor(leaf, moss.get(leaf.point.index%100, leaf.point.index%50));
+      // }
+
+    }
+  }
+}
  
 
 
@@ -136,6 +149,17 @@ public class Turbulence extends LXPattern {
       b = 0.8f;
       fluid.addDensity(px, py, radius, r, g, b, intensityV);
       
+
+      intensityV = 1.0f*intensity.getValuef();
+      px = 2*200/5;
+      py = 200;
+      radius = 300*size.getValuef();
+      r = 0.2f;
+      g = 0.2f;
+      b = 0.5f;
+      fluid.addDensity(px, py, radius, r, g, b, intensityV);
+
+
       temperature = animator * 20f;
       fluid.addTemperature(px, py, radius, temperature);
       
