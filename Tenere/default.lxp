@@ -1,9 +1,10 @@
 {
   "version": "0.1",
-  "timestamp": 1503006338553,
+  "timestamp": 1503231719506,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
+    "modulationColor": -16711812,
     "parameters": {
       "label": "Engine",
       "scene-1": false,
@@ -24,6 +25,7 @@
     "palette": {
       "id": 2,
       "class": "heronarts.lx.color.LXPalette",
+      "modulationColor": -7208705,
       "parameters": {
         "label": "",
         "cue": false,
@@ -34,8 +36,9 @@
         "color": -16746241,
         "period": 32000.0,
         "range": 0.0,
+        "spread": 0.0,
         "spreadX": 0.0,
-        "spreadY": 320.3149606299213,
+        "spreadY": 1.0,
         "spreadZ": 0.0,
         "spreadR": 0.0,
         "offsetX": 0.0,
@@ -48,6 +51,7 @@
       {
         "id": 30,
         "class": "heronarts.lx.LXChannel",
+        "modulationColor": -1704192,
         "parameters": {
           "label": "Pattern",
           "arm": false,
@@ -61,16 +65,17 @@
           "crossfadeGroup": 0,
           "blendMode": 0,
           "transitionEnabled": true,
-          "transitionTimeSecs": 5.0,
+          "transitionTimeSecs": 1.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 22,
         "patterns": [
           {
             "id": 4756,
             "class": "Tenere$PatternSolid",
+            "modulationColor": -65509,
             "parameters": {
               "label": "PatternSolid",
               "h": 0.0,
@@ -86,6 +91,7 @@
           {
             "id": 10554,
             "class": "Tenere$PatternSnakes",
+            "modulationColor": -16711753,
             "parameters": {
               "label": "PatternSnakes",
               "speed": 7000.0,
@@ -101,6 +107,7 @@
           {
             "id": 9806,
             "class": "Tenere$PatternMeltUp",
+            "modulationColor": -16711726,
             "parameters": {
               "label": "PatternMeltUp",
               "speed": 793.208238468578,
@@ -116,6 +123,7 @@
           {
             "id": 9794,
             "class": "Tenere$PatternMeltDown",
+            "modulationColor": -9984,
             "parameters": {
               "label": "PatternMeltDown",
               "speed": 568.8659753506563,
@@ -131,6 +139,7 @@
           {
             "id": 9800,
             "class": "Tenere$PatternMeltOut",
+            "modulationColor": -16711700,
             "parameters": {
               "label": "PatternMeltOut",
               "speed": 815.6550978592334,
@@ -146,6 +155,7 @@
           {
             "id": 9438,
             "class": "Tenere$PatternChess",
+            "modulationColor": -5570305,
             "parameters": {
               "label": "PatternChess",
               "speed": 24790.057230564664,
@@ -160,6 +170,7 @@
           {
             "id": 8371,
             "class": "Tenere$PatternLighthouse",
+            "modulationColor": -65314,
             "parameters": {
               "label": "PatternLighthouse",
               "speed": 16411.399936309455,
@@ -175,6 +186,7 @@
           {
             "id": 4758,
             "class": "Tenere$PatternBorealis",
+            "modulationColor": -5832449,
             "parameters": {
               "label": "PatternBorealis",
               "speed": 0.5989999978095293,
@@ -188,14 +200,11 @@
                 {
                   "id": 5115,
                   "class": "heronarts.lx.modulator.VariableLFO",
+                  "modulationColor": -6750464,
                   "parameters": {
                     "label": "LFO",
                     "running": true,
                     "trigger": false,
-                    "color/hue": 192.23532104492188,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -16724993,
                     "loop": true,
                     "wave": 0,
                     "period": 32882.48147072408,
@@ -217,6 +226,7 @@
                   },
                   "id": 5116,
                   "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "modulationColor": -5439233,
                   "parameters": {
                     "label": "",
                     "Polarity": 1,
@@ -230,6 +240,7 @@
           {
             "id": 4760,
             "class": "Tenere$PatternClouds",
+            "modulationColor": -12976384,
             "parameters": {
               "label": "PatternClouds",
               "thickness": 100.0,
@@ -250,6 +261,7 @@
           {
             "id": 4772,
             "class": "Tenere$PatternScanner",
+            "modulationColor": -16711837,
             "parameters": {
               "label": "PatternScanner",
               "speed": -0.03999998793005943,
@@ -262,14 +274,11 @@
                 {
                   "id": 5106,
                   "class": "heronarts.lx.modulator.VariableLFO",
+                  "modulationColor": -2948865,
                   "parameters": {
                     "label": "Speed",
                     "running": true,
                     "trigger": false,
-                    "color/hue": 62.35294723510742,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -655616,
                     "loop": true,
                     "wave": 0,
                     "period": 24648.47708309631,
@@ -282,14 +291,11 @@
                 {
                   "id": 5108,
                   "class": "heronarts.lx.modulator.VariableLFO",
+                  "modulationColor": -9174785,
                   "parameters": {
                     "label": "Sharp",
                     "running": true,
                     "trigger": false,
-                    "color/hue": 201.1764678955078,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -16734721,
                     "loop": true,
                     "wave": 0,
                     "period": 27196.563807434504,
@@ -302,14 +308,11 @@
                 {
                   "id": 5110,
                   "class": "heronarts.lx.modulator.VariableLFO",
+                  "modulationColor": -65488,
                   "parameters": {
                     "label": "XSlope",
                     "running": true,
                     "trigger": false,
-                    "color/hue": 195.7646942138672,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -16728833,
                     "loop": true,
                     "wave": 1,
                     "period": 37701.103999128485,
@@ -322,14 +325,11 @@
                 {
                   "id": 5113,
                   "class": "heronarts.lx.modulator.VariableLFO",
+                  "modulationColor": -57088,
                   "parameters": {
                     "label": "ZSlope",
                     "running": true,
                     "trigger": false,
-                    "color/hue": 29.88235092163086,
-                    "color/brightness": 100.0,
-                    "color/saturation": 100.0,
-                    "color": -33024,
                     "loop": true,
                     "wave": 0,
                     "period": 16207.235927699854,
@@ -351,6 +351,7 @@
                   },
                   "id": 5107,
                   "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "modulationColor": -16752129,
                   "parameters": {
                     "label": "",
                     "Polarity": 1,
@@ -367,6 +368,7 @@
                   },
                   "id": 5109,
                   "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "modulationColor": -16738817,
                   "parameters": {
                     "label": "",
                     "Polarity": 0,
@@ -383,6 +385,7 @@
                   },
                   "id": 5111,
                   "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "modulationColor": -6488320,
                   "parameters": {
                     "label": "",
                     "Polarity": 0,
@@ -399,6 +402,7 @@
                   },
                   "id": 5114,
                   "class": "heronarts.lx.parameter.LXCompoundModulation",
+                  "modulationColor": -15008000,
                   "parameters": {
                     "label": "",
                     "Polarity": 1,
@@ -412,6 +416,7 @@
           {
             "id": 4774,
             "class": "Tenere$PatternSirens",
+            "modulationColor": -16725505,
             "parameters": {
               "label": "PatternSirens",
               "speed1": 9000.0,
@@ -432,6 +437,7 @@
           {
             "id": 4779,
             "class": "Tenere$PatternSlideshow",
+            "modulationColor": -16711681,
             "parameters": {
               "label": "PatternSlideshow",
               "rate": 3000.0
@@ -445,6 +451,7 @@
           {
             "id": 4784,
             "class": "Tenere$PatternStarlight",
+            "modulationColor": -16715521,
             "parameters": {
               "label": "PatternStarlight",
               "speed": 3000.0,
@@ -460,6 +467,7 @@
           {
             "id": 4786,
             "class": "Tenere$PatternSwarm",
+            "modulationColor": -13369089,
             "parameters": {
               "label": "PatternSwarm",
               "speed": 2000.0,
@@ -475,6 +483,7 @@
           {
             "id": 4811,
             "class": "Tenere$PatternTumbler",
+            "modulationColor": -15073536,
             "parameters": {
               "label": "PatternTumbler"
             },
@@ -487,6 +496,7 @@
           {
             "id": 4815,
             "class": "Tenere$PatternVortex",
+            "modulationColor": -16734977,
             "parameters": {
               "label": "PatternVortex",
               "speed": 2000.0,
@@ -506,6 +516,7 @@
           {
             "id": 4830,
             "class": "Tenere$PatternWaves",
+            "modulationColor": -65292,
             "parameters": {
               "label": "PatternWaves",
               "rate": 6000.0,
@@ -526,6 +537,7 @@
           {
             "id": 5688,
             "class": "Tenere$PatternAxisPlanes",
+            "modulationColor": -16711841,
             "parameters": {
               "label": "PatternAxisPlanes",
               "xSpeed": 11000.0,
@@ -544,6 +556,7 @@
           {
             "id": 6001,
             "class": "Tenere$PatternAudioMeter",
+            "modulationColor": -59904,
             "parameters": {
               "label": "PatternAudioMeter",
               "mode": 0.0,
@@ -558,6 +571,7 @@
           {
             "id": 6311,
             "class": "Tenere$PatternAudioWaves",
+            "modulationColor": -65403,
             "parameters": {
               "label": "PatternAudioWaves",
               "speed": 256.0,
@@ -574,9 +588,37 @@
           {
             "id": 27,
             "class": "heronarts.lx.pattern.IteratorTestPattern",
+            "modulationColor": -16711840,
             "parameters": {
               "label": "IteratorTest",
               "Speed": 10.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 11901,
+            "class": "Tenere$Plasma",
+            "modulationColor": -65322,
+            "parameters": {
+              "label": "Plasma",
+              "Size": 0.800000011920929
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 11906,
+            "class": "Tenere$TheFourSeasons",
+            "modulationColor": -16711709,
+            "parameters": {
+              "label": "TheFourSeasons"
             },
             "modulation": {
               "modulators": [],
@@ -589,12 +631,13 @@
       {
         "id": 3835,
         "class": "heronarts.lx.LXChannel",
+        "modulationColor": -65493,
         "parameters": {
           "label": "Note",
           "arm": false,
           "enabled": true,
           "cue": false,
-          "midiMonitor": true,
+          "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
@@ -612,6 +655,7 @@
           {
             "id": 4706,
             "class": "Tenere$NoteAssemblages",
+            "modulationColor": -16741633,
             "parameters": {
               "label": "NoteAssemblages",
               "attack": 50.0,
@@ -629,6 +673,7 @@
           {
             "id": 6623,
             "class": "Tenere$NoteWaves",
+            "modulationColor": -16711914,
             "parameters": {
               "label": "NoteWaves",
               "speed": 759.4330708661417,
@@ -650,10 +695,11 @@
       {
         "id": 2698,
         "class": "heronarts.lx.LXChannel",
+        "modulationColor": -16762625,
         "parameters": {
           "label": "Texturize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
@@ -673,6 +719,7 @@
           {
             "id": 5693,
             "class": "Tenere$TextureNone",
+            "modulationColor": -16711849,
             "parameters": {
               "label": "TextureNone"
             },
@@ -685,6 +732,7 @@
           {
             "id": 11402,
             "class": "Tenere$TextureCrawl",
+            "modulationColor": -49664,
             "parameters": {
               "label": "TextureCrawl"
             },
@@ -697,6 +745,7 @@
           {
             "id": 8006,
             "class": "Tenere$TextureInOut",
+            "modulationColor": -22784,
             "parameters": {
               "label": "TextureInOut",
               "speed": 2531.640175857017,
@@ -711,6 +760,7 @@
           {
             "id": 2988,
             "class": "Tenere$TextureLoop",
+            "modulationColor": -16772609,
             "parameters": {
               "label": "TextureLoop",
               "rate": 1068.656038403024,
@@ -725,6 +775,7 @@
           {
             "id": 2991,
             "class": "Tenere$TextureSparkle",
+            "modulationColor": -10157825,
             "parameters": {
               "label": "TextureSparkle",
               "speed": 1000.0,
@@ -739,6 +790,7 @@
           {
             "id": 3139,
             "class": "Tenere$TextureWave",
+            "modulationColor": -16711811,
             "parameters": {
               "label": "TextureWave",
               "speed": 2304.614878954809
@@ -754,10 +806,11 @@
       {
         "id": 96,
         "class": "heronarts.lx.LXChannel",
+        "modulationColor": -65387,
         "parameters": {
           "label": "Colorize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
@@ -777,6 +830,7 @@
           {
             "id": 3290,
             "class": "Tenere$ColorGradientTree",
+            "modulationColor": -16759809,
             "parameters": {
               "label": "ColorGradientTree",
               "slopeX": 0.0,
@@ -791,10 +845,10 @@
           {
             "id": 3288,
             "class": "Tenere$ColorGradientAssemblage",
+            "modulationColor": -65307,
             "parameters": {
               "label": "ColorGradientAssemblage",
-              "speed": 8000.0,
-              "spread": 0.0
+              "speed": 8000.0
             },
             "modulation": {
               "modulators": [],
@@ -805,6 +859,7 @@
           {
             "id": 549,
             "class": "Tenere$ColorAutumn",
+            "modulationColor": -5374208,
             "parameters": {
               "label": "ColorAutumn",
               "range": 39.2999997921288
@@ -818,6 +873,7 @@
           {
             "id": 2031,
             "class": "Tenere$ColorRain",
+            "modulationColor": -16711832,
             "parameters": {
               "label": "ColorRain",
               "speed": 1.6999999843537807,
@@ -832,6 +888,7 @@
           {
             "id": 749,
             "class": "Tenere$ColorSwirl",
+            "modulationColor": -65309,
             "parameters": {
               "label": "ColorSwirl",
               "speed": 0.5,
@@ -847,6 +904,7 @@
           {
             "id": 8722,
             "class": "Tenere$ColorLighthouse",
+            "modulationColor": -16711762,
             "parameters": {
               "label": "ColorLighthouse",
               "speed": 14685.252505544297,
@@ -865,6 +923,7 @@
     "master": {
       "id": 18,
       "class": "heronarts.lx.LXMasterChannel",
+      "modulationColor": -65447,
       "parameters": {
         "label": "Master",
         "arm": false
@@ -873,6 +932,7 @@
         {
           "id": 3556,
           "class": "heronarts.lx.effect.StrobeEffect",
+          "modulationColor": -5308672,
           "parameters": {
             "label": "Strobe",
             "enabled": false,
@@ -889,6 +949,7 @@
         {
           "id": 3560,
           "class": "heronarts.lx.effect.BlurEffect",
+          "modulationColor": -1966336,
           "parameters": {
             "label": "Blur",
             "enabled": false,
@@ -906,6 +967,7 @@
     "audio": {
       "id": 20,
       "class": "heronarts.lx.audio.LXAudioEngine",
+      "modulationColor": -37888,
       "parameters": {
         "label": "Audio",
         "enabled": true,
@@ -914,40 +976,38 @@
       "meter": {
         "id": 23,
         "class": "heronarts.lx.audio.GraphicMeter",
+        "modulationColor": -16721153,
         "parameters": {
           "label": "Meter",
           "running": true,
           "trigger": false,
-          "color/hue": 339.0588073730469,
-          "color/brightness": 100.0,
-          "color/saturation": 100.0,
-          "color": -65447,
           "gain": 18.24000000000001,
           "range": 36.30000000000002,
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
           "Band-1": 0.0,
-          "Band-2": 0.12586789402791898,
-          "Band-3": 0.2947225804903233,
-          "Band-4": 0.43733926634612375,
-          "Band-5": 0.41826594220528224,
-          "Band-6": 0.25225403619588616,
-          "Band-7": 0.31214295310230455,
-          "Band-8": 0.49562682169524264,
-          "Band-9": 0.4734282210557116,
-          "Band-10": 0.0967333113907427,
-          "Band-11": 0.25255257423802724,
-          "Band-12": 0.41659210958707316,
-          "Band-13": 0.6561291275101844,
-          "Band-14": 0.573690942258944,
-          "Band-15": 0.45773477705420484,
-          "Band-16": 0.30416879710565614
+          "Band-2": 0.016900861751211194,
+          "Band-3": 0.12888008021875164,
+          "Band-4": 0.23441764063623027,
+          "Band-5": 0.26562148263809215,
+          "Band-6": 0.1863836149521887,
+          "Band-7": 0.3948096860922331,
+          "Band-8": 0.5915407106048685,
+          "Band-9": 0.4990960975430201,
+          "Band-10": 0.10493006210975941,
+          "Band-11": 0.045603015967706995,
+          "Band-12": 0.0,
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
         }
       },
       "input": {
         "id": 21,
         "class": "heronarts.lx.audio.LXAudioInput",
+        "modulationColor": -2359552,
         "parameters": {
           "label": "Audio Input",
           "device": 0
@@ -956,6 +1016,7 @@
       "output": {
         "id": 22,
         "class": "heronarts.lx.audio.LXAudioOutput",
+        "modulationColor": -16725761,
         "parameters": {
           "label": "Audio Output",
           "play": false,
@@ -968,6 +1029,7 @@
     "output": {
       "id": 19,
       "class": "heronarts.lx.LXEngine$Output",
+      "modulationColor": -10813696,
       "parameters": {
         "label": "Output",
         "enabled": false,
@@ -981,6 +1043,7 @@
       "sensors": {
         "id": 32,
         "class": "Tenere$Sensors",
+        "modulationColor": -16737025,
         "parameters": {
           "label": "Sensors"
         },
@@ -988,6 +1051,7 @@
           {
             "id": 33,
             "class": "Tenere$Sensors$Sensor",
+            "modulationColor": -16711706,
             "parameters": {
               "label": "A",
               "enabled": true,
@@ -1002,12 +1066,15 @@
               "acc2": 0.25390860438346863,
               "gyro0": 0.5009869337081909,
               "gyro1": 0.49605223536491394,
-              "gyro2": 0.4925979673862457
+              "gyro2": 0.4925979673862457,
+              "orientation0": 0.0,
+              "orientation1": 0.0
             }
           },
           {
             "id": 35,
             "class": "Tenere$Sensors$Sensor",
+            "modulationColor": -61952,
             "parameters": {
               "label": "B",
               "enabled": true,
@@ -1022,12 +1089,15 @@
               "acc2": 0.0,
               "gyro0": 0.0,
               "gyro1": 0.0,
-              "gyro2": 0.0
+              "gyro2": 0.0,
+              "orientation0": 0.0,
+              "orientation1": 0.0
             }
           },
           {
             "id": 37,
             "class": "Tenere$Sensors$Sensor",
+            "modulationColor": -13312,
             "parameters": {
               "label": "C",
               "enabled": true,
@@ -1042,12 +1112,15 @@
               "acc2": 0.0,
               "gyro0": 0.0,
               "gyro1": 0.0,
-              "gyro2": 0.0
+              "gyro2": 0.0,
+              "orientation0": 0.0,
+              "orientation1": 0.0
             }
           },
           {
             "id": 39,
             "class": "Tenere$Sensors$Sensor",
+            "modulationColor": -16773377,
             "parameters": {
               "label": "D",
               "enabled": true,
@@ -1062,12 +1135,15 @@
               "acc2": 0.0,
               "gyro0": 0.0,
               "gyro1": 0.0,
-              "gyro2": 0.0
+              "gyro2": 0.0,
+              "orientation0": 0.0,
+              "orientation1": 0.0
             }
           },
           {
             "id": 41,
             "class": "Tenere$Sensors$Sensor",
+            "modulationColor": -8847105,
             "parameters": {
               "label": "E",
               "enabled": true,
@@ -1082,7 +1158,9 @@
               "acc2": 0.0,
               "gyro0": 0.0,
               "gyro1": 0.0,
-              "gyro2": 0.0
+              "gyro2": 0.0,
+              "orientation0": 0.0,
+              "orientation1": 0.0
             }
           }
         ]
@@ -1105,6 +1183,7 @@
     "osc": {
       "id": 24,
       "class": "heronarts.lx.osc.LXOscEngine",
+      "modulationColor": -51968,
       "parameters": {
         "label": "OSC",
         "receiveHost": "0.0.0.0",
@@ -1154,6 +1233,7 @@
       "audioExpanded": false,
       "paletteExpanded": true,
       "engineExpanded": false,
+      "cameraExpanded": true,
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
