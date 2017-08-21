@@ -95,11 +95,6 @@ public static class Plasma extends LXPattern {
 }
 
 
-
-          
-
-/* ------------------------------------------------------------------------------------------------------------------------*/
-
 // This is a helper class to generate plasma. 
 
   public static class PlasmaGenerator {
@@ -149,6 +144,13 @@ public static class Plasma extends LXPattern {
     }
     
   }//end plasma generator
+  
+  
+ 
+  
+  //////////////////////////////////////////////////////////////////////////
+  
+  
 
   public class TheFourSeasons extends LXPattern {
   // by Fin McCarthy finchronicity@gmail.com
@@ -159,12 +161,12 @@ public static class Plasma extends LXPattern {
 
   SeasonsHelpers.Seasons season = SeasonsHelpers.Seasons.WINTER;
   int dayOfTheSeason;
-  int summerDays = 100;
+  int summerDays = 99;
   int autumnDays = 1800;
-  int winterDays = 7000;
+  int winterDays = 2000;
   int snowingDays = 1100;
   int springDays = 1000;
-  int blossumTime = 100;
+  int blossumTime = 200;
   int currentDayOfSpring = 0;
   int nextSeasonChange = 1600; //frames    
   int startupPause = 20;
@@ -221,8 +223,7 @@ public static class Plasma extends LXPattern {
   
   public TheFourSeasons(LX lx) {
     super(lx);
-   //InitializePseudoLeaves();
-   InitializeWinter();
+   InitializePseudoLeaves();
   }
     
   public void run(double deltaMs) {
@@ -234,7 +235,7 @@ public static class Plasma extends LXPattern {
   
   public void onActive() 
   {
-    season = SeasonsHelpers.Seasons.WINTER;
+    season = SeasonsHelpers.Seasons.STARTUP;
     dayOfTheSeason =0;
   }
   
@@ -424,8 +425,9 @@ public static class Plasma extends LXPattern {
      {
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
-           pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.blossumColor,0.01);
-           IlluminateNearby(pleaf);
+           //pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.blossumColor,0.01);
+           pleaf.leafColor = pleaf.blossumColor;
+           IlluminateNearby(pleaf,0.1);
         }
      }
      
@@ -434,18 +436,17 @@ public static class Plasma extends LXPattern {
      {
        for(PseudoLeaf pleaf : pseudoLeaves)
        {
-           pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.greenColor,0.03);
-           IlluminateNearby(pleaf);
+           pleaf.leafColor = pleaf.greenColor;
+           IlluminateNearby(pleaf, 0.3);
         }
      }
      
     void LerpIntoSummer()
     {
-        ClearColors();
+        if(dayOfTheSeason==0) dayOfTheSeason = 1; //helps lerp
         for(PseudoLeaf pleaf : pseudoLeaves)
         {
-             pleaf.leafColor = LXColor.lerp(pleaf.leafColor,pleaf.greenColor,(float)dayOfTheSeason/100f);
-             IlluminateNearby(pleaf);
+             IlluminateNearby(pleaf,(float)dayOfTheSeason/100f);
         }
     }
 
@@ -493,7 +494,7 @@ public static class Plasma extends LXPattern {
              // zzzzzZZZzzZzzZZzZz do nothing
            }
            
-            IlluminateNearby(pleaf);
+            IlluminateNearby(pleaf,0);
         }
      }
      
@@ -535,7 +536,7 @@ public static class Plasma extends LXPattern {
              // zzzzzZZZzzZzzZZzZz do nothing
            }
            
-            IlluminateNearby(pleaf);
+            IlluminateNearby(pleaf,0);
         }
      }
    
@@ -609,7 +610,7 @@ public static class Plasma extends LXPattern {
           //deal with green leaves first. 
           if(pleaf.status == SeasonsHelpers.LeafStatus.GROWING)
           {
-              IlluminateNearby(pleaf);//make current colour, which will be green.
+              IlluminateNearby(pleaf,0);//make current colour, which will be green.
           }
           
          //now deal with brown leaves, overwiring green ones.
@@ -623,7 +624,7 @@ public static class Plasma extends LXPattern {
            
            //Continue Browning
             pleaf.leafColor  = LXColor.lerp(pleaf.leafColor,pleaf.browningColor,0.05); //transform
-            IlluminateNearby(pleaf);
+            IlluminateNearby(pleaf,0);
 
              pleaf.brownTime++;
            }
@@ -638,7 +639,7 @@ public static class Plasma extends LXPattern {
              
              else //draw this leaf
              {
-               IlluminateNearby(pleaf);
+               IlluminateNearby(pleaf,0);
              }
            }
            else if(pleaf.status == SeasonsHelpers.LeafStatus.FALLEN)
@@ -668,7 +669,7 @@ public static class Plasma extends LXPattern {
        }
     }
     
-    void IlluminateNearby(PseudoLeaf pleaf)
+    void IlluminateNearby(PseudoLeaf pleaf, float lerp)
     {
        for(Branch branch : tree.branches)
        {
@@ -688,8 +689,18 @@ public static class Plasma extends LXPattern {
                     float dist = dist(ll.x, ll.y, ll.z, pleaf.x, pleaf.y, pleaf.z);
                     if(dist < pleaf.size)
                     {
+                       
+                       if(lerp > 0)
+                       {
+                         int c = LXColor.lerp(colors[ll.point.index],pleaf.leafColor,lerp);
+                         setColor(ll, c);
+                       }
+                       else
+                       {
                        //pleaf.leafColor = LXColor.lerp(pleaf.leafColor,colour,0.02);
                        setColor(ll, pleaf.leafColor);
+                       }
+                       
                     }
                   }
                 }
