@@ -703,7 +703,7 @@ public class PatternEmanation extends TenerePattern {
     super(lx);
     addParameter("speed", this.speed);
     addParameter("size", this.size);
-    addParameter("direction", this.direction);
+    addParameter("inward", this.inward);
     for (int i = 0; i < NUM_POSITIONS; ++i) {
       this.pos[i] = startModulator(new SawLFO(maxPos, 0, this.speed).randomBasis());
     }
@@ -711,9 +711,13 @@ public class PatternEmanation extends TenerePattern {
   
   public void run(double deltaMs) {
     float falloff = 100 / this.sizeDamped.getValuef();
+    boolean inward = this.inward.isOn();
     int bi = 0;
     for (Branch branch : model.branches) {
-      float pos = this.pos[bi++ % this.pos.length].getValuef();      
+      float pos = this.pos[bi++ % this.pos.length].getValuef();
+      if (inward) {
+        pos = maxPos - pos;
+      }
       float ai = 0;
       for (LeafAssemblage assemblage : branch.assemblages) {
         float d = LXUtils.wrapdistf(abs(ai - midBranch), pos, maxPos);
