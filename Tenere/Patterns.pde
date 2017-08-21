@@ -641,7 +641,7 @@ public abstract class BufferPattern extends TenerePattern {
 public abstract class SpinningPattern extends TenerePattern {
   
   public final CompoundParameter speed = (CompoundParameter)
-    new CompoundParameter("Speed", 17000, 25000, 5000)
+    new CompoundParameter("Speed", 17000, 31000, 5000)
     .setExponent(2)
     .setDescription("Speed of lighthouse motion");
         
@@ -650,6 +650,59 @@ public abstract class SpinningPattern extends TenerePattern {
   public SpinningPattern(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
+  }
+}
+
+public class PatternGentleSpin extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public PatternGentleSpin(LX lx) {
+    super(lx);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    for (LeafAssemblage assemblage : model.assemblages) {
+      LXPoint p = assemblage.points[0];
+      float az = (p.azimuth + azimuth + abs(p.yn - .5) * QUARTER_PI) % TWO_PI;
+      setColor(assemblage, LXColor.gray(max(0, 100 - 40 * abs(az - PI))));
+    }
+  }
+}
+
+public class PatternChevron extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter slope =
+    new CompoundParameter("Slope", 0, -HALF_PI, HALF_PI)
+    .setDescription("Slope of the chevron shape");
+    
+  public final CompoundParameter sharp =
+    new CompoundParameter("Sharp", 200, 100, 800)
+    .setDescription("Sharpness of the lines");
+  
+  private final LXModulator slopeDamped = startModulator(new DampedParameter(this.slope, PI, TWO_PI, PI));
+  private final LXModulator sharpDamped = startModulator(new DampedParameter(this.sharp, 300, 400, 200));
+  
+  public PatternChevron(LX lx) {
+    super(lx);
+    addParameter("slope", this.slope);
+    addParameter("sharp", this.sharp);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    float slope = this.slopeDamped.getValuef();
+    float sharp = this.sharpDamped.getValuef();
+    for (LeafAssemblage assemblage : model.assemblages) {
+      LXPoint p = assemblage.points[0];
+      float az = (p.azimuth + azimuth + abs(p.yn - .5) * slope) % QUARTER_PI;
+      setColor(assemblage, LXColor.gray(max(0, 100 - sharp * abs(az - PI/8.))));
+    }
   }
 }
 

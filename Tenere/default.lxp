@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503336920055,
+  "timestamp": 1503350265469,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -70,7 +70,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 2,
         "patterns": [
           {
             "id": 4756,
@@ -97,6 +97,36 @@
               "speed": 7000.0,
               "modSpeed": 5850.855565701824,
               "size": 52.79999949038029
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 12942,
+            "class": "Tenere$PatternChevron",
+            "modulationColor": -7680,
+            "parameters": {
+              "label": "PatternChevron",
+              "speed": 30121.66231367724,
+              "slope": 1.5707963705062866,
+              "sharp": 396.00000232458115
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 12939,
+            "class": "Tenere$PatternGentleSpin",
+            "modulationColor": -6881025,
+            "parameters": {
+              "label": "PatternGentleSpin",
+              "speed": 17000.0
             },
             "modulation": {
               "modulators": [],
@@ -976,16 +1006,16 @@
           "release": 587.1049740012817,
           "slope": 4.5,
           "Band-1": 0.0,
-          "Band-2": 0.16016675833660565,
-          "Band-3": 0.36586894068902387,
-          "Band-4": 0.5324018274957933,
-          "Band-5": 0.5031725291365999,
-          "Band-6": 0.4655492860358119,
-          "Band-7": 0.420468582657997,
-          "Band-8": 0.4376706332315343,
-          "Band-9": 0.34709304187500567,
-          "Band-10": 0.298926827623896,
-          "Band-11": 0.026841082526938842,
+          "Band-2": 0.0,
+          "Band-3": 0.0,
+          "Band-4": 0.0,
+          "Band-5": 0.0,
+          "Band-6": 0.0,
+          "Band-7": 0.0,
+          "Band-8": 0.0,
+          "Band-9": 0.0,
+          "Band-10": 0.0,
+          "Band-11": 0.0,
           "Band-12": 0.0,
           "Band-13": 0.0,
           "Band-14": 0.0,
@@ -1008,7 +1038,7 @@
         "modulationColor": -52736,
         "parameters": {
           "label": "Audio Output",
-          "file": "media/ambient/Pop Ambient 2017 Mixed.wav",
+          "file": "media/ambient/Treescape - Mixed by Mark Slee.wav",
           "trigger": false,
           "looping": true,
           "play": true
@@ -1232,9 +1262,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 4698.176809840667,
-        "theta": 0.05779939508437812,
-        "phi": 0.026467064976692024
+        "radius": 8485.906505688761,
+        "theta": 0.12379939508437812,
+        "phi": 0.050467064976692115
       }
     }
   }
