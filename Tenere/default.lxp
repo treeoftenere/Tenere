@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503323928801,
+  "timestamp": 1503351557660,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -65,12 +65,12 @@
           "crossfadeGroup": 0,
           "blendMode": 0,
           "transitionEnabled": true,
-          "transitionTimeSecs": 1.0,
+          "transitionTimeSecs": 5.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 22,
+        "patternIndex": 23,
         "patterns": [
           {
             "id": 4756,
@@ -97,6 +97,36 @@
               "speed": 7000.0,
               "modSpeed": 5850.855565701824,
               "size": 52.79999949038029
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 12942,
+            "class": "Tenere$PatternChevron",
+            "modulationColor": -7680,
+            "parameters": {
+              "label": "PatternChevron",
+              "speed": 30121.66231367724,
+              "slope": 1.5707963705062866,
+              "sharp": 396.00000232458115
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 12939,
+            "class": "Tenere$PatternGentleSpin",
+            "modulationColor": -6881025,
+            "parameters": {
+              "label": "PatternGentleSpin",
+              "speed": 17000.0
             },
             "modulation": {
               "modulators": [],
@@ -600,25 +630,13 @@
             }
           },
           {
-            "id": 12933,
-            "class": "Tenere$Plasma",
-            "modulationColor": -16736257,
+            "id": 13515,
+            "class": "Tenere$PatternEmanation",
+            "modulationColor": -16758529,
             "parameters": {
-              "label": "Plasma",
-              "Size": 0.800000011920929
-            },
-            "modulation": {
-              "modulators": [],
-              "modulations": [],
-              "triggers": []
-            }
-          },
-          {
-            "id": 12938,
-            "class": "Tenere$TheFourSeasons",
-            "modulationColor": -16711750,
-            "parameters": {
-              "label": "TheFourSeasons"
+              "label": "PatternEmanation",
+              "speed": 5000.0,
+              "size": 2.0
             },
             "modulation": {
               "modulators": [],
@@ -635,7 +653,7 @@
         "parameters": {
           "label": "Note",
           "arm": false,
-          "enabled": false,
+          "enabled": true,
           "cue": false,
           "midiMonitor": true,
           "midiChannel": 16,
@@ -730,7 +748,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 0,
         "patterns": [
           {
             "id": 5693,
@@ -826,13 +844,13 @@
         "parameters": {
           "label": "Colorize",
           "arm": false,
-          "enabled": false,
+          "enabled": true,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 81.0,
-          "fader": 1.0,
+          "fader": 0.9857142856344581,
           "crossfadeGroup": 0,
           "blendMode": 1,
           "transitionEnabled": true,
@@ -987,7 +1005,7 @@
       "parameters": {
         "label": "Audio",
         "enabled": true,
-        "mode": 0
+        "mode": 1
       },
       "meter": {
         "id": 23,
@@ -997,7 +1015,7 @@
           "label": "Meter",
           "running": true,
           "trigger": false,
-          "gain": 18.24000000000001,
+          "gain": 0.0,
           "range": 36.30000000000002,
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
@@ -1035,10 +1053,10 @@
         "modulationColor": -52736,
         "parameters": {
           "label": "Audio Output",
-          "play": false,
+          "file": "media/ambient/Treescape - Mixed by Mark Slee.wav",
           "trigger": false,
-          "looping": false,
-          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3"
+          "looping": true,
+          "play": true
         }
       }
     },
@@ -1252,17 +1270,31 @@
   },
   "externals": {
     "ui": {
-      "audioExpanded": false,
+      "audioExpanded": true,
       "paletteExpanded": true,
       "engineExpanded": false,
       "cameraExpanded": true,
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 4698.176809840667,
-        "theta": 0.05779939508437812,
-        "phi": 0.026467064976692024
+        "radius": 7877.917615527178,
+        "theta": 0.12379939508437812,
+        "phi": 0.050467064976692115
       }
     }
   }
 }
+  "timestamp": 1503351557660,
+        "patternIndex": 23,
+            "id": 13515,
+            "class": "Tenere$PatternEmanation",
+            "modulationColor": -16758529,
+              "label": "PatternEmanation",
+              "speed": 5000.0,
+              "size": 2.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }

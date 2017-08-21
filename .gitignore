@@ -1,5 +1,6 @@
 .DS_Store
 .lxproject
+media
 applet
 application.linux32
 application.linux64
@@ -7,6 +8,4 @@ application.windows32
 application.windows64
 application.macosx
 
-Tenere/default.lxp
-Tenere/default.lxp
 Tenere/default.lxp
