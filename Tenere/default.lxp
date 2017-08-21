@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503285286300,
+  "timestamp": 1503323928801,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -65,12 +65,12 @@
           "crossfadeGroup": 0,
           "blendMode": 0,
           "transitionEnabled": true,
-          "transitionTimeSecs": 5.0,
+          "transitionTimeSecs": 1.0,
           "transitionBlendMode": 0
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 22,
         "patterns": [
           {
             "id": 4756,
@@ -598,6 +598,33 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 12933,
+            "class": "Tenere$Plasma",
+            "modulationColor": -16736257,
+            "parameters": {
+              "label": "Plasma",
+              "Size": 0.800000011920929
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 12938,
+            "class": "Tenere$TheFourSeasons",
+            "modulationColor": -16711750,
+            "parameters": {
+              "label": "TheFourSeasons"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -608,7 +635,7 @@
         "parameters": {
           "label": "Note",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": true,
           "midiChannel": 16,
@@ -688,7 +715,7 @@
         "parameters": {
           "label": "Texturize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
@@ -799,7 +826,7 @@
         "parameters": {
           "label": "Colorize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
@@ -987,10 +1014,10 @@
           "Band-10": 0.0,
           "Band-11": 0.0,
           "Band-12": 0.0,
-          "Band-13": 0.11999345372619041,
-          "Band-14": 0.24367784778837476,
-          "Band-15": 0.23268416309430784,
-          "Band-16": 0.2690442850086858
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
         }
       },
       "input": {
