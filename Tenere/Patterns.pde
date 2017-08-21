@@ -672,6 +672,59 @@ public class PatternGentleSpin extends SpinningPattern {
   }
 }
 
+public class PatternEmanation extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 5000, 11000, 500)
+    .setExponent(.5)
+    .setDescription("Speed of emanation");
+    
+  public final CompoundParameter size =
+    new CompoundParameter("Size", 2, 1, 4)
+    .setDescription("Size of emanation");
+    
+  public final BooleanParameter inward =
+    new BooleanParameter("Inward", false)
+    .setDescription("Direction of emanation");    
+    
+  private final LXModulator sizeDamped = startModulator(new DampedParameter(this.size, 2));
+  
+  private final float maxPos = Branch.NUM_ASSEMBLAGES-1;
+  private final float midBranch = maxPos / 2;
+  
+  private static final int NUM_POSITIONS = 15;
+  
+  private final LXModulator[] pos = new LXModulator[NUM_POSITIONS];
+
+  public PatternEmanation(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    addParameter("direction", this.direction);
+    for (int i = 0; i < NUM_POSITIONS; ++i) {
+      this.pos[i] = startModulator(new SawLFO(maxPos, 0, this.speed).randomBasis());
+    }
+  }
+  
+  public void run(double deltaMs) {
+    float falloff = 100 / this.sizeDamped.getValuef();
+    int bi = 0;
+    for (Branch branch : model.branches) {
+      float pos = this.pos[bi++ % this.pos.length].getValuef();      
+      float ai = 0;
+      for (LeafAssemblage assemblage : branch.assemblages) {
+        float d = LXUtils.wrapdistf(abs(ai - midBranch), pos, maxPos);
+        setColor(assemblage, LXColor.gray(max(0, 100 - falloff * d)));
+        ++ai;
+      }
+    }
+  }  
+  
+}
+
 public class PatternChevron extends SpinningPattern {
   public String getAuthor() {
     return "Mark C. Slee";

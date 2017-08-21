@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503350265469,
+  "timestamp": 1503351557660,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -70,7 +70,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 2,
+        "patternIndex": 23,
         "patterns": [
           {
             "id": 4756,
@@ -628,6 +628,21 @@
               "modulations": [],
               "triggers": []
             }
+          },
+          {
+            "id": 13515,
+            "class": "Tenere$PatternEmanation",
+            "modulationColor": -16758529,
+            "parameters": {
+              "label": "PatternEmanation",
+              "speed": 5000.0,
+              "size": 2.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
           }
         ]
       },
@@ -718,7 +733,7 @@
         "parameters": {
           "label": "Texturize",
           "arm": false,
-          "enabled": true,
+          "enabled": false,
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
@@ -733,7 +748,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 0,
         "patterns": [
           {
             "id": 5693,
@@ -1262,7 +1277,7 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 8485.906505688761,
+        "radius": 7877.917615527178,
         "theta": 0.12379939508437812,
         "phi": 0.050467064976692115
       }
