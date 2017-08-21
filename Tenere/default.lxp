@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503285286300,
+  "timestamp": 1503336920055,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -805,7 +805,7 @@
           "midiChannel": 16,
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 81.0,
-          "fader": 1.0,
+          "fader": 0.9857142856344581,
           "crossfadeGroup": 0,
           "blendMode": 1,
           "transitionEnabled": true,
@@ -960,7 +960,7 @@
       "parameters": {
         "label": "Audio",
         "enabled": true,
-        "mode": 0
+        "mode": 1
       },
       "meter": {
         "id": 23,
@@ -970,27 +970,27 @@
           "label": "Meter",
           "running": true,
           "trigger": false,
-          "gain": 18.24000000000001,
+          "gain": 0.0,
           "range": 36.30000000000002,
           "attack": 39.999999329447746,
           "release": 587.1049740012817,
           "slope": 4.5,
           "Band-1": 0.0,
-          "Band-2": 0.0,
-          "Band-3": 0.0,
-          "Band-4": 0.0,
-          "Band-5": 0.0,
-          "Band-6": 0.0,
-          "Band-7": 0.0,
-          "Band-8": 0.0,
-          "Band-9": 0.0,
-          "Band-10": 0.0,
-          "Band-11": 0.0,
+          "Band-2": 0.16016675833660565,
+          "Band-3": 0.36586894068902387,
+          "Band-4": 0.5324018274957933,
+          "Band-5": 0.5031725291365999,
+          "Band-6": 0.4655492860358119,
+          "Band-7": 0.420468582657997,
+          "Band-8": 0.4376706332315343,
+          "Band-9": 0.34709304187500567,
+          "Band-10": 0.298926827623896,
+          "Band-11": 0.026841082526938842,
           "Band-12": 0.0,
-          "Band-13": 0.11999345372619041,
-          "Band-14": 0.24367784778837476,
-          "Band-15": 0.23268416309430784,
-          "Band-16": 0.2690442850086858
+          "Band-13": 0.0,
+          "Band-14": 0.0,
+          "Band-15": 0.0,
+          "Band-16": 0.0
         }
       },
       "input": {
@@ -1008,10 +1008,10 @@
         "modulationColor": -52736,
         "parameters": {
           "label": "Audio Output",
-          "play": false,
+          "file": "media/ambient/Pop Ambient 2017 Mixed.wav",
           "trigger": false,
-          "looping": false,
-          "file": "../../../../../Studio/2017/07/LIB Edit Project/LIB17_Woogie_Sun_MarkSlee - PROTON CUT.mp3"
+          "looping": true,
+          "play": true
         }
       }
     },
@@ -1225,7 +1225,7 @@
   },
   "externals": {
     "ui": {
-      "audioExpanded": false,
+      "audioExpanded": true,
       "paletteExpanded": true,
       "engineExpanded": false,
       "cameraExpanded": true,
