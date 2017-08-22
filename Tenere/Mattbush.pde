@@ -3,12 +3,16 @@ public class Lattice extends LXPattern {
   public final double MAX_RIPPLES_TREAT_AS_INFINITE = 2000.0;
   
   public final CompoundParameter rippleRadius =
-    new CompoundParameter("Ripple radius", 500.0, 50.0, MAX_RIPPLES_TREAT_AS_INFINITE)
+    new CompoundParameter("Ripple radius", 500.0, 200.0, MAX_RIPPLES_TREAT_AS_INFINITE)
     .setDescription("Controls the spacing between ripples");
 
   public final CompoundParameter subdivisionSize =
-    new CompoundParameter("Subdivision size", 1000.0, 200.0, MAX_RIPPLES_TREAT_AS_INFINITE)
+    new CompoundParameter("Subdivision size", MAX_RIPPLES_TREAT_AS_INFINITE, 200.0, MAX_RIPPLES_TREAT_AS_INFINITE)
     .setDescription("Subdivides the canvas into smaller canvases of this size");
+
+  public final CompoundParameter numSpirals =
+    new CompoundParameter("Spirals", 0, -3, 3)
+    .setDescription("Adds a spiral effect");
 
   public final CompoundParameter yFactor =
     new CompoundParameter("Y factor")
@@ -32,6 +36,7 @@ public class Lattice extends LXPattern {
     super(lx);
     addParameter(rippleRadius);
     addParameter(subdivisionSize);
+    addParameter(numSpirals);
     addParameter(yFactor);
     addParameter(manhattanCoefficient);
     addParameter(triangleCoefficient);
@@ -71,13 +76,15 @@ public class Lattice extends LXPattern {
     double triangleCoefficientValueHalf = triangleCoefficient.getValue() / 2;
     double visibleAmountValueMultiplier = 1 / visibleAmount.getValue();
     double visibleAmountValueToSubtract = visibleAmountValueMultiplier - 1;
+    double numSpiralsValue = Math.round(numSpirals.getValue());
 
     // Let's iterate over all the leaves...
     for (Leaf leaf : tree.leaves) {
       double totalDistance = _calculateDistance(leaf);
-      double rawRefreshValue = totalDistance / rippleRadiusValue;
+      double rawRefreshValueFromDistance = totalDistance / rippleRadiusValue;
+      double rawRefreshValueFromSpiral = Math.atan2(leaf.z, leaf.x) * numSpiralsValue / (2 * Math.PI);
 
-      double refreshValueModOne = (ticksSoFar - rawRefreshValue) % 1.0;
+      double refreshValueModOne = (ticksSoFar - rawRefreshValueFromDistance - rawRefreshValueFromSpiral) % 1.0;
       double brightnessValueBeforeVisibleCheck = (refreshValueModOne >= triangleCoefficientValueHalf) ?
         1 - (refreshValueModOne - triangleCoefficientValueHalf) / (1 - triangleCoefficientValueHalf) :
         (refreshValueModOne / triangleCoefficientValueHalf);
