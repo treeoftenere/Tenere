@@ -88,8 +88,7 @@
             "id": 2991,
             "class": "Tenere$Lattice",
             "parameters": {
-              "label": "Lattice",
-              "Ripple radius": 100.0
+              "label": "Lattice"
             },
             "modulation": {
               "modulators": [],
