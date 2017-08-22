@@ -1284,3 +1284,17 @@
     }
   }
 }
+  "timestamp": 1503351557660,
+        "patternIndex": 23,
+            "id": 13515,
+            "class": "Tenere$PatternEmanation",
+            "modulationColor": -16758529,
+              "label": "PatternEmanation",
+              "speed": 5000.0,
+              "size": 2.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
