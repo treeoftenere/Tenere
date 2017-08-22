@@ -51,9 +51,9 @@ public class Lattice extends LXPattern {
   }
   
   private double _calculateDistance(Leaf leaf) {
-    double x = Math.abs(leaf.x);
-    double y = (Math.abs(leaf.y) * this.yFactor.getValue());
-    double z = Math.abs(leaf.z);
+    double x = leaf.x;
+    double y = leaf.y * this.yFactor.getValue();
+    double z = leaf.z;
     
     double subdivisionSizeValue = subdivisionSize.getValue();
     if (subdivisionSizeValue < MAX_RIPPLES_TREAT_AS_INFINITE) {
@@ -61,8 +61,8 @@ public class Lattice extends LXPattern {
       y = _modAndShiftToHalfZigzag(y, subdivisionSizeValue);
       z = _modAndShiftToHalfZigzag(z, subdivisionSizeValue);
     }
-    
-    double manhattanDistance = x + y + z;
+        
+    double manhattanDistance = (Math.abs(x) + Math.abs(y) + Math.abs(z)) / 1.5;
     double euclideanDistance = Math.sqrt(x * x + y * y + z * z);
     return LXUtils.lerp(euclideanDistance, manhattanDistance, manhattanCoefficient.getValue());
   }
