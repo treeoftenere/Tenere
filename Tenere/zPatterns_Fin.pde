@@ -110,20 +110,22 @@ public class Plasma extends TenerePattern {
       float xmax, ymax, zmax;
       LXVector circle; 
       
+      static final LXUtils.LookupTable.Sin sinTable = new LXUtils.LookupTable.Sin(255);
+      
       float SinVertical(LXVector p, float size, float movement)
       {
-        return sin(   ( p.x / xmax / size) + (movement / 100 ));
+        return sinTable.sin(   ( p.x / xmax / size) + (movement / 100 ));
       }
       
       float SinRotating(LXVector p, float size, float movement)
       {
-        return sin( ( ( p.y / ymax / size) * sin( movement /66 )) + (p.z / zmax / size) * (cos(movement / 100))  ) ;
+        return sinTable.sin( ( ( p.y / ymax / size) * sin( movement /66 )) + (p.z / zmax / size) * (cos(movement / 100))  ) ;
       }
        
       float SinCircle(LXVector p, float size, float movement)
       {
         float distance =  p.dist(circle);
-        return sin( (( distance + movement + (p.z/zmax) ) / xmax / size) * 2 ); 
+        return sinTable.sin( (( distance + movement + (p.z/zmax) ) / xmax / size) * 2 ); 
       }
     
       float GetThreeTierPlasma(LXPoint p, float size, float movement)
