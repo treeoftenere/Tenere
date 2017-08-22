@@ -1,12 +1,13 @@
 public class Breather extends TenerePattern {
   private final float E = exp(1);
   private final float SECOND = 1000;
+  private final int COUNT = 100;
 
   public String getName() { return "Breather"; }
   public String getAuthor() { return "Benjamin Kudria"; }
 
   private double[] hues      = new double[lx.total];
-  private SinLFO[] breathers = new SinLFO[lx.total];
+  private SinLFO[] breathers = new SinLFO[COUNT];
 
   private BoundedParameter satParam  = new BoundedParameter("SAT", 90, 40, 100);
   private BoundedParameter huesParam = new BoundedParameter("HUES", 80, 30, 100);
@@ -33,9 +34,10 @@ public class Breather extends TenerePattern {
 
   private void initBreathers() {
     for (int p = 0; p < lx.total; p++) {
-      breathers[p] = new SinLFO(-1, 1, getRate());
-      breathers[p].setLooping(false);
-      addModulator(breathers[p]).start();
+      int i = p % COUNT;
+      breathers[i] = new SinLFO(-1, 1, getRate());
+      breathers[i].setLooping(false);
+      addModulator(breathers[i]).start();
     }
   }
 
@@ -44,17 +46,17 @@ public class Breather extends TenerePattern {
 
     for (int p = 0; p < lx.total; p++) {
       double jitteredHue = startHue + random(-huesParam.getValuef(), huesParam.getValuef());
-           if (jitteredHue < 0)   { hues[p] = 360 + jitteredHue; }
+          if (jitteredHue < 0)   { hues[p] = 360 + jitteredHue; }
       else if (jitteredHue > 360) { hues[p] = jitteredHue - 360; }
       else                        { hues[p] = jitteredHue;      }
     }
   }
 
   public void resetBreathers() {
-    for (int p = 0; p < lx.total; p++) {
-      breathers[p].setPeriod(getRate());
-      breathers[p].setBasis(random(0.02, 0.15));
-      breathers[p].start();
+    for (int i = 0; i < COUNT; i++) {
+      breathers[i].setPeriod(getRate());
+      breathers[i].setBasis(random(0.02, 0.15));
+      breathers[i].start();
     }
   }
 
@@ -65,7 +67,7 @@ public class Breather extends TenerePattern {
   public void breathe() {
     double maxBreath = 0;
     for (LXPoint p : model.points) {
-      double breath = norm(-exp(breathers[p.index].getValuef()), -1/E, -E);
+      double breath = norm(-exp(breathers[p.index % COUNT].getValuef()), -1/E, -E);
       if (breath > maxBreath) { maxBreath = breath; }
 
       double brightness = breath * 80;
