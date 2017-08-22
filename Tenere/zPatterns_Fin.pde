@@ -1,4 +1,8 @@
-public static class Plasma extends LXPattern {
+public class Plasma extends TenerePattern {
+  
+  public String getAuthor() {
+    return "Fin McCarthy";
+  }
   
   //by Fin McCarthy
   // finchronicity@gmail.com
@@ -38,6 +42,8 @@ public static class Plasma extends LXPattern {
       22000 
     );
 
+  private final LXUtils.LookupTable.Sin sinTable = new LXUtils.LookupTable.Sin(255);
+  private final LXUtils.LookupTable.Cos cosTable = new LXUtils.LookupTable.Cos(255);
   
   public Plasma(LX lx) {
     super(lx);
@@ -56,7 +62,7 @@ public static class Plasma extends LXPattern {
     
   public void run(double deltaMs) {
    
-    for (LXPoint p : model.points) {
+    for (Leaf leaf : model.leaves) {
       
       //GET A UNIQUE SHADE FOR THIS PIXEL
 
@@ -64,15 +70,15 @@ public static class Plasma extends LXPattern {
       float _size = size.getValuef(); 
       
       //combine the individual plasma patterns 
-      shade = plasmaGenerator.GetThreeTierPlasma(p, _size, movement );
+      shade = plasmaGenerator.GetThreeTierPlasma(leaf.point, _size, movement );
  
       //separate out a red, green and blue shade from the plasma wave 
-      red = map(sin(shade*PI), -1, 1, 0, brightness);
-      green =  map(sin(shade*PI+(2*cos(movement*490))), -1, 1, 0, brightness); //*cos(movement*490) makes the colors morph over the top of each other 
-      blue = map(sin(shade*PI+(4*sin(movement*300))), -1, 1, 0, brightness);
+      red = map(sinTable.sin(shade*PI), -1, 1, 0, brightness);
+      green =  map(sinTable.sin(shade*PI+(2*cosTable.cos(movement*490))), -1, 1, 0, brightness); //*cos(movement*490) makes the colors morph over the top of each other 
+      blue = map(sinTable.sin(shade*PI+(4*sinTable.sin(movement*300))), -1, 1, 0, brightness);
 
       //ready to populate this color!
-      colors[p.index]  = LX.rgb((int)red,(int)green, (int)blue);
+      setColor(leaf, LXColor.rgb((int)red,(int)green, (int)blue));
 
     }
     
@@ -104,20 +110,22 @@ public static class Plasma extends LXPattern {
       float xmax, ymax, zmax;
       LXVector circle; 
       
+      static final LXUtils.LookupTable.Sin sinTable = new LXUtils.LookupTable.Sin(255);
+      
       float SinVertical(LXVector p, float size, float movement)
       {
-        return sin(   ( p.x / xmax / size) + (movement / 100 ));
+        return sinTable.sin(   ( p.x / xmax / size) + (movement / 100 ));
       }
       
       float SinRotating(LXVector p, float size, float movement)
       {
-        return sin( ( ( p.y / ymax / size) * sin( movement /66 )) + (p.z / zmax / size) * (cos(movement / 100))  ) ;
+        return sinTable.sin( ( ( p.y / ymax / size) * sin( movement /66 )) + (p.z / zmax / size) * (cos(movement / 100))  ) ;
       }
        
       float SinCircle(LXVector p, float size, float movement)
       {
         float distance =  p.dist(circle);
-        return sin( (( distance + movement + (p.z/zmax) ) / xmax / size) * 2 ); 
+        return sinTable.sin( (( distance + movement + (p.z/zmax) ) / xmax / size) * 2 ); 
       }
     
       float GetThreeTierPlasma(LXPoint p, float size, float movement)
