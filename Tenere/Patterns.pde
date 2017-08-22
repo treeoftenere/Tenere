@@ -415,7 +415,6 @@ public class PatternWaves extends TenerePattern {
     
     for (int i = 0; i < bins.length; ++i) {
       bins[i] = model.cy + model.yRange/2 * Math.sin(i * TWO_PI / bins.length + phaseValue);
-      println(bins[i] + "-"+i);
     }
     for (Leaf leaf : tree.leaves) {
       int idx = Math.round((bins.length-1) * (len1 * leaf.point.xn)) % bins.length;
