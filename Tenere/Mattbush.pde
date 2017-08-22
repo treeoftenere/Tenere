@@ -1,8 +1,14 @@
 public class Lattice extends LXPattern {
 
+  public final double MAX_RIPPLES_TREAT_AS_INFINITE = 2000.0;
+  
   public final CompoundParameter rippleRadius =
-    new CompoundParameter("Ripple radius", 500.0, 50.0, 1000.0)
+    new CompoundParameter("Ripple radius", 500.0, 50.0, MAX_RIPPLES_TREAT_AS_INFINITE)
     .setDescription("Controls the spacing between ripples");
+
+  public final CompoundParameter subdivisionSize =
+    new CompoundParameter("Subdivision size", 1000.0, 200.0, MAX_RIPPLES_TREAT_AS_INFINITE)
+    .setDescription("Subdivides the canvas into smaller canvases of this size");
 
   public final CompoundParameter yFactor =
     new CompoundParameter("Y factor")
@@ -25,16 +31,31 @@ public class Lattice extends LXPattern {
   public Lattice(LX lx) {
     super(lx);
     addParameter(rippleRadius);
+    addParameter(subdivisionSize);
     addParameter(yFactor);
     addParameter(manhattanCoefficient);
     addParameter(triangleCoefficient);
     addParameter(visibleAmount);
   }
   
+  private double _modAndShiftToHalfZigzag(double dividend, double divisor) {
+    double mod = (dividend + divisor) % divisor;
+    double value = (mod > divisor / 2) ? (mod - divisor) : mod;
+    int quotient = (int) (dividend / divisor);
+    return (quotient % 2 == 0) ? -value : value;
+  }
+  
   private double _calculateDistance(Leaf leaf) {
     double x = Math.abs(leaf.x);
     double y = (Math.abs(leaf.y) * this.yFactor.getValue());
     double z = Math.abs(leaf.z);
+    
+    double subdivisionSizeValue = subdivisionSize.getValue();
+    if (subdivisionSizeValue < MAX_RIPPLES_TREAT_AS_INFINITE) {
+      x = _modAndShiftToHalfZigzag(x, subdivisionSizeValue);
+      y = _modAndShiftToHalfZigzag(y, subdivisionSizeValue);
+      z = _modAndShiftToHalfZigzag(z, subdivisionSizeValue);
+    }
     
     double manhattanDistance = x + y + z;
     double euclideanDistance = Math.sqrt(x * x + y * y + z * z);
