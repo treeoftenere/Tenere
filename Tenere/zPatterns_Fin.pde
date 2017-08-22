@@ -231,8 +231,7 @@ public class Plasma extends TenerePattern {
   
   public TheFourSeasons(LX lx) {
     super(lx);
-   //InitializePseudoLeaves();
-   InitializeWinter();
+   InitializePseudoLeaves();
   }
     
   public void run(double deltaMs) {
@@ -244,7 +243,7 @@ public class Plasma extends TenerePattern {
   
   public void onActive() 
   {
-    season = SeasonsHelpers.Seasons.WINTER;
+    season = SeasonsHelpers.Seasons.STARTUP;
     dayOfTheSeason =0;
   }
   
