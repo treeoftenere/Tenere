@@ -1,7 +1,7 @@
 public class Lattice extends LXPattern {
 
   public final CompoundParameter rippleRadius =
-    new CompoundParameter("Ripple radius", 500, 50, 1000)
+    new CompoundParameter("Ripple radius", 500.0, 50.0, 1000.0)
     .setDescription("Controls the spacing between ripples");
 
   public final CompoundParameter yFactor =
@@ -9,17 +9,26 @@ public class Lattice extends LXPattern {
     .setDescription("How much Y is taken into account");
 
   public final CompoundParameter manhattanCoefficient =
-    new CompoundParameter("Manh coeff")
-    .setDescription("How much to use Manhattan vs Euclidean distance");
+    new CompoundParameter("Square")
+    .setDescription("Whether the rippes should be circular or square");
 
+  public final CompoundParameter triangleCoefficient =
+    new CompoundParameter("Triangle coeff")
+    .setDescription("Whether the wave resembles a sawtooth or a triangle");
 
-  private double timeSoFarMs = 0;
+  public final CompoundParameter visibleAmount =
+    new CompoundParameter("Visible", 1.0, 0.1, 1.0)
+    .setDescription("Whether the full wave is visible or only the peaks");
+
+  private double timeSoFarMs = 100000;
 
   public Lattice(LX lx) {
     super(lx);
     addParameter(rippleRadius);
     addParameter(yFactor);
     addParameter(manhattanCoefficient);
+    addParameter(triangleCoefficient);
+    addParameter(visibleAmount);
   }
   
   private double _calculateDistance(Leaf leaf) {
@@ -37,33 +46,26 @@ public class Lattice extends LXPattern {
     double tempoMs = 2000;
     double ticksSoFar = timeSoFarMs / tempoMs;
 
-    double rippleRadius = this.rippleRadius.getValue();
+    double rippleRadiusValue = rippleRadius.getValue();
+    double triangleCoefficientValueHalf = triangleCoefficient.getValue() / 2;
+    double visibleAmountValueMultiplier = 1 / visibleAmount.getValue();
+    double visibleAmountValueToSubtract = visibleAmountValueMultiplier - 1;
 
     // Let's iterate over all the leaves...
     for (Leaf leaf : tree.leaves) {
       double totalDistance = _calculateDistance(leaf);
-      double rawRefreshValue = totalDistance / rippleRadius;
+      double rawRefreshValue = totalDistance / rippleRadiusValue;
 
-      double refreshValue = (ticksSoFar - rawRefreshValue) % 1.0;
-      // We can get the position of this point via p.x, p.y, p.z
+      double refreshValueModOne = (ticksSoFar - rawRefreshValue) % 1.0;
+      double brightnessValueBeforeVisibleCheck = (refreshValueModOne >= triangleCoefficientValueHalf) ?
+        1 - (refreshValueModOne - triangleCoefficientValueHalf) / (1 - triangleCoefficientValueHalf) :
+        (refreshValueModOne / triangleCoefficientValueHalf);
 
-      // Compute a brightness that dims as we move away from the line
-      double brightness = 100 - refreshValue * 100;
-      if (brightness > 0) {
-        // There's a color here! Let's use the global color palette
-        setColor(leaf, LXColor.gray((float) brightness));
+      double brightnessValue = brightnessValueBeforeVisibleCheck * visibleAmountValueMultiplier - visibleAmountValueToSubtract;
 
-        // Alternatively, if we wanted to do our own color scheme, we
-        // could do a manual color computation:
-        //   colors[p.index] = LX.hsb(hue[0-360], saturation[0-100], brightness[0-100])
-        //   colors[p.index] = LX.rgb(red, green blue)
-        //
-        // Note that we do *NOT* use Processing's color() function. That
-        // function employs global state and is not thread safe!
-
+      if (brightnessValue > 0) {
+        setColor(leaf, LXColor.gray((float) brightnessValue * 100));
       } else {
-        // This point is not even on! Best practice is to skip calling
-        // the color palette if we don't need it, just set nothing.
         setColor(leaf, #000000);
       }
     }
