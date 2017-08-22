@@ -160,7 +160,10 @@ public class Plasma extends TenerePattern {
   
   
 
-  public class TheFourSeasons extends LXPattern {
+public class TheFourSeasons  extends TenerePattern {
+  public String getAuthor() {
+    return "Fin McCarthy";
+  }
   // by Fin McCarthy finchronicity@gmail.com
   
   //Capturing the colors of the four seasons, from Central Park New York,
