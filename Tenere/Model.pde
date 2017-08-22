@@ -109,7 +109,9 @@ public static class Tree extends LXModel {
     private final List<Limb> limbs = new ArrayList<Limb>();
     
     Fixture(ModelMode mode) {
-      if (mode == ModelMode.STELLAR_IMPORT) {
+      if (SINGLE_BRANCH_MODE) {
+        addBranch(new Branch.Orientation(0, 10*FEET, 0, HALF_PI, HALF_PI, 0));
+      } else if (mode == ModelMode.STELLAR_IMPORT) {
                 
         // Load up the Stellar export file
         JSONObject assemblages = applet.loadJSONObject(STELLAR_FILE);        

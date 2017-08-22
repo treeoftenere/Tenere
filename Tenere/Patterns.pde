@@ -641,7 +641,7 @@ public abstract class BufferPattern extends TenerePattern {
 public abstract class SpinningPattern extends TenerePattern {
   
   public final CompoundParameter speed = (CompoundParameter)
-    new CompoundParameter("Speed", 17000, 25000, 5000)
+    new CompoundParameter("Speed", 17000, 31000, 5000)
     .setExponent(2)
     .setDescription("Speed of lighthouse motion");
         
@@ -650,6 +650,116 @@ public abstract class SpinningPattern extends TenerePattern {
   public SpinningPattern(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
+  }
+}
+
+public class PatternGentleSpin extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public PatternGentleSpin(LX lx) {
+    super(lx);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    for (LeafAssemblage assemblage : model.assemblages) {
+      LXPoint p = assemblage.points[0];
+      float az = (p.azimuth + azimuth + abs(p.yn - .5) * QUARTER_PI) % TWO_PI;
+      setColor(assemblage, LXColor.gray(max(0, 100 - 40 * abs(az - PI))));
+    }
+  }
+}
+
+public class PatternEmanation extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter speed = (CompoundParameter)
+    new CompoundParameter("Speed", 5000, 11000, 500)
+    .setExponent(.5)
+    .setDescription("Speed of emanation");
+    
+  public final CompoundParameter size =
+    new CompoundParameter("Size", 2, 1, 4)
+    .setDescription("Size of emanation");
+    
+  public final BooleanParameter inward =
+    new BooleanParameter("Inward", false)
+    .setDescription("Direction of emanation");    
+    
+  private final LXModulator sizeDamped = startModulator(new DampedParameter(this.size, 2));
+  
+  private final float maxPos = Branch.NUM_ASSEMBLAGES-1;
+  private final float midBranch = maxPos / 2;
+  
+  private static final int NUM_POSITIONS = 15;
+  
+  private final LXModulator[] pos = new LXModulator[NUM_POSITIONS];
+
+  public PatternEmanation(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    addParameter("inward", this.inward);
+    for (int i = 0; i < NUM_POSITIONS; ++i) {
+      this.pos[i] = startModulator(new SawLFO(maxPos, 0, this.speed).randomBasis());
+    }
+  }
+  
+  public void run(double deltaMs) {
+    float falloff = 100 / this.sizeDamped.getValuef();
+    boolean inward = this.inward.isOn();
+    int bi = 0;
+    for (Branch branch : model.branches) {
+      float pos = this.pos[bi++ % this.pos.length].getValuef();
+      if (inward) {
+        pos = maxPos - pos;
+      }
+      float ai = 0;
+      for (LeafAssemblage assemblage : branch.assemblages) {
+        float d = LXUtils.wrapdistf(abs(ai - midBranch), pos, maxPos);
+        setColor(assemblage, LXColor.gray(max(0, 100 - falloff * d)));
+        ++ai;
+      }
+    }
+  }  
+  
+}
+
+public class PatternChevron extends SpinningPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter slope =
+    new CompoundParameter("Slope", 0, -HALF_PI, HALF_PI)
+    .setDescription("Slope of the chevron shape");
+    
+  public final CompoundParameter sharp =
+    new CompoundParameter("Sharp", 200, 100, 800)
+    .setDescription("Sharpness of the lines");
+  
+  private final LXModulator slopeDamped = startModulator(new DampedParameter(this.slope, PI, TWO_PI, PI));
+  private final LXModulator sharpDamped = startModulator(new DampedParameter(this.sharp, 300, 400, 200));
+  
+  public PatternChevron(LX lx) {
+    super(lx);
+    addParameter("slope", this.slope);
+    addParameter("sharp", this.sharp);
+  }
+  
+  public void run(double deltaMs) {
+    float azimuth = this.azimuth.getValuef();
+    float slope = this.slopeDamped.getValuef();
+    float sharp = this.sharpDamped.getValuef();
+    for (LeafAssemblage assemblage : model.assemblages) {
+      LXPoint p = assemblage.points[0];
+      float az = (p.azimuth + azimuth + abs(p.yn - .5) * slope) % QUARTER_PI;
+      setColor(assemblage, LXColor.gray(max(0, 100 - sharp * abs(az - PI/8.))));
+    }
   }
 }
 
