@@ -42,8 +42,8 @@ public class Plasma extends TenerePattern {
       22000 
     );
 
-  private final LXUtils.LookupTable sinTable = new LXUtils.LookupTable.Sin(255);
-  private final LXUtils.LookupTable cosTable = new LXUtils.LookupTable.Cos(255);
+  private final LXUtils.LookupTable.Sin sinTable = new LXUtils.LookupTable.Sin(255);
+  private final LXUtils.LookupTable.Cos cosTable = new LXUtils.LookupTable.Cos(255);
   
   public Plasma(LX lx) {
     super(lx);
