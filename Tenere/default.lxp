@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503511544843,
+  "timestamp": 1503513122154,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -86,7 +86,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 10554,
@@ -102,7 +103,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 12942,
@@ -119,7 +121,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 12939,
@@ -134,7 +137,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 9806,
@@ -151,7 +155,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 9794,
@@ -168,7 +173,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 9800,
@@ -185,7 +191,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 9438,
@@ -201,7 +208,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 8371,
@@ -218,7 +226,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4758,
@@ -272,7 +281,8 @@
                 }
               ],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4760,
@@ -293,7 +303,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4772,
@@ -448,7 +459,8 @@
                 }
               ],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4774,
@@ -469,7 +481,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4779,
@@ -483,7 +496,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4784,
@@ -499,7 +513,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4786,
@@ -515,7 +530,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4811,
@@ -528,7 +544,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4815,
@@ -548,7 +565,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 4830,
@@ -569,7 +587,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 5688,
@@ -588,7 +607,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 6001,
@@ -603,7 +623,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 6311,
@@ -620,7 +641,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 27,
@@ -634,7 +656,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": false
           },
           {
             "id": 13515,
@@ -650,7 +673,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           }
         ]
       },
@@ -694,7 +718,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 6623,
@@ -714,7 +739,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 12368,
@@ -730,7 +756,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           }
         ]
       },
@@ -769,7 +796,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 11402,
@@ -782,7 +810,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 8006,
@@ -797,7 +826,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 2988,
@@ -812,7 +842,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 2991,
@@ -827,7 +858,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 3139,
@@ -841,7 +873,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           }
         ]
       },
@@ -882,7 +915,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 3288,
@@ -896,7 +930,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 549,
@@ -910,7 +945,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 2031,
@@ -925,7 +961,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 749,
@@ -941,7 +978,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 8722,
@@ -957,7 +995,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 14111,
@@ -971,7 +1010,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": true
           },
           {
             "id": 19385,
@@ -985,7 +1025,8 @@
               "modulators": [],
               "modulations": [],
               "triggers": []
-            }
+            },
+            "autoCycleEnabled": false
           }
         ]
       }
@@ -1266,6 +1307,12 @@
     },
     "midi": {
       "inputs": [
+        {
+          "name": "CoreMIDI4J - Bass Station II",
+          "channel": false,
+          "control": true,
+          "sync": false
+        },
         {
           "name": "CoreMIDI4J - Seaboard RISE",
           "channel": true,
