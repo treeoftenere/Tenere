@@ -304,6 +304,7 @@ public class NotePulse extends TenerePattern {
     addParameter("sustain", this.sustain);
     addParameter("release", this.release);
     addParameter("velocityBrightness", this.velocityBrightness);
+    addModulator(this.envelope);
   }
   
   public void run(double deltaMs) {
@@ -418,7 +419,11 @@ public class NoteSeaboard extends TenerePattern {
   }
   
   private final float[] b = new float[model.assemblages.size()];
-  private final float SPREAD = model.yRange / 31;
+  
+  private final int NUM_KEYS = 25;
+  private final int CENTER_KEY = 60;
+  
+  private final float SPREAD = model.yRange / (NUM_KEYS + 6);
   
   public void run(double deltaMs) {
     for (int i = 0; i < b.length; ++i) {
@@ -432,7 +437,7 @@ public class NoteSeaboard extends TenerePattern {
       if (level > 0) {
         float falloff = 100 / (size * (1 + 2 * note.slideDamped.getValuef()));
         int i = 0;
-        float yp = model.cy + (note.pitch - 60 + note.bendDamped.getValuef() * Note.BEND_RANGE) * SPREAD;
+        float yp = model.cy + (note.pitch - CENTER_KEY + note.bendDamped.getValuef() * Note.BEND_RANGE) * SPREAD;
         for (LeafAssemblage assemblage : model.assemblages) {
           b[i] += max(0, level - falloff * abs(yp - assemblage.points[0].y));
           ++i;
