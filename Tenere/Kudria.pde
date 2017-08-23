@@ -6,13 +6,13 @@ public class Breather extends TenerePattern {
   public String getName() { return "Breather"; }
   public String getAuthor() { return "Benjamin Kudria"; }
 
-  private double[] hues      = new double[lx.total];
+  private double[] hues = new double[lx.total];
   private SinLFO[] breathers = new SinLFO[COUNT];
 
-  private BoundedParameter satParam  = new BoundedParameter("SAT", 90, 40, 100);
-  private BoundedParameter huesParam = new BoundedParameter("HUES", 80, 30, 100);
-  private BoundedParameter rateParam = new BoundedParameter("RATE", 10, 0.6, 15);
-  private BoundedParameter varParam  = new BoundedParameter("VAR", 0.7, 0.1, 0.9);
+  private BoundedParameter satParam  = new BoundedParameter("SAT",  80,  40,  100);
+  private BoundedParameter huesParam = new BoundedParameter("HUES", 75,  30,  100);
+  private BoundedParameter rateParam = new BoundedParameter("RATE",  7,  0.6, 15);
+  private BoundedParameter varParam  = new BoundedParameter("VAR",  0.9, 0.1, 0.9);
 
   public Breather(LX lx) {
     super(lx);
@@ -43,12 +43,15 @@ public class Breather extends TenerePattern {
 
   private void resetHues() {
     double startHue = random(0, 360);
+    float leafHueJitterAmount = huesParam.getValuef();
+    float pointHueJitterAmount = leafHueJitterAmount * 0.5;
 
-    for (int p = 0; p < lx.total; p++) {
-      double jitteredHue = startHue + random(-huesParam.getValuef(), huesParam.getValuef());
-          if (jitteredHue < 0)   { hues[p] = 360 + jitteredHue; }
-      else if (jitteredHue > 360) { hues[p] = jitteredHue - 360; }
-      else                        { hues[p] = jitteredHue;      }
+    for (Leaf l : tree.leaves) {
+      double leafHue = startHue + random(-leafHueJitterAmount, leafHueJitterAmount) % 360;
+      for (LXPoint p : l.points) {
+        double pointHue = leafHue + random(-pointHueJitterAmount, pointHueJitterAmount) % 360;
+        hues[p.index] = pointHue;
+      }
     }
   }
 
@@ -66,12 +69,17 @@ public class Breather extends TenerePattern {
 
   public void breathe() {
     double maxBreath = 0;
-    for (LXPoint p : model.points) {
-      double breath = norm(-exp(breathers[p.index % COUNT].getValuef()), -1/E, -E);
-      if (breath > maxBreath) { maxBreath = breath; }
+    double saturation = satParam.getValue();
 
-      double brightness = breath * 80;
-      colors[p.index] = LXColor.hsb(hues[p.index], satParam.getValue(), brightness);
+    for (int l = 0; l < tree.leaves.size(); l++) {
+      double breath = norm(-exp(breathers[l % COUNT].getValuef()), -1/E, -E);
+      if (breath > maxBreath) { maxBreath = breath; }
+      double brightness = breath * 100;
+
+      Leaf leaf = tree.leaves.get(l);
+      for (LXPoint p : leaf.points) {
+        colors[p.index] = LXColor.hsb(hues[p.index], saturation, brightness);
+      }
     }
 
     if (maxBreath <= 0.001) {
