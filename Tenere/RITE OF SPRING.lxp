@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503458987120,
+  "timestamp": 1503460135849,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -15,7 +15,7 @@
       "crossfader": 0.0,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
-      "focusedChannel": 2,
+      "focusedChannel": 3,
       "cueA": false,
       "cueB": false,
       "multithreaded": true,
@@ -263,7 +263,7 @@
           "label": "Noise",
           "arm": false,
           "enabled": true,
-          "cue": true,
+          "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
           "autoCycleEnabled": false,
@@ -377,7 +377,7 @@
           "label": "Notes",
           "arm": false,
           "enabled": true,
-          "cue": false,
+          "cue": true,
           "midiMonitor": true,
           "midiChannel": 16,
           "autoCycleEnabled": false,
@@ -391,7 +391,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 3,
+        "patternIndex": 5,
         "patterns": [
           {
             "id": 15086,
@@ -487,6 +487,21 @@
               "release": 500.0,
               "velocityBrightness": 0.5,
               "melt": 0.5
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            }
+          },
+          {
+            "id": 17795,
+            "class": "Tenere$NoteSnakes",
+            "modulationColor": -49920,
+            "parameters": {
+              "label": "NoteSnakes",
+              "speed": 5000.0,
+              "size": 61.74999926239252
             },
             "modulation": {
               "modulators": [],
@@ -978,9 +993,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 7765.7133699227525,
-        "theta": 0.32779939508437606,
-        "phi": 0.029467064976692048
+        "radius": 4957.879017399268,
+        "theta": 0.5287993950843762,
+        "phi": 0.00846706497669206
       }
     }
   }

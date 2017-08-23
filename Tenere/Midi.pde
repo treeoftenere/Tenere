@@ -280,6 +280,66 @@ public class NoteMeltDown extends NoteMelt {
   }
 }
 
+public class NoteSnakes extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  final static int NUM_BRANCH_GROUPS = 24;
+  
+  private final LinearEnvelope[] branchGroups = new LinearEnvelope[NUM_BRANCH_GROUPS];
+  private final int[][] branchMasks = new int[NUM_BRANCH_GROUPS][Branch.NUM_LEAVES];
+  
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", 2000, 10000, 500)
+    .setDescription("Speed of the snakes"); 
+  
+  public final CompoundParameter size =
+    new CompoundParameter("Size", 10, 5, 80)
+    .setDescription("Size of the snakes"); 
+  
+  private int branchRoundRobin = 0;
+  
+  public NoteSnakes(LX lx) {
+    super(lx);
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    for (int i = 0; i < this.branchGroups.length; ++i) {
+      this.branchGroups[i] = (LinearEnvelope) addModulator(new LinearEnvelope(0, Branch.NUM_LEAVES + 40, speed));
+    }
+  }
+  
+  public void run(double deltaMs) {
+    float falloff = 100 / this.size.getValuef();
+    for (int i = 0; i < NUM_BRANCH_GROUPS; ++i) {
+      int[] mask = this.branchMasks[i];
+      float pos = this.branchGroups[i].getValuef();
+      float max = 100 * (1 - this.branchGroups[i].getBasisf());
+      for (int j = 0; j < Branch.NUM_LEAVES; ++j) {
+        float b = (j < pos) ? max(0, 100 - falloff * (pos - j)) : 0;
+        mask[j] = LXColor.gray(b); 
+      }
+    }
+    
+    // Copy into all masks
+    int bi = 0;
+    for (Branch branch : model.branches) {
+      int li = 0;
+      for (Leaf leaf : branch.leaves) {
+        setColor(leaf, this.branchMasks[bi % this.branchMasks.length][li]);
+        ++li;
+      }
+      ++bi;
+    }
+  }
+  
+  @Override
+  public void noteOnReceived(MidiNoteOn note) {
+    this.branchGroups[this.branchRoundRobin].trigger();
+    this.branchRoundRobin = (this.branchRoundRobin + 1) % this.branchGroups.length;
+  }
+}
+
 public class NoteSeaboard extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
