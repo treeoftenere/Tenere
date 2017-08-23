@@ -330,3 +330,20 @@ public class ColorSwirl extends TenerePattern {
     }
   }
 }
+
+public class ColorFixed extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final CompoundParameter hue = new CompoundParameter("Hue", 0, 360);
+  
+  public ColorFixed(LX lx) {
+    super(lx);
+    addParameter("hue", this.hue);
+  }
+  
+  public void run(double deltaMs) {
+    setColors(LXColor.hsb(this.hue.getValuef(), 100, 100));
+  }
+}

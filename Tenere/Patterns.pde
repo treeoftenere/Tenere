@@ -269,8 +269,8 @@ public class PatternStarlight extends TenerePattern {
   public PatternStarlight(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
-    addParameter("variance", this.variance);
     addParameter("numStars", this.numStars);
+    addParameter("variance", this.variance);
     this.shuffledLeaves = new ArrayList<Leaf>(model.leaves); 
     Collections.shuffle(this.shuffledLeaves);
     for (int i = 0; i < MAX_STARS; ++i) {
