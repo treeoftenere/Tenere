@@ -30,8 +30,6 @@ public class Lattice extends LXPattern {
     new CompoundParameter("Visible", 1.0, 0.1, 1.0)
     .setDescription("Whether the full wave is visible or only the peaks");
 
-  private double timeSoFarMs = 100000;
-
   public Lattice(LX lx) {
     super(lx);
     addParameter(rippleRadius);
@@ -68,9 +66,9 @@ public class Lattice extends LXPattern {
   }
 
   public void run(double deltaMs) {
-    timeSoFarMs += deltaMs;
-    double tempoMs = 2000;
-    double ticksSoFar = timeSoFarMs / tempoMs;
+    // add an arbitrary number of beats so refreshValueModOne isn't negative;
+    // divide by 4 so you get one ripple per measure
+    double ticksSoFar = (lx.tempo.beatCount() + lx.tempo.ramp() + 256) / 4;
 
     double rippleRadiusValue = rippleRadius.getValue();
     double triangleCoefficientValueHalf = triangleCoefficient.getValue() / 2;
