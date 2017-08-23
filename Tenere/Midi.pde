@@ -280,6 +280,48 @@ public class NoteMeltDown extends NoteMelt {
   }
 }
 
+public class NotePulse extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private final ADSR adsr = new ADSR();
+  private final CompoundParameter attack = adsr.attack;
+  private final CompoundParameter decay = adsr.decay;
+  private final CompoundParameter sustain = adsr.sustain;
+  private final CompoundParameter release = adsr.release;
+    
+  private final CompoundParameter velocityBrightness = new CompoundParameter("Vel>Brt", .5)
+    .setDescription("Sets the amount of modulation from note velocity to brightness");
+
+  private NormalizedParameter level = new NormalizedParameter("Level", 1); 
+  private final ADSREnvelope envelope = new ADSREnvelope("Env", 0, this.level, this.attack, this.decay, this.sustain, this.release);
+  
+  public NotePulse(LX lx) {
+    super(lx);
+    addParameter("attack", this.attack);
+    addParameter("decay", this.decay);
+    addParameter("sustain", this.sustain);
+    addParameter("release", this.release);
+    addParameter("velocityBrightness", this.velocityBrightness);
+  }
+  
+  public void run(double deltaMs) {
+    setColors(LXColor.gray(100 * this.envelope.getValuef()));
+  }
+  
+  @Override
+  public void noteOnReceived(MidiNoteOn note) {
+    this.level.setValue(lerp(1, note.getVelocity() / 127., this.velocityBrightness.getNormalizedf()));
+    this.envelope.engage.setValue(true);
+  }
+  
+  @Override
+  public void noteOffReceived(MidiNote note) {
+    this.envelope.engage.setValue(false);
+  }
+}
+
 public class NoteSnakes extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
