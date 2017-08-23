@@ -645,11 +645,25 @@ public abstract class SpinningPattern extends TenerePattern {
     .setExponent(2)
     .setDescription("Speed of lighthouse motion");
         
-  protected final LXModulator azimuth = startModulator(new SawLFO(0, TWO_PI, speed));
+  public final BooleanParameter reverse =
+    new BooleanParameter("Reverse", false)
+    .setDescription("Reverse the direction of spinning");
+        
+  protected final SawLFO azimuth = (SawLFO) startModulator(new SawLFO(0, TWO_PI, speed));
     
   public SpinningPattern(LX lx) {
     super(lx);
     addParameter("speed", this.speed);
+    addParameter("reverse", this.reverse);
+  }
+  
+  public void onParameterChanged(LXParameter p) {
+    if (p == this.reverse) {
+      float start = this.reverse.isOn() ? TWO_PI : 0;
+      float end = TWO_PI - start;
+      double basis = this.azimuth.getBasis();
+      this.azimuth.setRange(start, end).setBasis(1 - basis); 
+    }
   }
 }
 
@@ -844,6 +858,11 @@ public abstract class PatternMelt extends BufferPattern {
     new BooleanParameter("Auto", true)
     .setDescription("Automatically make content");
   
+    public final CompoundParameter melt =
+    new CompoundParameter("Melt", .5)
+    .setDescription("Amount of melt distortion");
+  
+  private final LXModulator meltDamped = startModulator(new DampedParameter(this.melt, 2, 2, 1.5));
   private LXModulator rot = startModulator(new SawLFO(0, 1, 39000)); 
   private LXModulator autoLevel = startModulator(new TriangleLFO(-.5, 1, startModulator(new SinLFO(3000, 7000, 19000))));
   
@@ -851,6 +870,7 @@ public abstract class PatternMelt extends BufferPattern {
     super(lx);
     addParameter("level", this.level);
     addParameter("auto", this.auto);
+    addParameter("melt", this.melt);
     for (int i = 0; i < this.multipliers.length; ++i) {
       float r = random(.6, 1);
       this.multipliers[i] = r * r * r;
@@ -860,12 +880,13 @@ public abstract class PatternMelt extends BufferPattern {
   public void onRun(double deltaMs) {
     float speed = this.speed.getValuef();
     float rot = this.rot.getValuef();
+    float melt = this.meltDamped.getValuef();
     for (Leaf leaf : model.leaves) {
       float az = leaf.point.azimuth;
       float maz = (az / TWO_PI + rot) * this.multipliers.length;
       float lerp = maz % 1;
       int floor = (int) (maz - lerp);
-      float m = lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp);      
+      float m = lerp(1, lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp), melt);      
       float d = getDist(leaf);
       int offset = round(d * speed * m);
       setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
@@ -996,6 +1017,8 @@ public class PatternSirens extends TenerePattern {
   public final CompoundParameter size2 = new CompoundParameter("Sz2", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 2");
   public final CompoundParameter size3 = new CompoundParameter("Sz3", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 3");
   public final CompoundParameter size4 = new CompoundParameter("Sz4", PI / 8, PI / 32, HALF_PI).setDescription("Size of siren 4");
+  
+  public final BooleanParameter reverse = new BooleanParameter("Reverse", false); 
   
   public final LXModulator azim1 = startModulator(new SawLFO(0, TWO_PI, this.speed1).randomBasis());
   public final LXModulator azim2 = startModulator(new SawLFO(TWO_PI, 0, this.speed2).randomBasis());

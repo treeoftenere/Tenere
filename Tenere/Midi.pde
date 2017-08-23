@@ -128,26 +128,25 @@ public class NoteAssemblages extends TenerePattern {
   }
 }
 
-public class NoteWaves extends WavePattern {
-  
+public abstract class NoteWavePattern extends WavePattern {
   private final ADSR adsr = new ADSR();
-  private final CompoundParameter attack = adsr.attack;
-  private final CompoundParameter decay = adsr.decay;
-  private final CompoundParameter sustain = adsr.sustain;
-  private final CompoundParameter release = adsr.release;
+  public final CompoundParameter attack = adsr.attack;
+  public final CompoundParameter decay = adsr.decay;
+  public final CompoundParameter sustain = adsr.sustain;
+  public final CompoundParameter release = adsr.release;
   
-  private final CompoundParameter velocityBrightness = new CompoundParameter("Vel>Brt", .5)
+  public final CompoundParameter velocityBrightness = new CompoundParameter("Vel>Brt", .5)
     .setDescription("Sets the amount of modulation from note velocity to brightness");
   
-  private final NormalizedParameter level = new NormalizedParameter("level"); 
+  protected final NormalizedParameter level = new NormalizedParameter("level"); 
   
-  private final ADSREnvelope envelope = new ADSREnvelope("Envelope", 0, this.level, this.attack, this.decay, this.sustain, this.release);
+  protected final ADSREnvelope envelope = new ADSREnvelope("Envelope", 0, this.level, this.attack, this.decay, this.sustain, this.release);
   
   private int notesDown = 0;
   private int damperNotes = 0;
   private boolean damperDown = false;
   
-  public NoteWaves(LX lx) {
+  protected NoteWavePattern(LX lx) {
     super(lx);
     addParameter("attack", this.attack);
     addParameter("decay", this.decay);
@@ -155,10 +154,6 @@ public class NoteWaves extends WavePattern {
     addParameter("release", this.release);
     addParameter("velocityBrightness", this.velocityBrightness);
     addModulator(this.envelope);
-  }
-  
-  public float getLevel() {
-    return this.envelope.getValuef();
   }
   
   @Override
@@ -198,6 +193,90 @@ public class NoteWaves extends WavePattern {
         }
       }
     }
+  }
+  
+  public float getLevel() {
+    return this.envelope.getValuef();
+  }
+}
+
+public class NoteWaves extends NoteWavePattern {
+  
+  public NoteWaves(LX lx) {
+    super(lx);
+  }
+ 
+
+}
+
+public abstract class NoteMelt extends NoteWavePattern {
+  
+  private final float[] multipliers = new float[32];
+
+  public final CompoundParameter melt =
+    new CompoundParameter("Melt", .5)
+    .setDescription("Amount of melt distortion");
+  
+  private final LXModulator meltDamped = startModulator(new DampedParameter(this.melt, 2, 2, 1.5));
+  
+  private final LXModulator rot = startModulator(new SawLFO(0, 1, 39000));
+    
+  public NoteMelt(LX lx) {
+    super(lx);
+    addParameter("melt", this.melt);
+    for (int i = 0; i < this.multipliers.length; ++i) {
+      float r = random(.6, 1);
+      this.multipliers[i] = r * r * r;
+    }
+  }
+  
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float rot = this.rot.getValuef();
+    float melt = this.meltDamped.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float az = leaf.point.azimuth;
+      float maz = (az / TWO_PI + rot) * this.multipliers.length;
+      float lerp = maz % 1;
+      int floor = (int) (maz - lerp);
+      float m = lerp(1, lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp), melt);      
+      float d = getDist(leaf);
+      int offset = round(d * speed * m);
+      setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
+    }
+  }
+  
+  protected abstract float getDist(Leaf leaf);
+  
+}
+
+public class NoteMeltOut extends NoteMelt {
+  public NoteMeltOut(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return 2*abs(leaf.point.yn - .5);
+  }
+}
+
+public class NoteMeltUp extends NoteMelt {
+  public NoteMeltUp(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return leaf.point.yn;
+  }
+}
+
+public class NoteMeltDown extends NoteMelt {
+  public NoteMeltDown(LX lx) {
+    super(lx);
+  }
+  
+  protected float getDist(Leaf leaf) {
+    return 1 - leaf.point.yn;
   }
 }
 
