@@ -521,9 +521,9 @@ public class PatternAxisPlanes extends TenerePattern {
     return "Mark C. Slee";
   }
   
-  public final CompoundParameter xSpeed = new CompoundParameter("XSpd", 11000, 21000, 5000).setDescription("Speed of motion on X-axis");
-  public final CompoundParameter ySpeed = new CompoundParameter("YSpd", 13000, 21000, 5000).setDescription("Speed of motion on Y-axis");
-  public final CompoundParameter zSpeed = new CompoundParameter("ZSpd", 17000, 21000, 5000).setDescription("Speed of motion on Z-axis");
+  public final CompoundParameter xSpeed = new CompoundParameter("XSpd", 19000, 31000, 5000).setDescription("Speed of motion on X-axis");
+  public final CompoundParameter ySpeed = new CompoundParameter("YSpd", 13000, 31000, 5000).setDescription("Speed of motion on Y-axis");
+  public final CompoundParameter zSpeed = new CompoundParameter("ZSpd", 17000, 31000, 5000).setDescription("Speed of motion on Z-axis");
   
   public final CompoundParameter xSize = new CompoundParameter("XSize", .1, .05, .3).setDescription("Size of X scanner");
   public final CompoundParameter ySize = new CompoundParameter("YSize", .1, .05, .3).setDescription("Size of Y scanner");
@@ -641,7 +641,7 @@ public abstract class BufferPattern extends TenerePattern {
 public abstract class SpinningPattern extends TenerePattern {
   
   public final CompoundParameter speed = (CompoundParameter)
-    new CompoundParameter("Speed", 17000, 31000, 5000)
+    new CompoundParameter("Speed", 17000, 49000, 5000)
     .setExponent(2)
     .setDescription("Speed of lighthouse motion");
         
@@ -771,7 +771,7 @@ public class PatternChevron extends SpinningPattern {
     float sharp = this.sharpDamped.getValuef();
     for (LeafAssemblage assemblage : model.assemblages) {
       LXPoint p = assemblage.points[0];
-      float az = (p.azimuth + azimuth + abs(p.yn - .5) * slope) % QUARTER_PI;
+      float az = (TWO_PI + p.azimuth + azimuth + abs(p.yn - .5) * slope) % QUARTER_PI;
       setColor(assemblage, LXColor.gray(max(0, 100 - sharp * abs(az - PI/8.))));
     }
   }
