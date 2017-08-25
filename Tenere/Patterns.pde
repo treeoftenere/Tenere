@@ -999,6 +999,83 @@ public class PatternAudioWaves extends WavePattern {
   
 } 
 
+public abstract class PatternAudioMelt extends BufferPattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  private final float[] multipliers = new float[32];
+    
+  public final CompoundParameter melt =
+    new CompoundParameter("Melt", .5)
+    .setDescription("Amount of melt distortion");
+  
+  private final LXModulator meltDamped = startModulator(new DampedParameter(this.melt, 2, 2, 1.5));
+  private LXModulator rot = startModulator(new SawLFO(0, 1, 39000)); 
+    
+  public PatternAudioMelt(LX lx) {
+    super(lx);
+    addParameter("melt", this.melt);  
+    for (int i = 0; i < this.multipliers.length; ++i) {
+      float r = random(.6, 1);
+      this.multipliers[i] = r * r * r;
+    }
+  }
+  
+  public void onRun(double deltaMs) {
+    float speed = this.speed.getValuef();
+    float rot = this.rot.getValuef();
+    float melt = this.meltDamped.getValuef();
+    for (Leaf leaf : model.leaves) {
+      float az = leaf.point.azimuth;
+      float maz = (az / TWO_PI + rot) * this.multipliers.length;
+      float lerp = maz % 1;
+      int floor = (int) (maz - lerp);
+      float m = lerp(1, lerp(this.multipliers[floor % this.multipliers.length], this.multipliers[(floor + 1) % this.multipliers.length], lerp), melt);      
+      float d = getDist(leaf);
+      int offset = round(d * speed * m);
+      setColor(leaf, this.history[(this.cursor + offset) % this.history.length]);
+    }
+  }
+  
+  protected abstract float getDist(Leaf leaf);
+  
+  public float getLevel() {
+    return this.lx.engine.audio.meter.getValuef();
+  }
+  
+} 
+
+public class PatternAudioMeltDown extends PatternAudioMelt {
+  public PatternAudioMeltDown(LX lx) {
+    super(lx);
+  }
+  
+  public float getDist(Leaf leaf) {
+    return 1 - leaf.point.yn;
+  }
+}
+
+public class PatternAudioMeltUp extends PatternAudioMelt {
+  public PatternAudioMeltUp(LX lx) {
+    super(lx);
+  }
+  
+  public float getDist(Leaf leaf) {
+    return leaf.point.yn;
+  }
+}
+
+public class PatternAudioMeltOut extends PatternAudioMelt {
+  public PatternAudioMeltOut(LX lx) {
+    super(lx);
+  }
+  
+  public float getDist(Leaf leaf) {
+    return 2 * abs(leaf.point.yn - .5);
+  }
+}
+
 public class PatternSirens extends TenerePattern {
   public String getAuthor() {
     return "Mark C. Slee";
@@ -1115,55 +1192,6 @@ public class PatternSnakes extends TenerePattern {
       for (Leaf leaf : branch.leaves) {
         setColor(leaf, mask[li++]);
       }
-    }
-  }
-}
-
-public class PatternSlideshow extends TenerePattern {
-  public String getAuthor() {
-    return "Mark C. Slee";
-  }
-  
-  private final String[] PATHS = {
-    "main_1200.jpg",
-    "The Great Heads-X2proc.jpg"
-  };
-  
-  private final PImage[] images;
-  
-  private final SawLFO imageIndex;
-  
-  public final CompoundParameter rate = new CompoundParameter("Rate", 3000, 6000, 500);
-  
-  public PatternSlideshow(LX lx) {
-    super(lx);
-    this.images = new PImage[PATHS.length];
-    for (int i = 0; i < this.images.length; ++i) {
-      this.images[i] = loadImage(PATHS[i]);
-      this.images[i].loadPixels();
-    }
-    addParameter("rate", this.rate);
-    this.imageIndex = new SawLFO(0, this.images.length, rate);
-    startModulator(this.imageIndex);
-  }
-  
-  public void run(double deltaMs) {
-    float imageIndex = this.imageIndex.getValuef();
-    int imageFloor = (int) Math.floor(imageIndex); 
-    PImage image1 = this.images[imageFloor % this.images.length];
-    PImage image2 = this.images[(imageFloor + 1) % this.images.length];
-    float imageLerp = imageIndex - imageFloor;
-    
-    for (Leaf leaf : model.leaves) {
-      int c1 = image1.get(
-        (int) (leaf.point.xn * (image1.width-1)),
-        (int) ((1-leaf.point.yn) * (image1.height-1))
-      );
-      int c2 = image2.get(
-        (int) (leaf.point.xn * (image2.width-1)),
-        (int) ((1-leaf.point.yn) * (image2.height-1))
-      );
-      setColor(leaf, LXColor.lerp(c1, c2, imageLerp));
     }
   }
 }

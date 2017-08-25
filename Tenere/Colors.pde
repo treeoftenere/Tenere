@@ -347,3 +347,115 @@ public class ColorFixed extends TenerePattern {
     setColors(LXColor.hsb(this.hue.getValuef(), 100, 100));
   }
 }
+
+public abstract class ColorSlideshow extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+    
+  public final CompoundParameter rate =
+    new CompoundParameter("Rate", 3000, 10000, 250);
+
+  private final SawLFO lerp = (SawLFO) startModulator(new SawLFO(0, 1, rate));
+
+  private int imageIndex;
+  private final PImage[] images;
+  
+  public ColorSlideshow(LX lx) {
+    super(lx);
+    String[] paths = getPaths();
+    this.images = new PImage[paths.length];
+    for (int i = 0; i < this.images.length; ++i) {
+      this.images[i] = loadImage(paths[i]);
+      this.images[i].loadPixels();
+    }
+    addParameter("rate", this.rate);
+    this.imageIndex = 0;
+  }
+  
+  abstract String[] getPaths();
+  
+  public void run(double deltaMs) {
+    float lerp = this.lerp.getValuef();
+    if (this.lerp.loop()) {
+      this.imageIndex = (this.imageIndex + 1) % this.images.length;
+    }
+    PImage image1 = this.images[this.imageIndex];
+    PImage image2 = this.images[(this.imageIndex + 1) % this.images.length];
+    
+    for (Leaf leaf : model.leaves) {
+      int c1 = image1.get(
+        (int) (leaf.point.xn * (image1.width-1)),
+        (int) ((1-leaf.point.yn) * (image1.height-1))
+      );
+      int c2 = image2.get(
+        (int) (leaf.point.xn * (image2.width-1)),
+        (int) ((1-leaf.point.yn) * (image2.height-1))
+      );
+      setColor(leaf, LXColor.lerp(c1, c2, lerp));
+    }
+  }
+}
+
+public class ColorSlideshowClouds extends ColorSlideshow {
+  public ColorSlideshowClouds(LX lx) {
+    super(lx);
+  }
+  
+  public String[] getPaths() {
+    return new String[] {
+      "clouds1.jpeg",
+      "clouds2.jpeg",
+      "clouds3.jpeg"
+      
+    };
+  }
+}
+
+public class ColorSlideshowSunsets extends ColorSlideshow {
+  public ColorSlideshowSunsets(LX lx) {
+    super(lx);
+  }
+  
+  public String[] getPaths() {
+    return new String[] {
+      "sunset1.jpeg",
+      "sunset2.jpeg",
+      "sunset3.jpeg",
+      "sunset4.jpeg",
+      "sunset5.jpeg",
+      "sunset6.jpeg"
+    };
+  }
+}
+
+public class ColorSlideshowOceans extends ColorSlideshow {
+  public ColorSlideshowOceans(LX lx) {
+    super(lx);
+  }
+  
+  public String[] getPaths() {
+    return new String[] {
+      "ocean1.jpeg",
+      "ocean2.jpeg",
+      "ocean3.jpeg",
+      "ocean4.jpeg"
+    };
+  }
+}
+
+public class ColorSlideshowCorals extends ColorSlideshow {
+  public ColorSlideshowCorals(LX lx) {
+    super(lx);
+  }
+  
+  public String[] getPaths() {
+    return new String[] {
+      "coral1.jpeg",
+      "coral2.jpeg",
+      "coral3.jpeg",
+      "coral4.jpeg",
+      "coral5.jpeg",
+    };
+  }
+}
