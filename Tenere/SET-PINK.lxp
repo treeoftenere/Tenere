@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503690456952,
+  "timestamp": 1503690316233,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -15,7 +15,7 @@
       "crossfader": 0.49606299212598426,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
-      "focusedChannel": 0,
+      "focusedChannel": 4,
       "cueA": false,
       "cueB": false,
       "multithreaded": true,
@@ -70,7 +70,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 5,
+        "patternIndex": 4,
         "patterns": [
           {
             "id": 4756,
@@ -2798,7 +2798,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 4,
+        "patternIndex": 2,
         "patterns": [
           {
             "id": 5693,
@@ -3242,7 +3242,7 @@
           "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
-          "autoCycleEnabled": true,
+          "autoCycleEnabled": false,
           "autoCycleTimeSecs": 84.0,
           "fader": 1.0,
           "crossfadeGroup": 0,
@@ -3253,7 +3253,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 1,
+        "patternIndex": 12,
         "patterns": [
           {
             "id": 3290,
@@ -3736,7 +3736,7 @@
       "parameters": {
         "label": "Audio",
         "enabled": true,
-        "mode": 1
+        "mode": 0
       },
       "meter": {
         "id": 23,
@@ -3784,7 +3784,7 @@
         "modulationColor": -52736,
         "parameters": {
           "label": "Audio Output",
-          "file": "media/classical/Zach Classical Mix.wav",
+          "file": "media/ambient/Treescape - Mixed by Mark Slee.wav",
           "trigger": false,
           "looping": true,
           "play": true
@@ -4213,27 +4213,6 @@
         },
         {
           "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
-        },
-        {
-          "description": "APC40 mkII"
         }
       ],
       "mapping": [
@@ -4263,9 +4242,9 @@
         "21508": false
       },
       "preview": {
-        "radius": 5610.553328347961,
-        "theta": -0.2002006049156224,
-        "phi": 0.026467064976692274
+        "radius": 6973.796030224103,
+        "theta": 0.28279939508437746,
+        "phi": 0.008467064976692277
       }
     }
   }

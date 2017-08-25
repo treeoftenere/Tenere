@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1503690456952,
+  "timestamp": 1503690530741,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -3753,14 +3753,14 @@
           "slope": 4.5,
           "Band-1": 0.0,
           "Band-2": 0.0,
-          "Band-3": 0.0,
-          "Band-4": 0.0,
-          "Band-5": 0.0,
-          "Band-6": 0.0,
-          "Band-7": 0.0,
-          "Band-8": 0.0,
-          "Band-9": 0.0,
-          "Band-10": 0.0,
+          "Band-3": 0.1500847955096617,
+          "Band-4": 0.41015532791942766,
+          "Band-5": 0.3965702048518459,
+          "Band-6": 0.22860567324426917,
+          "Band-7": 0.42672020853218473,
+          "Band-8": 0.5321913882385331,
+          "Band-9": 0.09126389204176732,
+          "Band-10": 0.0697485580072571,
           "Band-11": 0.0,
           "Band-12": 0.0,
           "Band-13": 0.0,
@@ -3784,7 +3784,7 @@
         "modulationColor": -52736,
         "parameters": {
           "label": "Audio Output",
-          "file": "media/classical/Zach Classical Mix.wav",
+          "file": "media/ambient/Pop Ambient 2017 Mixed.wav",
           "trigger": false,
           "looping": true,
           "play": true
@@ -4193,6 +4193,48 @@
         }
       ],
       "surfaces": [
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
+        {
+          "description": "APC40 mkII"
+        },
         {
           "description": "APC40 mkII"
         },
