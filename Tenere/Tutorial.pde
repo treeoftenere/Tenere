@@ -157,3 +157,22 @@ public class TestAxis extends LXPattern {
     }
   }
 }
+
+public class TestBranch extends TenerePattern {
+  public String getAuthor() {
+    return "Mark C. Slee";
+  }
+  
+  public final DiscreteParameter branchIndex = new DiscreteParameter("Branch", 0, model.branches.size()); 
+  
+  public TestBranch(LX lx) {
+    super(lx);
+    addParameter("branchIndex", this.branchIndex);
+  }
+  
+  public void run(double deltaMs) {
+    setColors(#000000);
+    setColor(model.branches.get(this.branchIndex.getValuei()), #ffffff);
+  }
+
+}
