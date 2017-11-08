@@ -51,7 +51,6 @@ DiscreteParameter boardNumber = (DiscreteParameter)
 // Processing's main invocation, build our model and set up LX
 void setup() {
   size(1200, 960, P3D);
-  frameRate(60.1); // Weird hack, Windows box does 30 FPS when set to 60 for unclear reasons
   final Timer t = new Timer();
   applet = this;
   tree = buildTree();
@@ -309,6 +308,8 @@ void setup() {
 
   // Use multi-threading for network output
   lx.engine.output.mode.setValue(LXOutput.Mode.RAW);
+  
+  frameRate(60.1); // Weird hack, Windows box does 30 FPS when set to 60 for unclear reasons
 }
 
 private class Settings extends LXComponent {
