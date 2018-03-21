@@ -103,7 +103,9 @@ void setup() {
          } else {
            OPC_ADDRESS = new String[] {
 // THE CURRENT ADDRESSES RESPONDING IN THE TREE
-"10.200.1.64"
+// "10.200.1.64"
+"10.200.1.77",
+"10.200.1.78",
 // "192.168.1.2",        
 // "192.168.1.10",       
 // "192.168.1.12",       
