@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "timestamp": 1547159505628,
+  "timestamp": 1547161309647,
   "engine": {
     "id": 1,
     "class": "heronarts.lx.LXEngine",
@@ -15,7 +15,7 @@
       "crossfader": 1.0,
       "crossfaderBlendMode": 0,
       "speed": 1.0,
-      "focusedChannel": 4,
+      "focusedChannel": 6,
       "cueA": false,
       "cueB": false,
       "multithreaded": true,
@@ -1003,14 +1003,14 @@
         "class": "heronarts.lx.LXChannel",
         "modulationColor": -327425,
         "parameters": {
-          "label": "Channel-5",
+          "label": "Pattern R",
           "arm": false,
           "enabled": true,
-          "cue": true,
+          "cue": false,
           "midiMonitor": false,
           "midiChannel": 16,
-          "autoCycleEnabled": false,
-          "autoCycleTimeSecs": 60.0,
+          "autoCycleEnabled": true,
+          "autoCycleTimeSecs": 45.0,
           "fader": 1.0,
           "crossfadeGroup": 2,
           "blendMode": 0,
@@ -1020,7 +1020,7 @@
         },
         "effects": [],
         "clips": [],
-        "patternIndex": 0,
+        "patternIndex": 9,
         "patterns": [
           {
             "id": 20104,
@@ -1030,7 +1030,7 @@
               "label": "PatternSwarm",
               "speed": 2000.0,
               "base": 10.0,
-              "floor": 20.0
+              "floor": 0.0
             },
             "modulation": {
               "modulators": [],
@@ -1059,7 +1059,7 @@
               "modulations": [],
               "triggers": []
             },
-            "autoCycleEnabled": true
+            "autoCycleEnabled": false
           },
           {
             "id": 20135,
@@ -1094,7 +1094,7 @@
               "modulations": [],
               "triggers": []
             },
-            "autoCycleEnabled": true
+            "autoCycleEnabled": false
           },
           {
             "id": 20190,
@@ -1151,6 +1151,84 @@
               "triggers": []
             },
             "autoCycleEnabled": true
+          },
+          {
+            "id": 20391,
+            "class": "Tenere$PatternScanner",
+            "modulationColor": -196864,
+            "parameters": {
+              "label": "PatternScanner",
+              "speed": 0.5,
+              "sharp": 0.0,
+              "xSlope": 0.0,
+              "zSlope": 0.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20393,
+            "class": "Tenere$PatternStarlight",
+            "modulationColor": -65527,
+            "parameters": {
+              "label": "PatternStarlight",
+              "speed": 3000.0,
+              "numStars": 5000.0,
+              "variance": 0.5
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20395,
+            "class": "Tenere$PatternVortex",
+            "modulationColor": -17920,
+            "parameters": {
+              "label": "PatternVortex",
+              "speed": 2000.0,
+              "size": 240.0,
+              "xPos": -21.4443359375,
+              "yPos": 552.0552368164062,
+              "xSlope": 0.20000000298023224,
+              "ySlope": 0.5,
+              "zSlope": 0.30000001192092896
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20404,
+            "class": "Tenere$PatternWaves",
+            "modulationColor": -16711728,
+            "parameters": {
+              "label": "PatternWaves",
+              "rate": 6000.0,
+              "size": 240.0,
+              "amp1": 0.5,
+              "amp2": 1.399999976158142,
+              "amp3": 0.5,
+              "len1": 1.0,
+              "len2": 0.800000011920929,
+              "len3": 1.5
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
           }
         ]
       },
@@ -1159,7 +1237,7 @@
         "class": "heronarts.lx.LXChannel",
         "modulationColor": -65485,
         "parameters": {
-          "label": "Channel-6",
+          "label": "Pattern R",
           "arm": false,
           "enabled": true,
           "cue": false,
@@ -1168,7 +1246,7 @@
           "autoCycleEnabled": false,
           "autoCycleTimeSecs": 60.0,
           "fader": 0.0,
-          "crossfadeGroup": 0,
+          "crossfadeGroup": 2,
           "blendMode": 0,
           "transitionEnabled": false,
           "transitionTimeSecs": 5.0,
@@ -1295,6 +1373,254 @@
               "speed": 2000.0,
               "base": 10.0,
               "floor": 20.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          }
+        ]
+      },
+      {
+        "id": 20229,
+        "class": "heronarts.lx.LXChannel",
+        "modulationColor": -16742401,
+        "parameters": {
+          "label": "texture",
+          "arm": false,
+          "enabled": true,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": false,
+          "autoCycleTimeSecs": 60.0,
+          "fader": 1.0,
+          "crossfadeGroup": 2,
+          "blendMode": 1,
+          "transitionEnabled": false,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 0,
+        "patterns": [
+          {
+            "id": 20245,
+            "class": "Tenere$TextureInOut",
+            "modulationColor": -16711750,
+            "parameters": {
+              "label": "TextureInOut",
+              "speed": 1000.0,
+              "size": 2.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20262,
+            "class": "Tenere$TextureLoop",
+            "modulationColor": -65504,
+            "parameters": {
+              "label": "TextureLoop",
+              "rate": 500.0,
+              "size": 3.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20265,
+            "class": "Tenere$TextureNone",
+            "modulationColor": -65524,
+            "parameters": {
+              "label": "TextureNone"
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20267,
+            "class": "Tenere$TextureSparkle",
+            "modulationColor": -65373,
+            "parameters": {
+              "label": "TextureSparkle",
+              "speed": 1000.0,
+              "bright": 60.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20374,
+            "class": "Tenere$TextureWave",
+            "modulationColor": -8191745,
+            "parameters": {
+              "label": "TextureWave",
+              "speed": 1000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          }
+        ]
+      },
+      {
+        "id": 20223,
+        "class": "heronarts.lx.LXChannel",
+        "modulationColor": -16761089,
+        "parameters": {
+          "label": "Color",
+          "arm": false,
+          "enabled": true,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": true,
+          "autoCycleTimeSecs": 52.0,
+          "fader": 1.0,
+          "crossfadeGroup": 0,
+          "blendMode": 0,
+          "transitionEnabled": false,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 4,
+        "patterns": [
+          {
+            "id": 20230,
+            "class": "Tenere$ColorSlideshowClouds",
+            "modulationColor": -16711883,
+            "parameters": {
+              "label": "ColorSlideshowClouds",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20233,
+            "class": "Tenere$ColorSlideshowOceans",
+            "modulationColor": -1244929,
+            "parameters": {
+              "label": "ColorSlideshowOceans",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20236,
+            "class": "Tenere$ColorSlideshowSunsets",
+            "modulationColor": -10747649,
+            "parameters": {
+              "label": "ColorSlideshowSunsets",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20239,
+            "class": "Tenere$ColorSlideshowOceans",
+            "modulationColor": -16711708,
+            "parameters": {
+              "label": "ColorSlideshowOceans",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          },
+          {
+            "id": 20242,
+            "class": "Tenere$ColorSlideshowCorals",
+            "modulationColor": -65430,
+            "parameters": {
+              "label": "ColorSlideshowCorals",
+              "rate": 3000.0
+            },
+            "modulation": {
+              "modulators": [],
+              "modulations": [],
+              "triggers": []
+            },
+            "autoCycleEnabled": true
+          }
+        ]
+      },
+      {
+        "id": 20226,
+        "class": "heronarts.lx.LXChannel",
+        "modulationColor": -65514,
+        "parameters": {
+          "label": "Color",
+          "arm": false,
+          "enabled": true,
+          "cue": false,
+          "midiMonitor": false,
+          "midiChannel": 16,
+          "autoCycleEnabled": false,
+          "autoCycleTimeSecs": 60.0,
+          "fader": 0.0,
+          "crossfadeGroup": 0,
+          "blendMode": 0,
+          "transitionEnabled": false,
+          "transitionTimeSecs": 5.0,
+          "transitionBlendMode": 0
+        },
+        "effects": [],
+        "clips": [],
+        "patternIndex": 0,
+        "patterns": [
+          {
+            "id": 20224,
+            "class": "heronarts.lx.pattern.SolidColorPattern",
+            "modulationColor": -65429,
+            "parameters": {
+              "label": "SolidColor",
+              "color/hue": 0.0,
+              "color/brightness": 100.0,
+              "color/saturation": 100.0,
+              "color": -65536
             },
             "modulation": {
               "modulators": [],
@@ -1663,9 +1989,9 @@
       "clipViewVisible": false,
       "modulatorExpanded": {},
       "preview": {
-        "radius": 7877.917615527178,
-        "theta": 0.2647993950843781,
-        "phi": 0.11046706497669216
+        "radius": 4870.8494932032445,
+        "theta": -0.7222006049156224,
+        "phi": -0.030532935023307704
       }
     }
   }
